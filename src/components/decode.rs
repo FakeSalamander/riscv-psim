@@ -128,6 +128,141 @@ mod tests {
     use crate::components::*;
 
     #[test]
+    fn pcmux() {
+        let bcomp: BranchComparator = BranchComparator {
+            r1_in: 0,
+            r2_in: 0,
+            branches_out: true,
+            branches_out_chk: true,
+            r1for_mux_ptr: None,
+            r2for_mux_ptr: None,
+            funct3_in: 0,
+            idex_latch_ptr: None,
+        };
+
+        let pcadd: PCAdder = PCAdder {
+            count_in: 0,
+            count_out: 36,
+            count_out_chk: true,
+            pc_ptr: None,
+        };
+
+        let idexlatch = IDEXLatch {
+            base_pc_in: 0,
+            base_pc_out: 32,
+            base_pc_out_chk: true,
+
+            added_pc_in: 0,
+            added_pc_out: 0,
+            added_pc_out_chk: false,
+
+            r1_data_in: 0,
+            r1_data_out: 1,
+            r1_data_out_chk: false,
+
+            r2_data_in: 0,
+            r2_data_out: 4,
+            r2_data_out_chk: false,
+
+            immediates_in: 2,
+            immediates_out: 2,
+            immediates_out_chk: true,
+
+            rd_index_in: 0,
+            rd_index_out: 0,
+            rd_index_out_chk: false,
+
+            ifid_latch_ptr: None,
+            reg_mem_ptr: None,
+            imm_dec_ptr: None,
+            instr_dec_ptr: None,
+
+            //these won't be displayed on interface!
+            opcode_in: 0,
+            opcode_out: 0b0010011, //a random opcode that shouldn't cause any jumping
+            opcode_out_chk: true,
+
+            funct3_in: 0,
+            funct3_out: 0,
+            funct3_out_chk: false,
+
+            funct7_in: 0,
+            funct7_out: 0,
+            funct7_out_chk: false,
+
+            r1_index_in: 0,
+            r1_index_out: 10,
+            r1_index_out_chk: true,
+
+            r2_index_in: 0,
+            r2_index_out: 11,
+            r2_index_out_chk: true,
+        };
+
+        let alu = ALUnit {
+            op1_in: 0,
+            op2_in: 0,
+
+            result_out: 128, //this is where the jump will take us
+            result_out_chk: true,
+
+            r1pc_mux_ptr: None,
+            r2imm_mux_ptr: None,
+
+            //not listed on GUI!
+            opcode_in: 0,
+            funct3_in: 0,
+            funct7_in: 0,
+            idex_latch_ptr: None,
+        };
+
+        let mut pcmux = PCMux {
+            added_pc_in: 0,
+            result_in: 0,
+            count_out: 0,
+            count_out_chk: false,
+            pc_adder_ptr: Some(&pcadd),
+            alu_ptr: Some(&alu),
+            idex_latch_ptr: Some(&idexlatch),
+            branch_comp_ptr: Some(&bcomp),
+            opcode_in: 0,
+            branches_in: false,
+        };
+
+        pcmux.grab_input();
+        assert!(pcmux.branches_in);
+        assert_eq!(pcmux.added_pc_in, 36);
+        assert_eq!(pcmux.result_in, 128);
+        assert_eq!(pcmux.opcode_in, 0b0010011);
+
+        //test non-jump instruction
+        pcmux.decide();
+
+        assert_eq!(pcmux.count_out, 36);
+
+        //test YES Branch
+        pcmux.opcode_in = 0b1100011; //Branch Opcode
+        pcmux.decide();
+
+        assert_eq!(pcmux.count_out, 128);
+
+        //test NO branch
+        pcmux.branches_in = false;
+        pcmux.decide();
+
+        assert_eq!(pcmux.count_out, 36);
+        //test JAL/JALR
+        pcmux.opcode_in = 0b1101111; //JAL Opcode
+        pcmux.decide();
+
+        assert_eq!(pcmux.count_out, 128);
+        pcmux.opcode_in = 0b1100111; //JALR opcode
+        pcmux.decide();
+
+        assert_eq!(pcmux.count_out, 128);
+    }
+
+    #[test]
     fn ifid_latch() {
         let pc: ProgramCounter = ProgramCounter {
             count_in: 0,
