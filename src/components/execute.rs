@@ -356,6 +356,8 @@ impl BranchComparator<'_> {
             self.r2_in = self.r2for_mux_ptr.unwrap().r2_out;
 
             self.funct3_in = self.idex_latch_ptr.unwrap().funct3_out;
+
+            self.branches_out_chk = true;
         }
     }
 
@@ -1084,6 +1086,174 @@ mod tests {
         r2immmux.decide(); // Test R2 choice.
 
         assert_eq!(r2immmux.op2_out, 1);
+    }
+
+    #[test]
+    fn branchcomp() {
+        let idexlatch = IDEXLatch {
+            base_pc_in: 0,
+            base_pc_out: 32,
+            base_pc_out_chk: true,
+
+            added_pc_in: 0,
+            added_pc_out: 0,
+            added_pc_out_chk: false,
+
+            r1_data_in: 0,
+            r1_data_out: 1,
+            r1_data_out_chk: false,
+
+            r2_data_in: 0,
+            r2_data_out: 4,
+            r2_data_out_chk: false,
+
+            immediates_in: 2,
+            immediates_out: 2,
+            immediates_out_chk: true,
+
+            rd_index_in: 0,
+            rd_index_out: 0,
+            rd_index_out_chk: false,
+
+            ifid_latch_ptr: None,
+            reg_mem_ptr: None,
+            imm_dec_ptr: None,
+            instr_dec_ptr: None,
+
+            //these won't be displayed on interface!
+            opcode_in: 0,
+            opcode_out: 0b0010011,
+            opcode_out_chk: true,
+
+            funct3_in: 0,
+            funct3_out: 0b111,
+            funct3_out_chk: true,
+
+            funct7_in: 0,
+            funct7_out: 0,
+            funct7_out_chk: false,
+
+            r1_index_in: 0,
+            r1_index_out: 10,
+            r1_index_out_chk: true,
+
+            r2_index_in: 0,
+            r2_index_out: 11,
+            r2_index_out_chk: true,
+        };
+        let r1formux = R1ForMux {
+            normal_r1_in: 0, //from IDEX latch, 1
+            exex_r1_in: 0,   //from EX-MEM latch, 2
+            memex_r1_in: 0,  //from WB Mux, 3
+
+            r1_out: 0,
+            r1_out_chk: true,
+
+            idex_latch_ptr: None,
+            exmem_latch_ptr: None,
+            memwb_latch_ptr: None,
+            wb_mux_ptr: None,
+
+            //not shown on GUI
+            exex_rd_in: 0,  //from EX-MEM latch, vary per test
+            memex_rd_in: 0, //from MEM-WB latch, vary per test
+            r1_index_in: 0, //from ID-EX latch, 10
+        };
+
+        let r2formux = R2ForMux {
+            normal_r2_in: 0,
+            exex_r2_in: 0,
+            memex_r2_in: 0,
+
+            r2_out: 1,
+            r2_out_chk: true,
+
+            idex_latch_ptr: None,
+            exmem_latch_ptr: None,
+            memwb_latch_ptr: None,
+            wb_mux_ptr: None,
+
+            //not shown on GUI
+            exex_rd_in: 0,  //from EX-MEM latch, vary per test
+            memex_rd_in: 0, //from MEM-WB latch, vary per test
+            r2_index_in: 0, //from ID-EX latch
+        };
+
+        let mut bcomp = BranchComparator {
+            r1_in: 13,
+            r2_in: 13,
+
+            branches_out: false,
+            branches_out_chk: false,
+
+            r1for_mux_ptr: Some(&r1formux),
+            r2for_mux_ptr: Some(&r2formux),
+
+            funct3_in: 0,
+            idex_latch_ptr: Some(&idexlatch),
+        };
+
+        bcomp.grab_input();
+        assert_eq!(bcomp.r1_in, 0);
+        assert_eq!(bcomp.r2_in, 1);
+        assert_eq!(bcomp.funct3_in, 0b111);
+        assert!(bcomp.branches_out_chk);
+
+        //Test BEQ, false then true
+        bcomp.funct3_in = 0b000;
+        bcomp.compare();
+        assert!(!bcomp.branches_out);
+
+        bcomp.r2_in = 0;
+        bcomp.compare();
+        assert!(bcomp.branches_out);
+
+        //Test BNE, false then true
+        bcomp.funct3_in = 0b001;
+        bcomp.compare();
+        assert!(!bcomp.branches_out);
+
+        bcomp.r2_in = (i32::from(-10)) as u32; //very big unsigned int, very low signed
+        bcomp.compare();
+        assert!(bcomp.branches_out);
+
+        //test BLT, false then true, signed
+        bcomp.funct3_in = 0b100;
+        bcomp.compare();
+        assert!(!bcomp.branches_out);
+
+        bcomp.r1_in = (i32::from(-20)) as u32;
+        bcomp.compare();
+        assert!(bcomp.branches_out);
+
+        //test BGE, signed
+        bcomp.funct3_in = 0b101;
+        bcomp.compare();
+        assert!(!bcomp.branches_out);
+
+        bcomp.r1_in = (i32::from(-5)) as u32;
+        bcomp.compare();
+        assert!(bcomp.branches_out);
+
+        //test BLTU, unsigned
+        bcomp.funct3_in = 0b110;
+        bcomp.compare();
+        assert!(!bcomp.branches_out);
+
+        bcomp.r1_in = 3;
+        bcomp.compare();
+        //println!("{}, {}", bcomp.r1_in, bcomp.r2_in);
+        assert!(bcomp.branches_out);
+
+        //test BGEU, unsigned
+        bcomp.funct3_in = 0b111;
+        bcomp.compare();
+        assert!(!bcomp.branches_out);
+
+        bcomp.r1_in = (i32::from(-20)) as u32;
+        bcomp.r2_in = 40;
+        bcomp.compare();
+        assert!(bcomp.branches_out);
     }
 
     #[test]
