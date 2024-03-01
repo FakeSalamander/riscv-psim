@@ -1,0 +1,234 @@
+MAIN THING TO DO:
+    ASK YOURSELF QUESTIONS
+    FIGURE OUT HOW THIS IS ALL INTERNALLY REPRESENTED IN YOUR CODE
+
+    PUT EITHER ANSWERS, iDEAS< OR OPEN ISSUES
+
+
+    Don't owrry about languae yet
+    dont worry about multithreading yet
+
+- Set up different sub-components  as objects.
+
+    - ALU and other subcomponest should have intermediary attributes for the data they recieve and send, even if it wouldn't be normally present. (call them input/output-holders)
+
+- A singular "step" method/function that calls all of the methods needed to make the processor move forward a step, and coordinates everything
+
+- Every object is responsible for SENDING its data forward
+    - perhaps they each have "has-recieved" bool for every input-holder ? object sending it flicks it on as part of method.
+        - "Step" function flicks all has-recieved bools off at end of step
+
+
+- ISSUE: need a plan for how to go back steps.
+
+- CHECK OUT: using register names as pointers perhaps?
+
+
+    - ISSUE: How do we give an object access to the attributrs of other objects? pointers?
+
+- ISSUE: need a way to convert assembly code into the binary instructions the Instruction memory will hold.
+
+- ISSUE: each object will need a method for displaying its current state, maybe?
+
+- ASK PROF: How big should our Register Memory be? and our Data Memory?
+
+- ASK PROF: How to handle multiplexers.
+
+- ASK PROF: RI-path shows that regB gets sent in anyways. why?
+
+- ASK PROF: what is Hint?
+
+
+SUB-COMPONENT OBJECTS:
+
+    PROGRAM COUNTER
+        - an int attribute with the program count.
+        - input-holder int  attribute for new program count
+
+        - method to send out Pcount to IF latch  & Instruction Memory (latch is for branch unit later)
+        - method to update Pcount with the new input
+
+        QUESSH: does this really need an output-holder?
+
+    PC ADDER
+        - input-holder for received PC
+
+        - output-holder for ouputted PC
+
+        - method for adding 4 to PC
+
+        - method for sending new PC to IF latch
+
+    INSTRUCTION MEMORY
+        - input-holde int attribute for recieved program count
+
+        - output-holder int attribute, for outputted line of code.
+
+        - list attribute; holds integers. each one is a line of the program, in binary.
+
+        - method for taking the program count and fetching the matching instruction.
+
+        - mwthod for sending output-holder instruction to IF
+
+    IF-ID LATCH:
+        -input holder, attribute, and output holder  for UNMODIFIED PROGRAM COUNT (headed for Branch Unit)
+
+        - input-holder, attribute, and output-holer for +4'D PROGRAM COUNT (headed for Program counter)
+
+        - input holder, attribute, output-holder for INSTRUCTION (headed for Decoder)
+
+        - method to send out output-holder stuff, THEN update wiht input-holder
+
+    INSTRUCTION DECODER:
+        - input holder for instruction
+
+        - output holder for opcode
+
+        - output holder for R1 index
+
+        - output holder for R2 index
+
+        - output holder for I2 literal
+
+        - output holder for Mem offset (Headed for ALU A multiplexor)
+
+        - output holder for Branch displaceemnt
+
+        - output holder for destination index
+
+        - method for decoding instruction into index, opcode, etc.
+            -check Opcode first, goes in opcode
+                RR-TYPE-ARITHMETIC: (CHECK 12th bit for this)
+                    - 25-21 goes in R1 index
+                    - 20-16 goes in R2 index
+                    -  4-0  goes in Dest index
+
+                RI_TYPE-ARITHMETIC: (check 12th)
+                    - 25-21 goes in R1 index
+                    - 20-13 goes in I2 literal
+                    -  4-0  goes in Dest index
+
+                LOAD:
+                    - 25-21 goes to Dest index
+                    - 20-16 goes to R2 index
+                    - 15-0  goes in Mem offset
+
+                STORE:
+                    - 25-21 goes to R1 index
+                    - 20-16 goes to R2 index
+                    - 15-0  goes in Mem offset
+
+                COND. BRANCH:
+                    - 25-21 goes to R1 index
+                    - 20-0  goes to Branch disp
+
+                SUBROUTINE BRANCH:
+                    - 25-21 goes to dest. index.
+                    - 20-0  goes to Branch disp
+
+                JUMP:
+                    - 25-21 goes in Dest. index
+                    - 20-16 goes in R2 index
+                    - ????? WHAT IS HINT?
+
+
+        - method for sending all outputs: R1 and R2 to Register Memory, the toehrs to... REVIEW  THIS
+            OPCODE: ????
+            R1 ind: Reg Array
+            R2 ind: Reg Array
+            I2 lit: ALU B Multiplexor
+            MemOff: ALU A Multiplexor (Sign extender first)?
+            Bdisp:  ALU A Multplexer  ( Sign extender first?0
+            FUNCT: ????
+
+    REGISTER MEMORY:
+        - input holder for R1 index
+
+        - input holder for R2 index
+
+        - input holder for Writeback Data
+
+        - input holder for Writeback index
+
+        - Array of actual registers
+
+        - Dictionary that matches register names to pointers to actual registers?
+
+        - output holder for R1 data
+        - output holder for R2 data
+
+        - method to update registers with Writeback data.
+        - method to fetch the right data from registers
+        - method to send output to ID-EX latch
+
+    BRANCH EXTENDER???:
+        ASK?
+
+    OFFSET EXTENDER???:
+
+    ID-EX LATCH:
+        - IH, A, OH for  unmodified program count  (Headed to MULTIPLEXOR B)
+
+                ....for  +4 program count           (EXMEM latch)
+                ....for  R1 data                 ( to ALU, OR Data Mem if STORE, or Zero Test if Branch))
+                ....for  R2 data                    (to ALU)
+                ....for  Write destinaton           (to writeback -regmem)
+                ....for  W index                    (to writeback -regmem)
+                .... for
+
+        - method as usual
+
+    MULTIPLEXOR A:
+        - input holder for R1 data
+        - input holder for Branch Displament
+        - input holder for Memory offset
+
+        ???
+
+    MULTIPLEXOR B:
+        - input holder for R2 data
+        - input holder for I2 literal
+        - input holder for Program Count
+
+    ALU:
+        - input holder for ALU A
+        - input holder for ALU B
+
+        - how does it know which operation???
+
+    EX-MEM LATCH:
+
+        - IH, A, OH for  +4'd Program count (headed for MEM-WB latch)
+
+                ....for  ALU output         (headed for MEM-WB latch + Data Mem + PC multiplexor???)
+                .... for WB destiination    (headed for MEM-WB latch)
+                .... for MemData Input     (headed for Data Memory)
+
+    DATA MEMORY:
+        - input holder for Data Input
+        - input holder for Address
+
+        - perhaps just a kind of "shell object"? Holds pointers to all the actual memory and coordinates it!!!
+
+    MEM-WB LATCH:
+
+        - IH, A, OH for  Data Output
+                ....for  ALU Output
+                ....for  +4d Program Count
+
+        sends all this to WB multiplexor!!
+
+    WB MULTIPLEXOR:
+
+        - how does it decide?
+
+
+
+QUESTIONS: ====================================
+    - How they interface
+
+    - How much the components are broken down
+
+    - What each sub-component is responsible for
+
+

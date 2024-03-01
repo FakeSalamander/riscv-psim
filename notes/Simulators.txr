@@ -1,0 +1,24 @@
+CPU SIMULATOR:
+
+    -Loosely based off of RISC, doesn't directly simulate any specific hardware
+
+    -5 stage Pipleine
+
+    - Simulates Memory, Page Table, Caches
+
+
+QtRvSim:
+    - RISC-V simulator
+
+    - Can choose whether to have pipeline, hazard unit, cache.
+
+
+
+QtMIPS:
+    - MIPS simulatorS
+
+PETER HIGGINGSON
+    -no pipelining, or proper ordering..
+
+
+RIPES

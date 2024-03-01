@@ -1,0 +1,14 @@
+I-type:
+    11:0 bits, sign extended
+    
+S-type:
+    11:0 bits, sign extended
+    
+B-type:
+    12:1 bits, sign extended 
+    
+Utype 
+    31:12 bits
+    
+J-type 
+    20:1 bits, sign extended

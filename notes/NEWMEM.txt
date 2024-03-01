@@ -1,0 +1,24 @@
+-Three levels of cache
+
+    Decide level of associativity
+
+
+    CACHE DESIGN:
+
+        settings holder for overall size
+
+        settings holder for set size
+
+        settings holder for row length
+
+
+        -input holder for physical address
+
+        -intermediary holders for  tag, set index, offset
+
+        - attribute of Set List
+
+            each set is itself a list of Row structs
+
+            - each Row has a Tag, a Valid Bool, and an array of Bytes/Words (unsigned ints?)
+

@@ -1,0 +1,27 @@
+WRITING:
+    - Library has template for formate
+    
+    - Can browse previous thesis
+    
+    
+HOIW TO DO:
+    - Undergraduate Primer + Research Paper
+    
+        - you decide how much of which.
+    
+    
+    INTRO, BACKGROUND, mayb not more
+    
+    
+    
+    UNDERGRAD PRIMER:
+         BACKGEROUND
+        - Say what goes on in a processor
+        
+    
+        - What my code does and what features it has! 
+            - Go back to implementation when run out of implemented features
+            
+    RESEARCH PAPER:
+        - look at handbook
+        - look at other thesis 

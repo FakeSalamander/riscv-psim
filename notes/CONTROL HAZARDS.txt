@@ -1,0 +1,12 @@
+- We have,,,    
+
+    ALU JUMP 
+    
+    
+JAL/JALR:
+    after it execs, FLUSH the ID and EX stages
+    
+    
+BRANCH
+    - uses the branch comparator, I think.
+    
