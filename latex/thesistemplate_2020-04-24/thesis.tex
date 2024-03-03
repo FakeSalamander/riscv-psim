@@ -93,8 +93,10 @@ You can always change the way your abbreviations are formatted. Play around with
 	\centering % You could remove this to move table to the left
 	\begin{tabular}{ll}
 		\textbf{ALU}    & Arithmetic Logic Unit                 \\
+		\textbf{CISC}   & Complex Instruction Set Computer      \\
 		\textbf{CPU}    & Central Processing Unit               \\
 		\textbf{ISA}    & Instruction Set Architecture          \\
+		\textbf{RISC}   & Reduced Instruction Set Computer      \\
 		\textbf{RISC-V} & Reduced Instruction Set Computer Five \\
 	\end{tabular}
 \end{table}
@@ -149,9 +151,30 @@ Ultimately, an ISA is a standard for how a CPU should take any given line of cod
 Though the ISA doesn't ascribe an exact design for how its demands should be met(that's called the \textit{implementation}, and is the domain of the CPU's manufacturer), it so heavily shapes the CPU's capabilities, and therefore indirectly its design, that choosing which ISA to implement is the most important decision one can make when designing a CPU, whether it's real or virtual. As alluded to in the introduction, there are multiple ISAs to choose from, and many more popular ones than RISC-V. So, what makes competing ISAs so different from one another, and why choose RISC-V for this project instead of any of the more popular options?
 
 
-RISC-V is a modern ISA, albeit one that has not experienced widespread success; while it is being actively worked on and there are real RISC-V CPUs in the work, its two contemporaries, x86 and ARM, dominate the Personal Computer CPU and Mobile CPU market entirely. And yet, RISC-V has two major advantages over them that make it the ideal choice for this simulator.
+RISC-V is a modern ISA, albeit one that has not yet experienced widespread success; while it very rapidly growing in use, its two contemporaries, x86 and ARM, dominate the Personal Computer CPU and Mobile CPU market entirely for the time being. And yet, RISC-V has two major advantages over them that make it the ideal choice for this simulator.
 
-The first is, simply, that RISC-V is fully open source. Unlike its two proprietary cousins, the full listings of all the RISC-V instructions are freely available, with details on what behavior is expected of each instruction and exactly how to glean an instruction's parameter from its 32-bit integer representation. This is pr
+The first is, simply, that RISC-V is fully open source. Unlike its two proprietary cousins, the full listings of all the RISC-V instructions are freely available, with details on what behavior is expected of each instruction and exactly how to glean an instruction's parameter from its 32-bit integer representation. Working with open-source sorftware and specifications is good by its very nature in that its development benefits everyone, not just its creators, but it's also a better choice practically.
+
+The second difference is that RISC-V is a RISC ISA, while x86 is a CISC ISA; it's even in the name. These stands for \textit{Reduced Instruction Set Computer} and \textit{Complex Instruction Set Computer} respectively, and they are opposing schools of design for an ISA. The difference ultimately comes down to how many different instructions the ISA lists out: The idea of a CISC ISA is that by providing a very large variety of different instructions, most individual things you'd want a program to do can be performed with just one instruction each. By contrast, a RISC ISA aims to keep its total number of instructions low: While this would mean that code would need more total instructions to accomplish the same task, the idea is that keeping the demands simpler would allow RISC processors to have faster and more efficient designs that offset this cost. This also coincidentally makes RISC processors a much better example for students to study, while still remaining a modern architecture that's growing in widespread use.
+
+\section{What do CPUs and Instructions do?}
+In order to build and understand the design of a CPU, we must first understand what it, in general terms, does. We've already established that a CPU carries out a program consisting of instructions from its ISA. However, what exactly do those instructions demand the CPU do, and what does the CPU have access to to carry it out?
+
+We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here:
+
+1. Read the first instruction from the Instruction Memory.
+
+2. Read the values of whichever registers the instruction calls for.
+
+3. Perform whichever arithmetic operation the instruction calls for, using values from the registers or from the instruction itself as input.
+
+4. If the instruction calls for a value to be read from or stored to the Data Memory, do so.
+
+5. Write back the end-result value of the instruction into the destination register it specified.
+
+6. Read the next instruction from the Instruction Memory, and start over again at step 2. Repeat until end of program.
+
+These five repeating steps are enough to accomplish everything that base version of RISC-V calls for, shockingly!
 
 
 \section{}
