@@ -155,27 +155,36 @@ RISC-V is a modern ISA, albeit one that has not yet experienced widespread succe
 
 The first is, simply, that RISC-V is fully open source. Unlike its two proprietary cousins, the full listings of all the RISC-V instructions are freely available, with details on what behavior is expected of each instruction and exactly how to glean an instruction's parameter from its 32-bit integer representation. Working with open-source sorftware and specifications is good by its very nature in that its development benefits everyone, not just its creators, but it's also a better choice practically.
 
-The second difference is that RISC-V is a RISC ISA, while x86 is a CISC ISA; it's even in the name. These stands for \textit{Reduced Instruction Set Computer} and \textit{Complex Instruction Set Computer} respectively, and they are opposing schools of design for an ISA. The difference ultimately comes down to how many different instructions the ISA lists out: The idea of a CISC ISA is that by providing a very large variety of different instructions, most individual things you'd want a program to do can be performed with just one instruction each. By contrast, a RISC ISA aims to keep its total number of instructions low: While this would mean that code would need more total instructions to accomplish the same task, the idea is that keeping the demands simpler would allow RISC processors to have faster and more efficient designs that offset this cost. This also coincidentally makes RISC processors a much better example for students to study, while still remaining a modern architecture that's growing in widespread use.
+The second difference is that RISC-V is a RISC ISA, while x86 is a CISC ISA; it's even in the name. These stands for \textit{Reduced Instruction Set Computer} and \textit{Complex Instruction Set Computer} respectively, and they are opposing schools of design for an ISA. The difference ultimately comes down to how many different instructions the ISA lists out: The idea of a CISC ISA is that by providing a very large variety of different instructions, most individual things you'd want a program to do can be performed with just one instruction each. By contrast, a RISC ISA aims to keep its total number of instructions low: While this would mean that code would need more total instructions to accomplish the same task, the idea is that keeping the demands simpler would allow RISC processors to have faster and more efficient designs that offset this cost \footnote{\cite{denning}}. This also coincidentally makes RISC processors a much better example for students to study, while still remaining a modern architecture that's growing in widespread use.
 
-\section{What do CPUs and Instructions do?}
+\section{An abstract view at how a CPU works}
 In order to build and understand the design of a CPU, we must first understand what it, in general terms, does. We've already established that a CPU carries out a program consisting of instructions from its ISA. However, what exactly do those instructions demand the CPU do, and what does the CPU have access to to carry it out?
 
-We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here:
+We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Decoder} that reads this raw 32-bit instruction and gleans the important details from it, like what instruction it is, what the inputs and outputs are, or other instruction-specific data. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here:
 
-1. Read the first instruction from the Instruction Memory.
+1. Read the first instruction from the Instruction Memory.\textbf{(IF: Instruction Fetch)}
 
-2. Read the values of whichever registers the instruction calls for.
+2. Decode the fetched instruction, and read the values of whichever registers the instruction calls for. \textbf{(ID: Instruction Decode)}
 
-3. Perform whichever arithmetic operation the instruction calls for, using values from the registers or from the instruction itself as input.
+3. Perform whichever arithmetic operation the instruction calls for, using values from the registers or from the instruction itself as input. \textbf{(EX: Execute)}
 
-4. If the instruction calls for a value to be read from or stored to the Data Memory, do so.
+4. If the instruction calls for a value to be read from or stored to the Data Memory, do so. \textbf{(MEM: Memory)}
 
-5. Write back the end-result value of the instruction into the destination register it specified.
+5. Write back the end-result value of the instruction into the destination register it specified. \textbf{(WB: WriteBack)}
 
 6. Read the next instruction from the Instruction Memory, and start over again at step 2. Repeat until end of program.
 
-These five repeating steps are enough to accomplish everything that base version of RISC-V calls for, shockingly!
+These five repeating steps are enough to accomplish everything that base version of RISC-V calls for, shockingly! It is enough for the CPU to successfully run low-level programs. How these simple instructions build up to the complex operating systems and graphical applications that most are familiar with today is beyond the scope of this project, but the important thing is that it is enough.
 
+It is also enough to get a rough idea of how any given RISC-V instruction is carried out. The full list of instructions can be found on the official \textit{RISC-V Instruction Set Manual} that is freely available online, or on a number of more user-friendly guides like Five EmbedDev's \textit{RISC-V ISA Instruction Quick Reference}. A list of all the instructions in the most basic version of RISC-V, the RV32I Base Integer Instruction Set, can be found (INSERT HERE), but the instructions can be broadly divided into the following categories
+
+\textbf{Control Transfer:} Instructions that call for the CPU to move on to a place in the code that is NOT the next instruction, potentially. These are what make the If-Then statements and Loops of high-level programming languages possible.
+
+\textbf{Store/Load:} The purpose of these instructions are simply to interact with the Data Memory, either storing a value to a specific address or reading a value from it.
+
+\textbf{Register-Register Operation:} These instructions take two registers as input, perform some sort of operation on their two values (an arithmetic operation like addition, or a logical operation like a bitwise AND or NOT), and store the result in a third register.
+
+\textbf{Register-Immediate Operation:} These are the same as RR (Register-Register) instructions, but take as input one register and one hard-coded value. It's the difference between "z = x + y" and "z = x + 3".
 
 \section{}
 

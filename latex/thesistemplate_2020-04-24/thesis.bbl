@@ -1,4 +1,4 @@
-\begin{thebibliography}{16}
+\begin{thebibliography}{17}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname url\endcsname\relax
   \def\url#1{{\tt #1}}\fi
@@ -18,6 +18,12 @@ Angel, E. (2001{\natexlab{a}}).
 Angel, E. (2001{\natexlab{b}}).
 \newblock {\em test second book by angel\/}.
 \newblock Boston, MA: Wesley Addison Longman.
+
+\bibitem[{Denning(1993)}]{denning}
+Denning, P.~J. (1993).
+\newblock The science of computing: Risc architecture.
+\newblock {\em American Scientist\/}, {\em 81\/}(1), 7--10.
+\urlprefix\url{http://www.jstor.org/stable/29774812}
 
 \bibitem[{Deussen \& Strothotte(2000)}]{deussen:2000}
 Deussen, O., \& Strothotte, T. (2000).
