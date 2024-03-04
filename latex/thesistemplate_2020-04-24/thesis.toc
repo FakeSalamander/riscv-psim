@@ -3,10 +3,10 @@
 \contentsline {subsection}{\numberline {0.1.1}What is an ISAs?}{1}{}%
 \contentsline {section}{\numberline {0.2}Why RISC-V?}{2}{}%
 \contentsline {section}{\numberline {0.3}An abstract view at how a CPU works}{3}{}%
-\contentsline {section}{\numberline {0.4}}{4}{}%
-\contentsline {section}{\numberline {0.5}Bibliographies}{4}{}%
-\contentsline {subsection}{\numberline {0.5.1}Tips for Bibliographies}{4}{}%
-\contentsline {section}{\numberline {0.6}Anything else?}{5}{}%
+\contentsline {section}{\numberline {0.4}}{5}{}%
+\contentsline {section}{\numberline {0.5}Bibliographies}{5}{}%
+\contentsline {subsection}{\numberline {0.5.1}Tips for Bibliographies}{5}{}%
+\contentsline {section}{\numberline {0.6}Anything else?}{6}{}%
 \contentsline {chapter}{Chapter 1: Mathematics and Science}{7}{}%
 \contentsline {section}{\numberline {1.1}Math}{7}{}%
 \contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{7}{}%

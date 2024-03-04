@@ -160,7 +160,7 @@ The second difference is that RISC-V is a RISC ISA, while x86 is a CISC ISA; it'
 \section{An abstract view at how a CPU works}
 In order to build and understand the design of a CPU, we must first understand what it, in general terms, does. We've already established that a CPU carries out a program consisting of instructions from its ISA. However, what exactly do those instructions demand the CPU do, and what does the CPU have access to to carry it out?
 
-We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Decoder} that reads this raw 32-bit instruction and gleans the important details from it, like what instruction it is, what the inputs and outputs are, or other instruction-specific data. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here:
+We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Decoder} that reads this raw 32-bit instruction and gleans the important details from it, like what instruction it is, what the inputs and outputs are, or other instruction-specific data. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here below. Note that this plan, and the designs described later, do not accurately describe all CPUs; rather, it is a simple design that, despite that, is fully equipped to execute base RISC-V programs. (REDO AS FOOTNOTE?)
 
 1. Read the first instruction from the Instruction Memory.\textbf{(IF: Instruction Fetch)}
 
@@ -174,17 +174,32 @@ We will go over the exact design of the model of CPU shown here later, with all 
 
 6. Read the next instruction from the Instruction Memory, and start over again at step 2. Repeat until end of program.
 
-These five repeating steps are enough to accomplish everything that base version of RISC-V calls for, shockingly! It is enough for the CPU to successfully run low-level programs. How these simple instructions build up to the complex operating systems and graphical applications that most are familiar with today is beyond the scope of this project, but the important thing is that it is enough.
+These five repeating steps, called stages, are enough to accomplish everything that base version of RISC-V calls for, shockingly! It is enough for the CPU to successfully run low-level programs. How these simple instructions build up to the complex operating systems and graphical applications that most are familiar with today is beyond the scope of this project, but the important thing is that it is enough.
 
-It is also enough to get a rough idea of how any given RISC-V instruction is carried out. The full list of instructions can be found on the official \textit{RISC-V Instruction Set Manual} that is freely available online, or on a number of more user-friendly guides like Five EmbedDev's \textit{RISC-V ISA Instruction Quick Reference}. A list of all the instructions in the most basic version of RISC-V, the RV32I Base Integer Instruction Set, can be found (INSERT HERE), but the instructions can be broadly divided into the following categories
+Do note that the dividing of the process of executing one instruction into five steps is arbitrary. However, this arbitrary 5-stage model is going to be incredibly helpful to implementing the pipeline design/feature of this simulator, which will be described later.
 
-\textbf{Control Transfer:} Instructions that call for the CPU to move on to a place in the code that is NOT the next instruction, potentially. These are what make the If-Then statements and Loops of high-level programming languages possible.
+It is also enough to get a rough idea of how any given RISC-V instruction is carried out. The full list of instructions can be found on the official \textit{RISC-V Instruction Set Manual} that is freely available online, or on a number of more user-friendly guides like Five EmbedDev's \textit{RISC-V ISA Instruction Quick Reference}. A list of all the instructions in the most basic version of RISC-V, the RV32I Base Integer Instruction Set, can be found (INSERT HERE), but the instructions are broadly divided into the following four categories by the \textit{RISC-V Instruction Set Manual}:
 
-\textbf{Store/Load:} The purpose of these instructions are simply to interact with the Data Memory, either storing a value to a specific address or reading a value from it.
 
-\textbf{Register-Register Operation:} These instructions take two registers as input, perform some sort of operation on their two values (an arithmetic operation like addition, or a logical operation like a bitwise AND or NOT), and store the result in a third register.
+\textbf{Register-Register Computation:} These instructions take two registers as input, perform some sort of operation on their two values (an arithmetic operation like addition, or a logical operation like a bitwise AND or NOT), and store the result in a third register.
 
-\textbf{Register-Immediate Operation:} These are the same as RR (Register-Register) instructions, but take as input one register and one hard-coded value. It's the difference between "z = x + y" and "z = x + 3".
+\textbf{Register-Immediate Computation:} These are the same as RR (Register-Register) instructions, but take as input one register and one hard-coded value that's written directly into the program, called an Immediate. It's the difference between "z = x + y" and "z = x + 3".
+
+\textbf{Load/Store:} The purpose of these instructions are simply to interact with the Data Memory, either storing a value to a specific address or reading a value from it.
+
+\textbf{Control Transfer:} Instructions that call for the CPU to move on to a place in the code that is NOT the next instruction, potentially. These are what make the If-Then statements and Loops of high-level programming languages possible. These work because there is a simple \textbf{Program Counter}, PC, attached to the Instruction Memory that simply keeps track of which instruction should be performed next.
+
+Each of these instructions in these categories, conveniently, move through the 5-stage process in roughly the same way based on their category.
+
+\textbf{RR Computation:} Run through the steps as usual, feeding the value of its two input registers as the input for the ALU. ignore step 4, MEM, since Comptutational Instructions do not interact with the Data Memory.
+
+\textbf{RI Computation:} Same as RR; but only one register is read at step 2. the other input value is the immediate, which the Decoder reads from the instruction itself.
+
+\textbf{Load:} Load Instructions have a Register and an Immediate as input, representing the address in data memory to read from, as well as a destination register. They run through all of the steps; in the EX stage, the register value and immediate are added together to get the final address, which is then fed to the Data Memory in the MEM stage. Finally, the data loaded from Data Memory is stored in the destination register.
+
+\textbf{Store:} Store Instructions are similar to Load, but have two registers and an Immediate, with no destination register. The first register + Immediate are the address as usual, but the second register holds the value that is to be stored into memory; and is sent directly to the Data Memory through its own special wire.
+
+\textbf{Control Transfer:} Control Transfer Instructions have an Immediate that describes where the program should jump to, and possibly some registers. They run normally until the EX stage: Here, rather than operate on registers, the ALU is given the Immediate and the current value of the PC, which are added together to determine the Jump location. Some additional computation may be performed in this stage, such as a comparison between registers, and for some instructions the jump destination is written to an output register, but the CPU, at this point, goes back to the IF stage while editing the value of the Program Counter to complete the jump.
 
 \section{}
 
