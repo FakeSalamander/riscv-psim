@@ -6,10 +6,10 @@
 \contentsline {section}{\numberline {0.4}A more detailed look of how a CPU functions}{5}{}%
 \contentsline {section}{\numberline {0.5}CPU-Simulator Features}{6}{}%
 \contentsline {section}{\numberline {0.6}Pipelining}{6}{}%
-\contentsline {section}{\numberline {0.7}}{6}{}%
-\contentsline {section}{\numberline {0.8}Bibliographies}{6}{}%
-\contentsline {subsection}{\numberline {0.8.1}Tips for Bibliographies}{7}{}%
-\contentsline {section}{\numberline {0.9}Anything else?}{7}{}%
+\contentsline {section}{\numberline {0.7}}{7}{}%
+\contentsline {section}{\numberline {0.8}Bibliographies}{7}{}%
+\contentsline {subsection}{\numberline {0.8.1}Tips for Bibliographies}{8}{}%
+\contentsline {section}{\numberline {0.9}Anything else?}{8}{}%
 \contentsline {chapter}{Chapter 1: Mathematics and Science}{9}{}%
 \contentsline {section}{\numberline {1.1}Math}{9}{}%
 \contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{9}{}%
