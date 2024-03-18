@@ -1,0 +1,40 @@
+- make Background into a chapter
+
+
+- "This field"
+    - Add a sentence abt computer architecture first
+    
+    
+- Same thing  with ISA
+
+    - Move Abstract CPU BEFORE ISA
+    
+    
+- IN ISA discussion...
+    - talk not just about instruction
+    
+    - also about what hardware it reveals
+        - r0 is zeor in mips, so on
+        
+        - do this in RISC-V
+        
+- In steps, remove 6th step
+
+        - split step 2 into two, describe  how it is arbitrary
+        
+- Iin pipelining, describe non-5-stages
+        
+        
+- Move CPU features to main body 
+
+
+MAIN BODY:L
+
+    - Two thing to talk about
+        - Your features/implementation
+        
+        
+        - Your design/goals 
+        
+CITING:
+    - Scholar.google.com will get you bibtex
