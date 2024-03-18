@@ -138,8 +138,8 @@ Though there's countless pieces of hardware to study and delve into within this 
 
 Therefore, the aim of this project is to develop a pedagogical simulator program, developed in the Rust programming language and capable of running on modern computers, that simulates a simple RISC-V CPU at the hardware level, running assembly code and then transparently displaying how the code and computed information traverse the inside of the processor. While simple, the simulated CPU implements a 5-stage pipeline design similar to the ones that are mandatory for modern CPUs. The project also seeks to include some user-facing features, like a graphical interface and the ability to step through and rewind through the execution of a program, to make the simulator more intuitive to use.
 
-\section{Background}
-\subsection{What is an ISAs?}
+\chapter*{Background}
+\section{What is an ISAs?}
 
 But first, what does it even mean that the CPU is RISC-V? RISC-V is one of many ISAs, belonging to the RISC family of design.
 
@@ -241,9 +241,21 @@ So, what is this modification? The main thing to be prevented here is that no st
 
 (INSERT CPU + LATCHES DIAGRAM)
 
-There's one latch inbetween each CPU stage, with all of the outputs passing through said latch. They are named after the two stages they separate, with the leftmost being the "IF-ID Latch" for example. No latch is needed after WB, since that stage simply consists of delivering the instruction result to where it needs to go.
+There's one latch inbetween each CPU stage, with all of the outputs passing through said latch. They are named after the two stages they separate, with the leftmost being the "IF-ID Latch" for example. No latch is needed after WB, since that stage simply consists of delivering the instruction result to where it needs to go. The latches have two states: "Open" and "Closed". When the latch is "open", all the circuits operate as normal, as if the latch wasn't even there. When it is closed, the latch "blocks" the incoming inputs while keeping the outputs unchanging: If the ALU's output wire read "13" before the EX-MEM latch was closed, and "4" after, the latch will continue to output "13" to the wire leading from the latch to the Data Memory until the latch is opened again. This achieves the 'holding' effect that was desired, and makes pipelining possible at all! In order to pipeline possible... (REFRESH ON HARDWARE LEVEL OF LATCH OPERATION)
 
-\section{}
+However, even with pipeline and latches in place, there are still other issues that will arise. Ultimately, whoever wrote the code that this CPU is running did so under the fundamental assumption that the CPU executes one instruction of code after the other, sequentially, waiting to finish one instruction before beginning the next. This is not the case in our faster, pipelined CPU; and while that's fine in most cases, it isn't always. There are certain scenarios that can occur in a machine code program where, due to this false assumption, our pipelined CPU as-it-is will produce an output that is wildly different from what the program correctly should. These scenarios are called "Hazards" In order for the pipelined CPU model to be valid, it must  have some way to avoid or correct any hazards that come up! Hazards can be broadly divided into these groups:
+
+- Data Hazards: Hazards that involve the reading and writing of data to registers.
+
+- Branch Hazards: Hazards that involve conditional/branching jump instructions.
+
+(... WERE THERE MORE??)
+
+Let's look at these hazards in more details, and at how the pipeline CPU design can be altereted to handle them.
+
+\section{Data Hazards}
+
+
 
 \section{Bibliographies}
 Of course you will need to cite things, and you will probably accumulate an armful of sources. This is why BibTeX was created. For more information about BibTeX and bibliographies, see our CUS site (\url{web.reed.edu/cis/help/latex/index.html})\footnote{\cite{reedweb:2007}}. There are three pages on this topic: {\it bibtex} (which talks about using BibTeX, at \url{/latex/bibtex.html}), {\it bibtexstyles} (about how to find and use the bibliography style that best suits your needs, at \url{/latex/bibtexstyles.html}) and {\it bibman} (which covers how to make and maintain a bibliography by hand, without BibTeX, at at \url{/latex/bibman.html}). The last page will not be useful unless you have only a few sources. There used to be APA stuff here, but we don't need it since I've fixed this with my apa-good natbib style file.
