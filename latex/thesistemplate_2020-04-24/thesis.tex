@@ -246,26 +246,28 @@ The solution is simple in theory, though difficult in execution: have the CPU be
 
 This is a good time to remind that the choice to subdivide this process into five stages, specifically, is entirely arbitrary. It's easy to see how two of these stages could be combined to have less-than-5 pipeline stages, or how the Instruction Decoding and Register Fetching could be separared into their own stages, but you can go much further than that: Most modern CPUs have somewhere around 5 to 14 distinct pipeline stages, and the outdated \textit{Pentium 4 Prescott} CPU had a whopping 31 stages! (CITATION NEEDED). Theoretically, you'd want to split your CPU into as many pipelined stages as you possibly can; the more instructions you're running at once, the more efficiently the CPU is being utilized. There are tradeoffs and reasons for why this is not the case, which are better to describe later in this section.
 
-Still, this is much, much faster;  in optimal conditions, the CPU can execute 5 instructions per cycle! 
+Still, this is much, much faster;  in optimal conditions, the CPU can execute nearly 5 cycles in the time it would've taken it to do 1 cycle before! Sure, each of those cycles only performs one-fifth of five instructions, but the end result over a long program would still be a five-fold increase in speed!
+
 Of course, conditions are not always optimal. A certain addition will be needed to this diagram for pipelining to be possible at all; A few smaller ones will be needed to handle new issues that arise out of pipelining specifically; and some of those new issues can only be mitigated, not avoided fully. Let's go over these.
 
 The first modification, which makes pipelining possible on a basic level, is to handle coordination. Theoretically, if  every subcomponent of a CPU was perfectly coordinated and each of the five stages each always took the exact same amount of time to complete, one could simply set the CPU going, with a slight alteration to the PC so that it increments its program count 5 times per cycle instead of once. However, this is not the case: In real hardware, one cannot count on parts being perfectly coordinated; and some stages will take more or less time than others. The memory stage, notably, can require time to perform that is magnitudes longer than the other stages when it is required to go off the CPU and into a separate RAM stick, as is often used in more complex modern computers. (NEED FIXING/CITATION) Data memory structures even tend to have specialized on-CPU caches to minimize the need for this; it was originally intended for the CPU simulator to represent these fully as well, but this was proven to be beyond the scope of the project. Instead, the Data Memory is abstracted as a "black-box" subcomponent, which stores an array of data accessible by address through unknown means. Indeed, this entire timing aspect will be largely abstracted away in the simulator, operating entirely on the time unit of a "step" in which each of the instructions currently in the CPU advance by one stage; however, the alteration used to solve this timing issue in real hardware is so essential to the design, and additionally used in some of the solutions for smaller problems that cannot be abstracted away, that they will be included in the simulator regardless. 
 
-\section( The Backbone of Pipelining: Latches)
+\section{The Backbone of Pipelining: Latches}
 
 So, what is this modification? The main thing to be prevented here is that no stage of the CPU should recieve the inputs for the next instruction before it is done performing its computations for its current structure; to keep all five stages in sync. The ideal way to do this is to "hold" the outputs of each stage once they are computed, until the slowest stage completes its computations, and then release them all at once to begin the next step. This "holding" of outputs is done through the addition of a set of "Latches" to the CPU: 
 
 (INSERT CPU + LATCHES DIAGRAM)
 
-There's one latch inbetween each CPU stage, with all of the outputs passing through said latch. They are named after the two stages they separate, with the leftmost being the "IF-ID Latch" for example. No latch is needed after WB, since that stage simply consists of delivering the instruction result to where it needs to go. The latches have two states: "Open" and "Closed". When the latch is "open", all the circuits operate as normal, as if the latch wasn't even there. When it is closed, the latch "blocks" the incoming inputs while keeping the outputs unchanging: If the ALU's output wire read "13" before the EX-MEM latch was closed, and "4" after, the latch will continue to output "13" to the wire leading from the latch to the Data Memory until the latch is opened again. This achieves the 'holding' effect that was desired, and makes pipelining possible at all! In order to pipeline possible... (REFRESH ON HARDWARE LEVEL OF LATCH OPERATION)
+There's one latch inbetween each CPU stage, with all of the outputs passing through said latch. They are named after the two stages they separate, with the leftmost being the "IF-ID Latch" for example. No latch is needed after WB, since that stage simply consists of delivering the instruction result to where it needs to go.
+The latches are their own kind of register; in fact, "Pipeline Register" is another name for them. The latch holds one value for every wire that would pass through it, and constantly outputs said value through to the output end. Then, at the start of every cycle If the ALU's output wire read "13" before the EX-MEM latch was closed, and "4" after, the latch will continue to output "13" to the wire leading from the latch to the Data Memory until the latch is opened again. This achieves the 'holding' effect that was desired, and makes pipelining possible at all! In order to pipeline possible... (REFRESH ON HARDWARE LEVEL OF LATCH OPERATION)
 
-This is one of the reasons why having more pipeline stages incurrs tradeoffs: Simply put, Latches take a small amount of time to open, during which no computation can ocurr. The more pipeline stages your CPU has, the more times this needs to happen during one cycle, and the longer the cycle gets; therefore, adding more pipeline stages inherently has dimishing returns for the CPU's effiency. There are entire studies about measuring the efficiency of CPUs, and how this is impacted by design decisions such as its latch placement.
+This is one of the reasons why having more pipeline stages incurrs diminishing returns, along other tradeoffs: Simply put, Latches take a small amount of time to open, during which no computation can ocurr. The more pipeline stages your CPU has, the more times this needs to happen during one cycle, and the longer the cycle gets; therefore, adding more pipeline stages inherently has dimishing returns for the CPU's effiency. There are entire studies about measuring the efficiency of CPUs, and how this is impacted by design decisions such as its latch placement.
 
 However, even with pipeline and latches in place, even with the efficiency tradeoffs in mind, there are still other issues that will arise from this feature. Ultimately, whoever wrote the code that this CPU is running did so under the fundamental assumption that the CPU executes one instruction of code after the other, sequentially, waiting to finish one instruction before beginning the next. This is not the case in our faster, pipelined CPU; and while that's fine in most cases, it isn't always. There are certain scenarios that can occur in a machine code program where, due to this false assumption, our pipelined CPU as-it-is will produce an output that is wildly different from what the program correctly should. These scenarios are called "Hazards" In order for the pipelined CPU model to be valid, it must  have some way to avoid or correct any hazards that come up! Hazards can be broadly divided into these groups:
 
 - Data Hazards: Hazards that involve the reading and writing of data to registers.
 
-- Branch Hazards: Hazards that involve conditional/branching jump instructions.
+- Control Hazards: Hazards that involve conditional/branching jump instructions.
 
 (... WERE THERE MORE??)
 
@@ -273,7 +275,20 @@ Let's look at these hazards in more details, and at how the pipeline CPU design 
 
 \section{Data Hazards}
 
+Data hazards are best introduced with a simple example, shown in assembly code. Assembly Code that is only one step removed from Machine Code: It's the same line-by-line instructions that deal directly with the CPU's registers and the Data Memory, for the most part, but presented in a way that is somewhat human readable instead of as rows of bits.
 
+For this example, all you need to know is the RISC-V instruction ADDI. The instruction "addi b, a, i", where $a$ and $b$ are registers and $i$ is an immediate value, adds the contents of the $a$ register to the immediate $i$ and stores the result in register $b$. It is not unlike the line of code "b = a + 10" (FORMATTING) in a python program.
+
+Imagine the following program, where $\$r0$, $\$r1$, and $\$r2$ are registers and all registers start with the value 0.
+
+\break
+\begin{verbatim}
+addi $r1, $r0, 3
+addi $r2, $r1, 4
+\end{verbatim}
+
+In a non-pipelined CPU, this program runs fine. Just focusing on the EX and WB stages for now: 
+The CPU starts instruction 1.
 
 \section{Bibliographies}
 Of course you will need to cite things, and you will probably accumulate an armful of sources. This is why BibTeX was created. For more information about BibTeX and bibliographies, see our CUS site (\url{web.reed.edu/cis/help/latex/index.html})\footnote{\cite{reedweb:2007}}. There are three pages on this topic: {\it bibtex} (which talks about using BibTeX, at \url{/latex/bibtex.html}), {\it bibtexstyles} (about how to find and use the bibliography style that best suits your needs, at \url{/latex/bibtexstyles.html}) and {\it bibman} (which covers how to make and maintain a bibliography by hand, without BibTeX, at at \url{/latex/bibman.html}). The last page will not be useful unless you have only a few sources. There used to be APA stuff here, but we don't need it since I've fixed this with my apa-good natbib style file.

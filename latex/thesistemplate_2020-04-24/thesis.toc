@@ -5,11 +5,11 @@
 \contentsline {section}{\numberline {0.4}A more detailed look of how a CPU functions}{7}{}%
 \contentsline {section}{\numberline {0.5}CPU-Simulator Features}{8}{}%
 \contentsline {section}{\numberline {0.6}Pipelining}{8}{}%
-\contentsline {section}{\numberline {0.7}(}{9}{}%
+\contentsline {section}{\numberline {0.7}The Backbone of Pipelining: Latches}{9}{}%
 \contentsline {section}{\numberline {0.8}Data Hazards}{10}{}%
-\contentsline {section}{\numberline {0.9}Bibliographies}{10}{}%
+\contentsline {section}{\numberline {0.9}Bibliographies}{11}{}%
 \contentsline {subsection}{\numberline {0.9.1}Tips for Bibliographies}{11}{}%
-\contentsline {section}{\numberline {0.10}Anything else?}{11}{}%
+\contentsline {section}{\numberline {0.10}Anything else?}{12}{}%
 \contentsline {chapter}{Chapter 1: Mathematics and Science}{13}{}%
 \contentsline {section}{\numberline {1.1}Math}{13}{}%
 \contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{13}{}%
