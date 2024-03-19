@@ -126,6 +126,7 @@ OUTPUT thesis.lof
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmr17.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmti12.tfm
+INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmsl12.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/latex-fonts/lasy10.tfm
@@ -137,7 +138,6 @@ INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
-INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmsl12.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmtt12.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmr12.tfm
 INPUT /opt/texlive/2023/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm

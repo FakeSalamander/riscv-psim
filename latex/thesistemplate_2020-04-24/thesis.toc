@@ -1,29 +1,30 @@
 \contentsline {chapter}{Introduction}{1}{}%
-\contentsline {section}{\numberline {0.1}What is an ISAs?}{3}{}%
-\contentsline {section}{\numberline {0.2}Why RISC-V?}{3}{}%
-\contentsline {section}{\numberline {0.3}An abstract view of how a CPU functions}{4}{}%
-\contentsline {section}{\numberline {0.4}A more detailed look of how a CPU functions}{6}{}%
-\contentsline {section}{\numberline {0.5}CPU-Simulator Features}{7}{}%
-\contentsline {section}{\numberline {0.6}Pipelining}{7}{}%
-\contentsline {section}{\numberline {0.7}Data Hazards}{9}{}%
-\contentsline {section}{\numberline {0.8}Bibliographies}{9}{}%
-\contentsline {subsection}{\numberline {0.8.1}Tips for Bibliographies}{9}{}%
-\contentsline {section}{\numberline {0.9}Anything else?}{10}{}%
-\contentsline {chapter}{Chapter 1: Mathematics and Science}{11}{}%
-\contentsline {section}{\numberline {1.1}Math}{11}{}%
-\contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{11}{}%
-\contentsline {subsection}{\numberline {1.2.1}Typesetting reactions}{12}{}%
-\contentsline {subsection}{\numberline {1.2.2}Other examples of reactions}{12}{}%
-\contentsline {section}{\numberline {1.3}Physics}{12}{}%
-\contentsline {section}{\numberline {1.4}Biology}{12}{}%
-\contentsline {chapter}{Chapter 2: Tables and Graphics}{13}{}%
-\contentsline {section}{\numberline {2.1}Tables}{13}{}%
-\contentsline {section}{\numberline {2.2}Figures}{15}{}%
-\contentsline {section}{\numberline {2.3}More Figure Stuff}{17}{}%
-\contentsline {section}{\numberline {2.4}Even More Figure Stuff}{17}{}%
-\contentsline {subsection}{\numberline {2.4.1}Common Modifications}{17}{}%
-\contentsline {chapter}{Conclusion}{19}{}%
-\contentsline {section}{\numberline {4.1}More info}{19}{}%
-\contentsline {chapter}{Appendix A: The First Appendix}{21}{}%
-\contentsline {chapter}{Appendix B: The Second Appendix, for Fun}{23}{}%
-\contentsline {chapter}{References}{25}{}%
+\contentsline {section}{\numberline {0.1}An abstract view of how a CPU functions}{3}{}%
+\contentsline {section}{\numberline {0.2}What is an ISAs?}{4}{}%
+\contentsline {section}{\numberline {0.3}Why RISC-V?}{5}{}%
+\contentsline {section}{\numberline {0.4}A more detailed look of how a CPU functions}{7}{}%
+\contentsline {section}{\numberline {0.5}CPU-Simulator Features}{8}{}%
+\contentsline {section}{\numberline {0.6}Pipelining}{8}{}%
+\contentsline {section}{\numberline {0.7}(}{9}{}%
+\contentsline {section}{\numberline {0.8}Data Hazards}{10}{}%
+\contentsline {section}{\numberline {0.9}Bibliographies}{10}{}%
+\contentsline {subsection}{\numberline {0.9.1}Tips for Bibliographies}{11}{}%
+\contentsline {section}{\numberline {0.10}Anything else?}{11}{}%
+\contentsline {chapter}{Chapter 1: Mathematics and Science}{13}{}%
+\contentsline {section}{\numberline {1.1}Math}{13}{}%
+\contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{13}{}%
+\contentsline {subsection}{\numberline {1.2.1}Typesetting reactions}{14}{}%
+\contentsline {subsection}{\numberline {1.2.2}Other examples of reactions}{14}{}%
+\contentsline {section}{\numberline {1.3}Physics}{14}{}%
+\contentsline {section}{\numberline {1.4}Biology}{14}{}%
+\contentsline {chapter}{Chapter 2: Tables and Graphics}{15}{}%
+\contentsline {section}{\numberline {2.1}Tables}{15}{}%
+\contentsline {section}{\numberline {2.2}Figures}{17}{}%
+\contentsline {section}{\numberline {2.3}More Figure Stuff}{19}{}%
+\contentsline {section}{\numberline {2.4}Even More Figure Stuff}{19}{}%
+\contentsline {subsection}{\numberline {2.4.1}Common Modifications}{19}{}%
+\contentsline {chapter}{Conclusion}{21}{}%
+\contentsline {section}{\numberline {4.1}More info}{21}{}%
+\contentsline {chapter}{Appendix A: The First Appendix}{23}{}%
+\contentsline {chapter}{Appendix B: The Second Appendix, for Fun}{25}{}%
+\contentsline {chapter}{References}{27}{}%

@@ -3,12 +3,13 @@
 
 - "This field"
     - Add a sentence abt computer architecture first
-    
+    DONE
     
 - Same thing  with ISA
 
     - Move Abstract CPU BEFORE ISA
     
+    DONE
     
 - IN ISA discussion...
     - talk not just about instruction
@@ -17,12 +18,16 @@
         - r0 is zeor in mips, so on
         
         - do this in RISC-V
+
+    TO-DO: Review RISC-V's hardware specifications!
         
 - In steps, remove 6th step
 
         - split step 2 into two, describe  how it is arbitrary
-        
+        DONE
+
 - Iin pipelining, describe non-5-stages
+    DONE!!!
         
         
 - Move CPU features to main body 
