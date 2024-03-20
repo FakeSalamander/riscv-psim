@@ -166,11 +166,11 @@ There are many simplifications and concerns ignored in this explanation, but one
 
 \section{What is an ISAs?}
 
-These questions all have the same answer; and so does an entirely different question, one you might've asked yourself back in the introduction: What does it even mean that a CPU is \textit{RISC-V}? 
+These questions all have the same answer; and so does an entirely different question, one you might've asked yourself back in the introduction: What does it even mean that a CPU is \textit{RISC-V}?
 
 The answer is, ISAs. ISAs are how CPUs know how to read machine code not specifically tailored to them; and RISC-V is one of many ISAs, belonging to the RISC family of design. So, what are they?
 
-Starting from the top, ISA stands for Instruction Set Architecture; you may have also heard it reffered to as just a CPU's "architecture", or of popular ISAs like x86 and ARM. We will go into the details later, but for now an ISA is simply a list of machine-code instructions that a CPU can carry out: These instructions are things like basic arithmetic operations (addition, subtraction, etc), calls to load or store data from the memory, or even jump instructions to alter the flow of the program; it specifies how to decode any machine-code instruction, stored as a set of bits, exactly. Ultimately, a program is just a list of these instructions, one after the other, that the CPU executes in order. 
+Starting from the top, ISA stands for Instruction Set Architecture; you may have also heard it reffered to as just a CPU's "architecture", or of popular ISAs like x86 and ARM. We will go into the details later, but for now an ISA is simply a list of machine-code instructions that a CPU can carry out: These instructions are things like basic arithmetic operations (addition, subtraction, etc), calls to load or store data from the memory, or even jump instructions to alter the flow of the program; it specifies how to decode any machine-code instruction, stored as a set of bits, exactly. Ultimately, a program is just a list of these instructions, one after the other, that the CPU executes in order.
 
 The ISA also contains certain hardware specifications that the CPU should be assumed to have: Things like the amount of registers available and how large a value they can store, or how the program counter ought to be measured, or even certain demands to make life easier for programmers. For example, the MIPS ISA demands that the 0th register, "Register r0", be hardcoded to the value zero at all times, so that programmers have easy access to it. While centered around the instructions, these additional demands are a glimpse into how important and widespread the ISA is in a CPU's design. (INSERT RISC-V SPECIFIC STUFF HERE)
 
@@ -226,7 +226,7 @@ Most of the components shown here have already been explained earlier, albeit wi
 
 3. Lastly, there are multiplexors, drawn as (INSERT INFO HERE), throughout. These simply take multiple inputs and, based on the state of the CPU, decide which one should pass through. For example, the two multiplexors right before the ALU need to decide to let the values from registers r1 and r2 pass on an RR instruction, but let the current PC and the Immediate pass in during a Control Transfer instruction.
 
-This is enough to understand the CPU simulator, for the most part; rather than simply take in a machine-code program and execute it as efficiently as possible, which would be trivial to do in a modern high-level programming language, the simulator represents each of these components individually as structs, so that the flow of data through the CPU circuits can be displayed accurately. 
+This is enough to understand the CPU simulator, for the most part; rather than simply take in a machine-code program and execute it as efficiently as possible, which would be trivial to do in a modern high-level programming language, the simulator represents each of these components individually as structs, so that the flow of data through the CPU circuits can be displayed accurately.
 
 \section{CPU-Simulator Features}
 
@@ -250,11 +250,11 @@ Still, this is much, much faster;  in optimal conditions, the CPU can execute ne
 
 Of course, conditions are not always optimal. A certain addition will be needed to this diagram for pipelining to be possible at all; A few smaller ones will be needed to handle new issues that arise out of pipelining specifically; and some of those new issues can only be mitigated, not avoided fully. Let's go over these.
 
-The first modification, which makes pipelining possible on a basic level, is to handle coordination. Theoretically, if  every subcomponent of a CPU was perfectly coordinated and each of the five stages each always took the exact same amount of time to complete, one could simply set the CPU going, with a slight alteration to the PC so that it increments its program count 5 times per cycle instead of once. However, this is not the case: In real hardware, one cannot count on parts being perfectly coordinated; and some stages will take more or less time than others. The memory stage, notably, can require time to perform that is magnitudes longer than the other stages when it is required to go off the CPU and into a separate RAM stick, as is often used in more complex modern computers. (NEED FIXING/CITATION) Data memory structures even tend to have specialized on-CPU caches to minimize the need for this; it was originally intended for the CPU simulator to represent these fully as well, but this was proven to be beyond the scope of the project. Instead, the Data Memory is abstracted as a "black-box" subcomponent, which stores an array of data accessible by address through unknown means. Indeed, this entire timing aspect will be largely abstracted away in the simulator, operating entirely on the time unit of a "step" in which each of the instructions currently in the CPU advance by one stage; however, the alteration used to solve this timing issue in real hardware is so essential to the design, and additionally used in some of the solutions for smaller problems that cannot be abstracted away, that they will be included in the simulator regardless. 
+The first modification, which makes pipelining possible on a basic level, is to handle coordination. Theoretically, if  every subcomponent of a CPU was perfectly coordinated and each of the five stages each always took the exact same amount of time to complete, one could simply set the CPU going, with a slight alteration to the PC so that it increments its program count 5 times per cycle instead of once. However, this is not the case: In real hardware, one cannot count on parts being perfectly coordinated; and some stages will take more or less time than others. The memory stage, notably, can require time to perform that is magnitudes longer than the other stages when it is required to go off the CPU and into a separate RAM stick, as is often used in more complex modern computers. (NEED FIXING/CITATION) Data memory structures even tend to have specialized on-CPU caches to minimize the need for this; it was originally intended for the CPU simulator to represent these fully as well, but this was proven to be beyond the scope of the project. Instead, the Data Memory is abstracted as a "black-box" subcomponent, which stores an array of data accessible by address through unknown means. Indeed, this entire timing aspect will be largely abstracted away in the simulator, operating entirely on the time unit of a "step" in which each of the instructions currently in the CPU advance by one stage; however, the alteration used to solve this timing issue in real hardware is so essential to the design, and additionally used in some of the solutions for smaller problems that cannot be abstracted away, that they will be included in the simulator regardless.
 
 \section{The Backbone of Pipelining: Latches}
 
-So, what is this modification? The main thing to be prevented here is that no stage of the CPU should recieve the inputs for the next instruction before it is done performing its computations for its current structure; to keep all five stages in sync. The ideal way to do this is to "hold" the outputs of each stage once they are computed, until the slowest stage completes its computations, and then release them all at once to begin the next step. This "holding" of outputs is done through the addition of a set of "Latches" to the CPU: 
+So, what is this modification? The main thing to be prevented here is that no stage of the CPU should recieve the inputs for the next instruction before it is done performing its computations for its current structure; to keep all five stages in sync. The ideal way to do this is to "hold" the outputs of each stage once they are computed, until the slowest stage completes its computations, and then release them all at once to begin the next step. This "holding" of outputs is done through the addition of a set of "Latches" to the CPU:
 
 (INSERT CPU + LATCHES DIAGRAM)
 
@@ -279,7 +279,7 @@ Data hazards are best introduced with a simple example, shown in assembly code. 
 
 For this example, all you need to know is the RISC-V instruction ADDI. The instruction "addi b, a, i", where $a$ and $b$ are registers and $i$ is an immediate value, adds the contents of the $a$ register to the immediate $i$ and stores the result in register $b$. It is not unlike the line of code "b = a + 10" (FORMATTING) in a python program.
 
-Imagine the following program, where $\$r0$, $\$r1$, and $\$r2$ are registers and all registers start with the value 0.
+Imagine the following program snippet, where $\$r0$, $\$r1$, and $\$r2$ are registers and all registers start with the value 0.
 
 \break
 \begin{verbatim}
@@ -287,8 +287,53 @@ addi $r1, $r0, 3
 addi $r2, $r1, 4
 \end{verbatim}
 
-In a non-pipelined CPU, this program runs fine. Just focusing on the EX and WB stages for now: 
-The CPU starts instruction 1.
+In a non-pipelined CPU, this program runs fine, as shown below. The steps relevant to this example are described by cycle; the IF and MEM stages do not matter to the example and will thus be skipped over.
+
+(INSERT DATAHAZARD-NOPIPELINE FIGURE)
+
+Cycle 2: Fetch the value of input register $\$r0$, $0$, from Register Memory.
+
+Cycle 3: ALU executes $0 + 3$, its output is $3$.
+
+Cycle 5: The output, $3$, is written back to the $\$r1$ register in the Register Memory.
+
+Cycle 7: Fetch the value of input register $\$r1$, $3$, from Register Memory.
+
+Cycle 8: ALU executes $3 + 4$, its output is $7$.
+
+Cycle 10: The output, $7$, is written back to the $\$r2$ register.
+
+\vspace{5mm}
+
+The end result is a state where $\$r1$ holds the value of $3$ and $\$r2$ holds the value of $4$. This is the correct output, and what any such person would expect this code snippet to perform with the described starting conditions. However, look at what happens if we run the same code snippet through our pipelined design:
+
+(INSERT DATAHAZARD-PIPELINE FIGURE)
+
+Cycle 2:
+
+\qquad Instr 1 ID:  Fetch value of input register $\$r0$, $0$, from R Mem.
+
+Cycle 3:
+
+\qquad Instr 1 EX: ALU excecutes $0 + 3$, output is $3$
+
+\qquad Instr 2 ID: Fetch value of input register $\$r1$, $0$, from R Mem.
+
+Cycle 4:
+
+\qquad Instr 2 EX: ALU executes $0 + 4$, output is $4$
+
+Cycle 5:
+
+\qquad Instr 1 WB: The output, $3$, is written back to the $\$r1$ register.
+
+Cycle 6
+
+\qquad Instr 2 WB: The output, $4$, is written back to the $\$r2$ register.
+
+\vspace{5mm}
+
+This time, the end value of $\$r2$ is, erroneously, $4$ instead of $7$! The pipelined CPU gives an incorrect output, and the reason boils down to this: \textbf{the output of Instruction 1 is needed for the correct input of Instruction 2, since $\$r1$ is both the former's destination register and the latter's input register}. But, Instruction 1's WB stage happens \textbf{AFTER} Instruction 2's ID stage. In most cases, this would be fine; but not when the second instruction is trying to read from the same register that the first instruction modifies. It will happen even if these two instructions aren't directly sequential; only after the two are far enough temporally that the former's WB stage ocurrs before the latter's ID stage (NOTE: WHAT HAPPENS IF THEYRE ON SAME STEP?) does it stop being an issue.
 
 \section{Bibliographies}
 Of course you will need to cite things, and you will probably accumulate an armful of sources. This is why BibTeX was created. For more information about BibTeX and bibliographies, see our CUS site (\url{web.reed.edu/cis/help/latex/index.html})\footnote{\cite{reedweb:2007}}. There are three pages on this topic: {\it bibtex} (which talks about using BibTeX, at \url{/latex/bibtex.html}), {\it bibtexstyles} (about how to find and use the bibliography style that best suits your needs, at \url{/latex/bibtexstyles.html}) and {\it bibman} (which covers how to make and maintain a bibliography by hand, without BibTeX, at at \url{/latex/bibman.html}). The last page will not be useful unless you have only a few sources. There used to be APA stuff here, but we don't need it since I've fixed this with my apa-good natbib style file.
