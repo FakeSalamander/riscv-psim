@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex thesis"] 1710888381 "thesis.aux" "thesis.bbl" "thesis" 1710888382 0
+["bibtex thesis"] 1710998557 "thesis.aux" "thesis.bbl" "thesis" 1710998664 0
   "./APA/apa-good.bst" 1701998296 29521 681759d6fea01a76087da65eae747ed5 ""
   "./thesis.bib" 1709501391 5528 a78bad4ccfb7ae2bba3e2b34168ecb8d ""
-  "thesis.aux" 1710888382 5941 505950910989b0e8b464b7109f8f1eeb "pdflatex"
+  "thesis.aux" 1710998664 6042 7d8e852c09d1e6d6add94bf75ca02a11 "pdflatex"
   (generated)
   "thesis.bbl"
   "thesis.blg"
   (rewritten before read)
-["pdflatex"] 1710888381 "/home/ralsei/Documents/SCHOOL/thesis/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" "thesis.pdf" "thesis" 1710888382 0
-  "/home/ralsei/Documents/SCHOOL/thesis/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" 1710888381 59195 191a5c8cc0541a0c40a02e367ae6864e ""
+["pdflatex"] 1710998664 "/home/ralsei/Documents/SCHOOL/thesis/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" "thesis.pdf" "thesis" 1710998664 0
+  "/home/ralsei/Documents/SCHOOL/thesis/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" 1710998663 60953 65b63a3d6c371db0c4a301bca51d472b ""
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1704400182 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1704400182 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1704400182 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
@@ -94,12 +94,12 @@
   "chemarr.sty" 1701998296 2427 429918874401aa8c2f0b441e3fc621f5 ""
   "reedthesis.cls" 1701998296 8293 480a01b2533a1585368760477c470aa0 ""
   "subdivision.pdf" 1701998296 11808 5cb09e199f00728bd95a288d1958f4c8 ""
-  "thesis.aux" 1710888382 5941 505950910989b0e8b464b7109f8f1eeb "pdflatex"
-  "thesis.bbl" 1710888381 3807 f8ebcac383855ef03017b04c63166ff5 "bibtex thesis"
-  "thesis.lof" 1710888382 514 bf3cfc71fc42fc0e4dcff937f5ce0463 "pdflatex"
-  "thesis.lot" 1710888382 304 74ee99c8117965224ee7cae48f87f473 "pdflatex"
-  "thesis.tex" 1710888381 59195 191a5c8cc0541a0c40a02e367ae6864e ""
-  "thesis.toc" 1710888382 1968 7f0049d56013eec7e2ab8341f72f65ec "pdflatex"
+  "thesis.aux" 1710998664 6042 7d8e852c09d1e6d6add94bf75ca02a11 "pdflatex"
+  "thesis.bbl" 1710998557 3807 f8ebcac383855ef03017b04c63166ff5 "bibtex thesis"
+  "thesis.lof" 1710998664 514 6722cb21085034210f0e336e3f1cd31c "pdflatex"
+  "thesis.lot" 1710998664 304 df0a08dc55cb0b7e25da5eb2e40b219f "pdflatex"
+  "thesis.tex" 1710998663 60953 65b63a3d6c371db0c4a301bca51d472b ""
+  "thesis.toc" 1710998664 2028 42aac42da96944ef4e5fa57023ceb63c "pdflatex"
   (generated)
   "thesis.aux"
   "thesis.lof"

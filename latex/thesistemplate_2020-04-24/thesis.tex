@@ -333,7 +333,30 @@ Cycle 6
 
 \vspace{5mm}
 
-This time, the end value of $\$r2$ is, erroneously, $4$ instead of $7$! The pipelined CPU gives an incorrect output, and the reason boils down to this: \textbf{the output of Instruction 1 is needed for the correct input of Instruction 2, since $\$r1$ is both the former's destination register and the latter's input register}. But, Instruction 1's WB stage happens \textbf{AFTER} Instruction 2's ID stage. In most cases, this would be fine; but not when the second instruction is trying to read from the same register that the first instruction modifies. It will happen even if these two instructions aren't directly sequential; only after the two are far enough temporally that the former's WB stage ocurrs before the latter's ID stage (NOTE: WHAT HAPPENS IF THEYRE ON SAME STEP?) does it stop being an issue.
+This time, the end value of $\$r2$ is, erroneously, $4$ instead of $7$! The pipelined CPU gives an incorrect output, and the reason boils down to this: \textbf{the output of Instruction 1 is needed for the correct input of Instruction 2, since $\$r1$ is both the former's destination register and the latter's input register}. But, Instruction 1's WB stage happens \textbf{AFTER} Instruction 2's ID stage. In most cases, this would be fine; but not when the second instruction is trying to read from the same register that the first instruction modifies. It will happen even if these two instructions aren't directly sequential; only after the two are far enough temporally that the former's WB stage ocurrs at the same time as the latter's ID stage does it stop being an issue.
+
+At the very least, having a program return a consistently incorrect output is unnaceptable, and we need to fix that. But, how?
+
+\section{Stalling}
+
+The first solution that might come to mind is: "Why don't we pause the CPU when a Data Hazard is incoming, so that it has time to catch up?". And, this is shockingly a good suggestion! The idea is simple: As it is in the example, the update to $\$r1$, ocurring at the start of Instruction 1's WB stage, was needed halfway through Instruction 2's ID stage (Register acessing happens during the latter half of the ID stage, after the Decoder has gone). The red arrow in the diagram represents this desired update that needs to happen for correctness.
+
+(DATAHAZARD-NOSTALL DIAGRAM)
+
+So, we could just delay the execution of Instruction 2 by three cycles...
+
+(DATAHAZARD-STALL DIAGRAM)
+
+And now the program will execute correctly! This process, called "Stalling", can be applied dynamically, too; if a Data Hazard happens by just one stage of difference, the offending instruction only needs to be stalled one cycle. This method inherently costs us some of the efficiency that pipelining offers either way, though.
+
+But, how is this Stalling implemented? As it is now, our pipelined CPU functions, but it will simply barrel forward without control: At the start of every CPU cycle, all the latches fire and transfer their information forward to the next stage. Luckily, we already have the perfect tool to control this flow, and it's those latches themselves!
+
+Let's add a new functionality to our latches. As they are now, the latcher are in "Transfer" mode:
+
+\qquad \textbf{Transfer:} At the start of cycle, take the incoming currents of the previous stage and update the outgoing currents to match.
+
+Now, let's add two other possible modes:
+
 
 \section{Bibliographies}
 Of course you will need to cite things, and you will probably accumulate an armful of sources. This is why BibTeX was created. For more information about BibTeX and bibliographies, see our CUS site (\url{web.reed.edu/cis/help/latex/index.html})\footnote{\cite{reedweb:2007}}. There are three pages on this topic: {\it bibtex} (which talks about using BibTeX, at \url{/latex/bibtex.html}), {\it bibtexstyles} (about how to find and use the bibliography style that best suits your needs, at \url{/latex/bibtexstyles.html}) and {\it bibman} (which covers how to make and maintain a bibliography by hand, without BibTeX, at at \url{/latex/bibman.html}). The last page will not be useful unless you have only a few sources. There used to be APA stuff here, but we don't need it since I've fixed this with my apa-good natbib style file.
