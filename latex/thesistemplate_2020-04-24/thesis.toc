@@ -8,9 +8,10 @@
 \contentsline {section}{\numberline {0.7}The Backbone of Pipelining: Latches}{9}{}%
 \contentsline {section}{\numberline {0.8}Data Hazards}{10}{}%
 \contentsline {section}{\numberline {0.9}Stalling}{12}{}%
-\contentsline {section}{\numberline {0.10}Bibliographies}{12}{}%
-\contentsline {subsection}{\numberline {0.10.1}Tips for Bibliographies}{12}{}%
-\contentsline {section}{\numberline {0.11}Anything else?}{13}{}%
+\contentsline {section}{\numberline {0.10}Forwarding}{13}{}%
+\contentsline {section}{\numberline {0.11}Bibliographies}{13}{}%
+\contentsline {subsection}{\numberline {0.11.1}Tips for Bibliographies}{14}{}%
+\contentsline {section}{\numberline {0.12}Anything else?}{14}{}%
 \contentsline {chapter}{Chapter 1: Mathematics and Science}{15}{}%
 \contentsline {section}{\numberline {1.1}Math}{15}{}%
 \contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{15}{}%

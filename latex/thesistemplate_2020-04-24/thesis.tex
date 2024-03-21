@@ -351,11 +351,38 @@ And now the program will execute correctly! This process, called "Stalling", can
 
 But, how is this Stalling implemented? As it is now, our pipelined CPU functions, but it will simply barrel forward without control: At the start of every CPU cycle, all the latches fire and transfer their information forward to the next stage. Luckily, we already have the perfect tool to control this flow, and it's those latches themselves!
 
-Let's add a new functionality to our latches. As they are now, the latcher are in "Transfer" mode:
+Let's add a new functionality to our latches. As they are now, the latches are in "Transfer" mode:
 
 \qquad \textbf{Transfer:} At the start of cycle, take the incoming currents of the previous stage and update the outgoing currents to match.
 
 Now, let's add two other possible modes:
+
+\qquad \textbf{Stall:} At the start of cycle, change nothing; keep the previous outgoing currents as they were.
+
+\qquad \textbf{Bubble:} Set the outgoing currents to all-zeroes, regardless of what the ingoing currents were.
+
+Lastly, we add a "Stall Control" subcomponent to the CPU. All it does is determine whether and how it needs to Stall for the given cycle, and  change the latches between these three states to perform the stall. Note: There is an additional fifth "Latch" in this setup, where the Stall Control hooks up to somewhere in the Program Counter circuitry. This simply allows the Stall Control to pause the Program Count's natural per-cycle increment; so long as the instructions are stalling, the program count needs to stall as well or the CPU will start skipping instructions entirely.
+
+But, why are all these modes needed at all? Well, we cannot simply stall out the entire CPU, that is the same as if it wasn't running at all. What we need to do is allow for some instructions, those before the hazard-bearing instruction, to finish running while the rest of the program stops and waits for the desired number of stall cycles.
+
+The Stall Control has all latches set to "Transfer" during normal operation. However, once an instruction with a Data Hazard reaches the ID stage, it alters the latch modes as follows.
+
+(INSERT STALL CONTROL FIGURE HERE)
+
+At this point, the EX, MEM, and WB stages hold the instructions that you do not wish to stall; those are Transfered so they can finish. The IF and ID stages are Stalled (using the PC and IF-ID Latch respectively), holding their current instructions. Lastly, the EX stage gets "Bubbled"; set to an output matching a "NOP" instruction that simply does absolutely nothing. This is quite important: if the EX stage was simply stalled as well, you'd actually start getting duplicates of the instruction immediately predecing the hazard-holding instruction inserted into the pipeline. Thanks to the bubble, harmless 'nop' instructions that alter nothing get sent out instead to fill that gap.
+
+Once the instruction that holds the needed alteration reaches the WB stage, the Stall Control simply flips all latches to Transfer mode, and operation continues as normal. This does successfully resolve the data hazard, and fixes these correctness issues! However, it is still painfully slow, and gives up much of the advantage of pipelining anytime that a register is written to and then read from in quick succession; as it turns, this is rather common. We've already accepted that conditions will not often be optimal for pipelining, but this is a serious blow. Can we do better than that?
+
+\section{Forwarding}
+
+The answer is that yes, we can! Let's go back to our data hazard example, when it is un-stalled:
+
+(DATAHAZARD-NOSTALL DIAGRAM)
+
+Obviously, the issue is clear here: The data needed in the ID isn't ready until Instruction 1's WB stage, and is needed in Instruction 2's ID stage. Except, this isn't really true. Technically, that data has already been computed by the end of Instruction 1's EX stage, found in the output of the ALU. And, it is Instruction 2's EX stage that needs the data for the addition calculation, not the ID; as long as the ALU gets the correct integer input of $4$ instead of $0$, it doesn't care where it came from. So, technically, the desired data to resolve this hazard \textit{is} available by the time it's needed; it just doesn't have the pathway to get there in time. So... what if we added that pathway ourselves?
+
+Introducing forwarding!
+
 
 
 \section{Bibliographies}
