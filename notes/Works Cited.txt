@@ -1,1 +1,15 @@
- 
+
+
+
+
+@INPROCEEDINGS{8052265,
+  author={Olivieri, Mauro and Cheikh, Abdallah and Cerutti, Gianmarco and Mastrandrea, Antonio and Menichelli, Francesco},
+  booktitle={2017 New Generation of CAS (NGCAS)},
+  title={Investigation on the Optimal Pipeline Organization in RISC-V Multi-threaded Soft Processor Cores},
+  year={2017},
+  volume={},
+  number={},
+  pages={45-48},
+  keywords={Microarchitecture;Multicore processing;Digital systems;Instruction sets;Pipelines;Organizations;Production;FPGA;Microprocessors;Embedded Systems;RISCV},
+  doi={10.1109/NGCAS.2017.61}}
+
