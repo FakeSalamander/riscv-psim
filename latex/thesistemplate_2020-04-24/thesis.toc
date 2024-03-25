@@ -2,31 +2,34 @@
 \contentsline {section}{\numberline {0.1}An abstract view of how a CPU functions}{3}{}%
 \contentsline {section}{\numberline {0.2}What is an ISAs?}{4}{}%
 \contentsline {section}{\numberline {0.3}Why RISC-V?}{5}{}%
-\contentsline {section}{\numberline {0.4}A more detailed look of how a CPU functions}{7}{}%
-\contentsline {section}{\numberline {0.5}CPU-Simulator Features}{8}{}%
-\contentsline {section}{\numberline {0.6}Pipelining}{8}{}%
-\contentsline {section}{\numberline {0.7}The Backbone of Pipelining: Latches}{9}{}%
-\contentsline {section}{\numberline {0.8}Data Hazards}{10}{}%
-\contentsline {section}{\numberline {0.9}Stalling}{12}{}%
-\contentsline {section}{\numberline {0.10}Forwarding}{13}{}%
-\contentsline {section}{\numberline {0.11}Bibliographies}{13}{}%
-\contentsline {subsection}{\numberline {0.11.1}Tips for Bibliographies}{14}{}%
-\contentsline {section}{\numberline {0.12}Anything else?}{14}{}%
-\contentsline {chapter}{Chapter 1: Mathematics and Science}{15}{}%
-\contentsline {section}{\numberline {1.1}Math}{15}{}%
-\contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{15}{}%
-\contentsline {subsection}{\numberline {1.2.1}Typesetting reactions}{16}{}%
-\contentsline {subsection}{\numberline {1.2.2}Other examples of reactions}{16}{}%
-\contentsline {section}{\numberline {1.3}Physics}{16}{}%
-\contentsline {section}{\numberline {1.4}Biology}{16}{}%
-\contentsline {chapter}{Chapter 2: Tables and Graphics}{17}{}%
-\contentsline {section}{\numberline {2.1}Tables}{17}{}%
-\contentsline {section}{\numberline {2.2}Figures}{19}{}%
-\contentsline {section}{\numberline {2.3}More Figure Stuff}{21}{}%
-\contentsline {section}{\numberline {2.4}Even More Figure Stuff}{21}{}%
-\contentsline {subsection}{\numberline {2.4.1}Common Modifications}{21}{}%
-\contentsline {chapter}{Conclusion}{23}{}%
-\contentsline {section}{\numberline {4.1}More info}{23}{}%
-\contentsline {chapter}{Appendix A: The First Appendix}{25}{}%
-\contentsline {chapter}{Appendix B: The Second Appendix, for Fun}{27}{}%
-\contentsline {chapter}{References}{29}{}%
+\contentsline {section}{\numberline {0.4}RISC-V Instructions}{6}{}%
+\contentsline {section}{\numberline {0.5}RISC-V Hardware Specifications}{7}{}%
+\contentsline {section}{\numberline {0.6}A more detailed look of how a CPU functions}{8}{}%
+\contentsline {section}{\numberline {0.7}Pipelining}{9}{}%
+\contentsline {subsection}{\numberline {0.7.1}The Backbone of Pipelining: Latches}{10}{}%
+\contentsline {subsection}{\numberline {0.7.2}Data Hazards}{11}{}%
+\contentsline {subsection}{\numberline {0.7.3}Stalling}{13}{}%
+\contentsline {subsection}{\numberline {0.7.4}Forwarding}{14}{}%
+\contentsline {subsection}{\numberline {0.7.5}Control Hazards}{15}{}%
+\contentsline {section}{\numberline {0.8}CPU-Simulator Features}{16}{}%
+\contentsline {section}{\numberline {0.9}Bibliographies}{16}{}%
+\contentsline {subsection}{\numberline {0.9.1}Tips for Bibliographies}{17}{}%
+\contentsline {section}{\numberline {0.10}Anything else?}{17}{}%
+\contentsline {chapter}{Chapter 1: Mathematics and Science}{19}{}%
+\contentsline {section}{\numberline {1.1}Math}{19}{}%
+\contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{19}{}%
+\contentsline {subsection}{\numberline {1.2.1}Typesetting reactions}{20}{}%
+\contentsline {subsection}{\numberline {1.2.2}Other examples of reactions}{20}{}%
+\contentsline {section}{\numberline {1.3}Physics}{20}{}%
+\contentsline {section}{\numberline {1.4}Biology}{20}{}%
+\contentsline {chapter}{Chapter 2: Tables and Graphics}{21}{}%
+\contentsline {section}{\numberline {2.1}Tables}{21}{}%
+\contentsline {section}{\numberline {2.2}Figures}{23}{}%
+\contentsline {section}{\numberline {2.3}More Figure Stuff}{25}{}%
+\contentsline {section}{\numberline {2.4}Even More Figure Stuff}{25}{}%
+\contentsline {subsection}{\numberline {2.4.1}Common Modifications}{25}{}%
+\contentsline {chapter}{Conclusion}{27}{}%
+\contentsline {section}{\numberline {4.1}More info}{27}{}%
+\contentsline {chapter}{Appendix A: The First Appendix}{29}{}%
+\contentsline {chapter}{Appendix B: The Second Appendix, for Fun}{31}{}%
+\contentsline {chapter}{References}{33}{}%

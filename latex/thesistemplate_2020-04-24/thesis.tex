@@ -144,7 +144,7 @@ Therefore, the aim of this project is to develop a pedagogical simulator program
 \section{An abstract view of how a CPU functions}
 In order to build and understand the design of a CPU, we must first understand what it, in general terms, does. We've already established that a CPU carries out a program consisting of instructions from its ISA. However, what exactly do those instructions demand the CPU do, and what does the CPU have access to to carry it out?
 
-We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Decoder} that reads this raw 32-bit instruction and gleans the important details from it, like what instruction it is, what the inputs and outputs are, or other instruction-specific data. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here below. Note that this plan, and the designs described later, do not accurately describe all CPUs; rather, it is a simple design that, despite that, is fully equipped to execute base RISC-V programs. (REDO AS FOOTNOTE?)
+We will go over the exact design of the model of CPU shown here later, with all of its intricacies and small parts. But, in broad terms, the CPU has access to: an \textbf{Instruction Memory}, where the program to be executed is stored instruction-by-instruction. A \textbf{Decoder} that reads this raw instruction, made of bits, and gleans the important details from it, like what instruction it is, what the inputs and outputs are, or other instruction-specific data. A \textbf{Register Memory}, which holds a small amount of numbered registers that store information; think of them as set mini-variables built directly into the CPU that it has quick and easy access to. A \textbf{Data Memory}, external and much larger than the previous two, in which to store larger values; and finally an \textbf{ALU}, Arithmetic Logic Unit, which is simply capable of performing arithmetic operations on the values it is given. This explanation leaves out many crucial components and smaller parts that make the whole thing possible, but they're enough to understand the CPU's general plan, detailed here below. Note that this plan, and the designs described later, do not accurately describe all CPUs; rather, it is a simple design that, despite that, is fully equipped to execute base RISC-V programs. (REDO AS FOOTNOTE?)
 
 1. Read the first instruction from the Instruction Memory.\textbf{(IF: Instruction Fetch)}
 
@@ -189,6 +189,8 @@ The first is, simply, that RISC-V is fully open source. Unlike its two proprieta
 The second difference is that RISC-V is a RISC ISA, while x86 is a CISC ISA; it's even in the name. These stands for \textit{Reduced Instruction Set Computer} and \textit{Complex Instruction Set Computer} respectively, and they are opposing schools of design for an ISA. The difference ultimately comes down to how many different instructions the ISA lists out: The idea of a CISC ISA is that by providing a very large variety of different instructions, most individual things you'd want a program to do can be performed with just one instruction each. By contrast, a RISC ISA aims to keep its total number of instructions low: While this would mean that code would need more total instructions to accomplish the same task, the idea is that keeping the demands simpler would allow RISC processors to have faster and more efficient designs that offset this cost \footnote{\cite{denning}}. This also coincidentally makes RISC processors a much better example for students to study, while still remaining a modern architecture that's growing in widespread use.
 
 
+\section{RISC-V Instructions}
+
 It is also enough to get a rough idea of how any given RISC-V instruction is carried out. The full list of instructions can be found on the official \textit{RISC-V Instruction Set Manual} that is freely available online, or on a number of more user-friendly guides like Five EmbedDev's \textit{RISC-V ISA Instruction Quick Reference}. A list of all the instructions in the most basic version of RISC-V, the RV32I Base Integer Instruction Set, can be found (INSERT HERE), but the instructions are broadly divided into the following four categories by the \textit{RISC-V Instruction Set Manual}:
 
 
@@ -212,6 +214,22 @@ Each of these instructions in these categories, conveniently, move through the 5
 
 \textbf{Control Transfer:} Control Transfer Instructions have an Immediate that describes where the program should jump to, and possibly some registers. They run normally until the EX stage: Here, rather than operate on registers, the ALU is given the Immediate and the current value of the PC, which are added together to determine the Jump location. Some additional computation may be performed in this stage, such as a comparison between registers, and for some instructions the jump destination is written to an output register, but the CPU, at this point, goes back to the IF stage while editing the value of the Program Counter to complete the jump.
 
+Do note that these categories are loose and arbitrary, to an extent. the RISC-V Instruction Manual itself has six "Types" it divides its instructions into, but these have less to do with what the instruction accomplishes and more with the details of how the CPU should read its bits. The categories described above help give a broad overlook of what sort of instructions the RISC-V ISA expects CPU implementations to handle.
+
+\section{RISC-V Hardware Specifications}
+
+An ISA also makes certain demands, or specifications, for the hardware of the CPUs that implement it. Generally, the hardware side of things is the CPU's job, not the ISA; but in order to be compatible with every CPU running under it, an ISA needs to make certain demands.
+
+RISC-V has two base variations to pick from, The \textit{RV32I Base Integer Instruction Set} and the \textit{RV64I Base Integer Instruction Set}. It also has many optional extensions, which are part of why RISC-V can have a simple core while remaining viable for commercial applications. However, it is the Base Integer Instruction Sets, reffered to as RV32I and RV64I respectively from now on, that determines hardware specification, so that is what we will look at now.
+
+RV32I calls for a total of 32 registers. Registers r1 through r31 are general-purpose registers, each capable of holding a 32-bit-wide integer value. r0 is a special register hardwired to the constant value 0, which is useful for many situations.
+
+It specifies that each Instruction should be 32-bits in length, though it doesn't specify how many Instructions the Instruction Memory should be able to hold. And, while the ISA doesn't make any demands of the Data Memory, and actually warns that the environment a program is executed in (like, say, an Operating System) gets to decide which parts of the Data Memory it can access, the amount it can access is upper-bound by the addresses that the RV32I Load and Store instructions can incode in their 32 bits.
+
+RV64I is rather similar, with the difference that the 32 registers have a width of 64 bits each, and that Instructions themselves are 64-bits long.
+
+The RV32I is simpler, and easier to understand at a glance, making it a better choice for an educational simulator.
+
 \section{A more detailed look of how a CPU functions}
 
 This information is enough to build a full hardware model of the CPU that the simulator will use; at least if Pipelining is ignored for now. The following is a visual representation of this model:
@@ -228,13 +246,16 @@ Most of the components shown here have already been explained earlier, albeit wi
 
 This is enough to understand the CPU simulator, for the most part; rather than simply take in a machine-code program and execute it as efficiently as possible, which would be trivial to do in a modern high-level programming language, the simulator represents each of these components individually as structs, so that the flow of data through the CPU circuits can be displayed accurately.
 
-\section{CPU-Simulator Features}
+\chapter*{CPU-Simulator Features}
+
+Before looking at the build of the actual CPU simulator, it is worth going over the features that this simulator seeks to implement.
 
 \section{Pipelining}
 
-However, there is one feature for which the previous CPU diagram is not accurate; it requires alterations to it to be implemented. However, this feature is quite powerful, and used near-universally in RISC-V CPU designs (CITATION NEEDED), and so the simulator is designed with it in mind.
+The most major of these features, Pipelining, must be described first: It is not a feature of the simulator as much as it is a feature of the CPU itself that this program simulates, and the design of the CPU itself must be majorly altered in order for it to be successfully implemented. However, this feature is quite powerful, and used near-universally in RISC-V CPU designs (CITATION NEEDED), and so the simulator is made with it in mind.
 
-The current design has one simple issue: It is painfully slow. This design is capable of executing one instruction per cycle: one instruction per full use of each of the CPU's parts. This may seem good, but at any given moment, most of the CPU is actually going unused: The decoder is waiting on the instruction memory to fetch the instruction it needs to decode, which is waited upon by the register memory that needs the register indices to fetch their data, which is waited upon by the ALU that wants its inputs, so on. When, say, the ALU is firing and computing, the data memory, decoder, instruction memory, ETC, are all entirely dormant. They could, theoretically, be doing something useful at the same time; but because our design handles one instruction at a time, the components before the ALU have already done their part and the components after the ALU are waiting on it to finish and present its output. Theoretically, one could be multiplying efficiency of this CPU many times.
+The previously-described CPU design has one simple issue: It is painfully slow. This design is capable of executing one instruction per cycle: one instruction per full use of each of the CPU's parts. This may seem good, but at any given moment, most of the CPU is actually going unused: The decoder is waiting on the instruction memory to fetch the instruction it needs to decode, which is waited upon by the register memory that needs the register indices to fetch their data, which is waited upon by the ALU that wants its inputs, so on.
+When, say, the ALU is firing and computing, the data memory, decoder, instruction memory, and so on are all entirely dormant. They could, theoretically, be doing something useful at the same time; but because our design handles one instruction at a time, the components before the ALU have already done their part and the components after the ALU are waiting on it to finish and present its output. Theoretically, one could be multiplying efficiency of this CPU many times.
 
 (DIAGRAM HERE OF THE STEPS, SHOW WASTED SPACE )
 
@@ -252,7 +273,7 @@ Of course, conditions are not always optimal. A certain addition will be needed 
 
 The first modification, which makes pipelining possible on a basic level, is to handle coordination. Theoretically, if  every subcomponent of a CPU was perfectly coordinated and each of the five stages each always took the exact same amount of time to complete, one could simply set the CPU going, with a slight alteration to the PC so that it increments its program count 5 times per cycle instead of once. However, this is not the case: In real hardware, one cannot count on parts being perfectly coordinated; and some stages will take more or less time than others. The memory stage, notably, can require time to perform that is magnitudes longer than the other stages when it is required to go off the CPU and into a separate RAM stick, as is often used in more complex modern computers. (NEED FIXING/CITATION) Data memory structures even tend to have specialized on-CPU caches to minimize the need for this; it was originally intended for the CPU simulator to represent these fully as well, but this was proven to be beyond the scope of the project. Instead, the Data Memory is abstracted as a "black-box" subcomponent, which stores an array of data accessible by address through unknown means. Indeed, this entire timing aspect will be largely abstracted away in the simulator, operating entirely on the time unit of a "step" in which each of the instructions currently in the CPU advance by one stage; however, the alteration used to solve this timing issue in real hardware is so essential to the design, and additionally used in some of the solutions for smaller problems that cannot be abstracted away, that they will be included in the simulator regardless.
 
-\section{The Backbone of Pipelining: Latches}
+\subsection{The Backbone of Pipelining: Latches}
 
 So, what is this modification? The main thing to be prevented here is that no stage of the CPU should recieve the inputs for the next instruction before it is done performing its computations for its current structure; to keep all five stages in sync. The ideal way to do this is to "hold" the outputs of each stage once they are computed, until the slowest stage completes its computations, and then release them all at once to begin the next step. This "holding" of outputs is done through the addition of a set of "Latches" to the CPU:
 
@@ -267,13 +288,13 @@ However, even with pipeline and latches in place, even with the efficiency trade
 
 - Data Hazards: Hazards that involve the reading and writing of data to registers.
 
-- Control Hazards: Hazards that involve conditional/branching jump instructions.
+- Control Hazards: Hazards that involve jump instructions.
 
 (... WERE THERE MORE??)
 
 Let's look at these hazards in more details, and at how the pipeline CPU design can be altereted to handle them.
 
-\section{Data Hazards}
+\subsection{Data Hazards}
 
 Data hazards are best introduced with a simple example, shown in assembly code. Assembly Code that is only one step removed from Machine Code: It's the same line-by-line instructions that deal directly with the CPU's registers and the Data Memory, for the most part, but presented in a way that is somewhat human readable instead of as rows of bits.
 
@@ -281,7 +302,6 @@ For this example, all you need to know is the RISC-V instruction ADDI. The instr
 
 Imagine the following program snippet, where $\$r0$, $\$r1$, and $\$r2$ are registers and all registers start with the value 0.
 
-\break
 \begin{verbatim}
 addi $r1, $r0, 3
 addi $r2, $r1, 4
@@ -337,7 +357,7 @@ This time, the end value of $\$r2$ is, erroneously, $4$ instead of $7$! The pipe
 
 At the very least, having a program return a consistently incorrect output is unnaceptable, and we need to fix that. But, how?
 
-\section{Stalling}
+\subsection{Stalling}
 
 The first solution that might come to mind is: "Why don't we pause the CPU when a Data Hazard is incoming, so that it has time to catch up?". And, this is shockingly a good suggestion! The idea is simple: As it is in the example, the update to $\$r1$, ocurring at the start of Instruction 1's WB stage, was needed halfway through Instruction 2's ID stage (Register acessing happens during the latter half of the ID stage, after the Decoder has gone). The red arrow in the diagram represents this desired update that needs to happen for correctness.
 
@@ -373,7 +393,7 @@ At this point, the EX, MEM, and WB stages hold the instructions that you do not 
 
 Once the instruction that holds the needed alteration reaches the WB stage, the Stall Control simply flips all latches to Transfer mode, and operation continues as normal. This does successfully resolve the data hazard, and fixes these correctness issues! However, it is still painfully slow, and gives up much of the advantage of pipelining anytime that a register is written to and then read from in quick succession; as it turns, this is rather common. We've already accepted that conditions will not often be optimal for pipelining, but this is a serious blow. Can we do better than that?
 
-\section{Forwarding}
+\subsection{Forwarding}
 
 The answer is that yes, we can! Let's go back to our data hazard example, when it is un-stalled:
 
@@ -381,7 +401,29 @@ The answer is that yes, we can! Let's go back to our data hazard example, when i
 
 Obviously, the issue is clear here: The data needed in the ID isn't ready until Instruction 1's WB stage, and is needed in Instruction 2's ID stage. Except, this isn't really true. Technically, that data has already been computed by the end of Instruction 1's EX stage, found in the output of the ALU. And, it is Instruction 2's EX stage that needs the data for the addition calculation, not the ID; as long as the ALU gets the correct integer input of $4$ instead of $0$, it doesn't care where it came from. So, technically, the desired data to resolve this hazard \textit{is} available by the time it's needed; it just doesn't have the pathway to get there in time. So... what if we added that pathway ourselves?
 
-Introducing forwarding!
+That is exactly what forwarding is! Extra data pathways are added  into the ALU input; controlled by a multiplexor that reads register indices to decide if forwarding is needed. The pathways come from the MEM-stage output if the offending instructions are adjacent, and from the WB-stage output if they are one instruction apart; any more than that, and there is no Data Hazard at all. These are called "EX-EX Forwarding" and "MEM-EX Forwarding" respectively. There is a third type of Data Hazard, which occurs when a value is loaded from the Data Memory to a register and then stored to somewhere else in the Data Memory immediately after; the store will still have the stale value from that register, from before it was read to. An extra pathway and multiplexor, from the WB stage to the Data Memory, handles that; this is called "MEM-MEM Forwarding" . With that, all of the Data Hazards are resolved, this time without performance loss!
+
+(INSERT FORWARDING TYPES DIAGRAM)
+
+Doesn't this make stalling entirely obsolete? Well, not exactly; there's still one more unhandled data hazard case. What if happens if a load instruction is immediately followed by an arithmetic instruction, using the register that was loaded to? (Or by a store instruction, using the register to calculate an adress rather than as the to-store data). As seen below, the data is retrieved at the end of the Load's MEM stage, yet is needed at the beginning of the EX stage so it can be used in the arithmetic operation. In this case, the data truly doesn't come soon enough!
+
+The ideal solution is a hybrid of the two techniques: If you stall the second instruction by just one cycle, the data can now arrive just in time. It can even use the same "MEM-EX Forwarding" from earlier without any new pathways needed!
+
+\subsection{Control Hazards}
+
+There is a second reason why stalling, or at least the Stalling Control we implemented, is still useful: Control Hazards.
+
+So, when do control hazards occur? Well, anytime any jump instruction is called. The problem is simple: anytime that a jump instruction occurs, the new address to jump to is already needed by start of the next instruction's IF stage: but it is calcuated in the jump's EX stage, where the ALU adds the jump value to the existing Progam Count.
+
+This hazard is going to lose us cycles no matter what; but to mitigate that, the first step is to add another forwarding pathway from the ALU output directly to the PC in the IF Stage. This almost resolves the issue, with the jump happening at a 2-cycle delay, though there's one more problem: Inbetween the  jump instruction entering the IF stage and the jump address being calculated in its EX stage, two instructions directly after the Jump get loaded in; instructions that shouldn't run at all, since the program supposedly jumps to another location. After those two, though, the output of the EX stage gets forwarded back to the PC in the IF stage, so the solution is simple: On the cycle that the jump instruction is in the EX stage, we tell the Stall Control to set the latches of the IF and ID stages (the stages holding the two erroneus instructions), to go on "Bubble Mode". This harmlessly flushes out those two instructions before they have a chance to perform any alterations, and the instruction following them will be from the correct jumped-to address! The end result is akin to stalling the instruction following a jump for 2 cycles, in order to avoid the Control Hazard.
+
+In fact, you could achieve the same result by stalling the instruction 2 cycles, using the method described in the earlier section on stalling. This would work: there, the two erroneous instructions never enter the pipeline at all. It would be simple if all hazards were handled through the same method, so why not just do that?
+
+It has to do with \textit{Branching} control instructions, or Branches. A Branch is similar to a jump, but it also makes some sort of logical comparison between two inputted register value. If the comparison resolves to true, the Branch jumps to the destination; if it's false, the jump is not taken and the program continues to the next sequential instruction. Branches are the main option assembly programs have for introducing, well, branching pathways to the control flow of their code, and what compilers most heavily use when compiling if-statements and loops from high-level programming languages.
+
+Well, as it turns out, handling jumps  with the flushing method is actually a small optimization that potentially saves time for \textit{branching} control instructions. Branching control instructions are almost the same as jump instructions: there's just an extra subcomponent in the EX stage that compares its values to check if the Branch is to be taken, which decides if the Program Count is changed or left alone. However since we cannot know whether the branch will be taken or not \textit{until} the EX stage, this causes a difference between the flushing and stalling methods: In the stalling method, the instruction after the Branch has to get stalled regardless of whether the Branch gets taken or not; it has to start stalling right away. In the flushing method, the CPU flushes and jumps as usual if the Branch gets taken; however, if it does not get taken, the Stall Control simply... doesn't do anything. Those two "erroneous instructions" are actually now the correct path forward for the program to take, and it just lets them happen. So, flushing the Branches instead of stalling them makes no diffence if the branch is taken, but saves cycles if it isn't! This method is also called the "Fetch and Cancel When Taken" method of handling control hazards, since the "cancel" or flush only happens if the Branch is taken.
+
+\section{CPU-Simulator Features}
 
 
 
