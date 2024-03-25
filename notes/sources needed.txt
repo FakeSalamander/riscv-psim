@@ -1,0 +1,16 @@
+- might need one for CPU components?
+
+- Prescott: FOUND?)
+
+
+- Source on what ISAs are
+
+
+- Cite the RISC-V ISA
+
+
+- Find source on RISC-V pipelining
+
+
+- FInd source on data memory stuff
+
