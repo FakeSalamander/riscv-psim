@@ -1,0 +1,18 @@
+mod fetch;
+mod execute;
+mod decode;
+mod memory;
+mod writeback;
+
+pub use fetch::*;
+pub use execute::*;
+pub use decode::*;
+pub use memory::*;
+pub use writeback::*;
+
+trait Logic {
+    fn update(&mut self);
+}
+trait Latch {
+    fn update(&mut self);
+}
