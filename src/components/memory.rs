@@ -7,7 +7,8 @@ pub struct EXMEMLatch {
     pub mem_data_in: u32,
     pub rd_index: u8,
 
-    pub opcode: u8
+    pub opcode: u8,
+    pub funct3: u8
 }
 
 //wires for the MEM stage

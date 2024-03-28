@@ -52,7 +52,38 @@ impl Registers {
 
         // Data Memory
 
-        //insert code for Data Mem read/write here
+        //insert code for Data Mem write here
+        //check if instr. is a stor,
+        if self.exmem.opcode == 0b0100011 {
+            //use these to find the right address to pull from
+            let which_word:usize = (self.exmem.alu_output as usize) / 4;
+            let align = self.exmem.alu_output % 4;
+            if self.exmem.funct3 == 0b000 {
+                //Store Byte
+                self.data_mem[which_word] = match align {
+                    0 => (self.data_mem[which_word] & 0b11111111111111111111111100000000) + (self.exmem.mem_data_in & 0b11111111),
+                    1 => (self.data_mem[which_word] & 0b11111111111111110000000011111111) + ((self.exmem.mem_data_in & 0b11111111) << 8),
+                    2 => (self.data_mem[which_word] & 0b11111111000000001111111111111111) + ((self.exmem.mem_data_in & 0b11111111) << 16),
+                    3 => (self.data_mem[which_word] & 0b00000000111111111111111111111111) + ((self.exmem.mem_data_in & 0b11111111) << 24),
+                    _ => panic!("align value is larger than 3!")
+                }
+            } else if self.exmem.funct3 == 0b010 {
+                //Store Half-Word
+                self.data_mem[which_word] = match align {
+                    0 => (self.data_mem[which_word] & 0b11111111111111110000000000000000) + (self.exmem.mem_data_in & 0b1111111111111111),
+                    1 => panic!("Misaligned store value!"),
+                    2 => (self.data_mem[which_word] & 0b00000000000000001111111111111111) + ((self.exmem.mem_data_in & 0b1111111111111111) << 16),
+                    3 => panic!("Misaligned store value!"),
+                    _ => panic!("Align value is larger thna 3!"),
+                }
+            } else if self.exmem.funct3 == 0b100 {
+                //Store Word
+                if align > 3 {panic!("align value is larger than 3!")}
+                if align > 0 {panic!("Misaligned store value!")}
+                
+                self.data_mem[which_word] = self.exmem.mem_data_in;
+            } else { panic!("Invalid funct3 on a Store instruction!")}
+        }
 
         //EX-MEM Latch
 
@@ -63,6 +94,7 @@ impl Registers {
         self.exmem.rd_index = self.idex.rd_index;
 
         self.exmem.opcode = self.idex.opcode;
+        self.exmem.funct3 = self.idex.funct3;
 
         // ID-EX Latch
         self.idex.base_pc = self.ifid.base_pc;
@@ -318,7 +350,57 @@ impl Logic {
         // =========================
 
         //Reading Data Memory is the only thing that happens in this stage.
-
+        //check if instruction is a load.
+        if state.exmem.opcode == 0b0000011 {
+            let which_word: usize = (state.exmem.alu_output as usize) / 4;
+            let align = state.exmem.alu_output % 4;
+            if state.exmem.funct3 == 0b000 {
+                //Load Byte, need to sign extend.
+                self.memory.mem_data_out = match align {
+                    0 => ((((state.data_mem[which_word] &  0b00000000000000000000000011111111) as i32 ) << 24 ) >> 24 ) as u32 ,
+                    1 => ((((state.data_mem[which_word] &  0b00000000000000001111111100000000) as i32 ) << 16  ) >> 24 ) as u32,
+                    2 => ((((state.data_mem[which_word] &  0b00000000111111110000000000000000) as i32 ) << 8 )  >> 24 ) as u32 ,
+                    3 => (((state.data_mem[which_word] &  0b11111111000000000000000000000000) as i32 ) >> 24) as u32,
+                    _ => panic!("Align is greater than 3!"),
+                }
+            } else if state.exmem.funct3 == 0b001 {
+                //Load Half-Word, need to sign extend.
+                self.memory.mem_data_out = match align {
+                    0 => ((((state.data_mem[which_word] &  0b00000000000000001111111111111111) as i32 ) << 16 ) >> 16 ) as u32 ,
+                    1 => panic!("Misaligned Load!"),
+                    2 => (((state.data_mem[which_word] &  0b11111111111111110000000000000000) as i32 )  >> 16 ) as u32 ,
+                    3 => panic!("Misaligned Load!"),
+                    _ => panic!("Align is greater than 3!"),
+                }
+            } else if state.exmem.funct3 == 0b010 {
+                //Load Word.
+                if align < 3 {panic!("Align is greater than 3!")}
+                if align < 0 {panic!("Misaligned Load!")}
+                self.memory.mem_data_out = state.data_mem[which_word];
+            } else if state.exmem.funct3 == 0b100 {
+               //Load Byte Unsigned. No sign extend
+               self.memory.mem_data_out = match align {
+                    0 => (state.data_mem[which_word] &  0b00000000000000000000000011111111)  ,
+                    1 => (state.data_mem[which_word] &  0b00000000000000001111111100000000) >> 8,
+                    2 => (state.data_mem[which_word] &  0b00000000111111110000000000000000) >> 16,
+                    3 => (state.data_mem[which_word] &  0b11111111000000000000000000000000) >> 24,
+                    _ => panic!("Align is greater than 3!"),
+               }
+            } else if state.exmem.funct3 == 0b101 {
+                //Load Half Word Unsigned. No sign extend.
+                self.memory.mem_data_out = match align {
+                    0 => (state.data_mem[which_word] &  0b00000000000000001111111111111111)  ,
+                    1 => panic!("Misaligned Load!"),
+                    2 => (state.data_mem[which_word] &  0b11111111111111110000000000000000) >> 16,
+                    3 => panic!("Misaligned Load!"),
+                    _ => panic!("Align is greater than 3!"),
+                }
+            } else { panic!("Invalid funct3 for a Load Instruction!")}
+        } else {
+            //if no value is read... output useless value
+            self.memory.mem_data_out = 0xdeadbeef;
+        }
+        
 
         // =========================
         // WB Stage
