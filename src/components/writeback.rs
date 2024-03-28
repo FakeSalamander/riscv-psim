@@ -5,6 +5,8 @@ pub struct MEMWBLatch {
     pub alu_output: u32,
     pub mem_data_out: u32,
     pub rd_index: u8,
+
+    pub opcode: u8,
 }
 
 pub struct WBLogic {
