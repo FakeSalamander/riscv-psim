@@ -197,6 +197,8 @@ impl Registers {
         self.idex.opcode = logic.decode.decode_opcode;
         self.idex.funct3 = logic.decode.decode_funct3;
         self.idex.funct7 = logic.decode.decode_funct7;
+        self.idex.r2_index = logic.decode.decode_r2;
+        self.idex.r1_index = logic.decode.decode_r1;
 
         // Register Memory. Write to it.
         assert!(old_rd < 0b100000); //Register indices are always 5 bits or less.
@@ -322,6 +324,29 @@ impl Logic {
         // EX Stage
         //======================
 
+        // Forwarding Multiplexors. Decides if it must perform EX-EX or MEM-EX forwarding.
+        if state.idex.r1_index == state.exmem.rd_index {
+            //need to EX-EX forward!
+            self.execute.formux_r1 = state.exmem.alu_output;
+        } else if state.idex.r1_index == state.memwb.rd_index {
+            //need to MEM-EX forward!
+            self.execute.formux_r1 = state.memwb.alu_output;
+        } else {
+            // no forwarding needed!
+            self.execute.formux_r1 = state.idex.r1_data;
+        }
+
+        if state.idex.r2_index == state.exmem.rd_index {
+            //need to EX-EX forward!
+            self.execute.formux_r2 = state.exmem.alu_output;
+        } else if state.idex.r2_index == state.memwb.rd_index {
+            //need to MEM-EX forward!
+            self.execute.formux_r2 = state.memwb.alu_output;
+        } else {
+            // no forwarding needed!
+            self.execute.formux_r2 = state.idex.r1_data;
+        }
+
         // R1-PC Multiplexor.
         // Decides if Operand 1 is the R1 value or the Program Count.
         // Uses Instruction Type to decide.
@@ -333,13 +358,13 @@ impl Logic {
         {
             self.execute.op1 = state.idex.base_pc;
         } else {
-            self.execute.op1 = state.idex.r1_data;
+            self.execute.op1 = self.execute.formux_r1;
         }
 
         // R2-Immediates Multiplexor.
         // Same thing for Op2, but between R2 value and Immediates value.
         if matches!(instr_type, InstrT::Rtype) {
-            self.execute.op2 = state.idex.r2_data;
+            self.execute.op2 = self.execute.formux_r2;
         } else {
             self.execute.op2 = state.idex.immediates;
         }
