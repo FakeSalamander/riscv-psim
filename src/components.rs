@@ -4,13 +4,14 @@ mod fetch;
 mod memory;
 mod writeback;
 
+use crate::isa::isa;
+use crate::isa::isa::InstrT;
 pub use decode::*;
 pub use execute::*;
 pub use fetch::*;
 pub use memory::*;
+use std::collections::hash_map::*;
 pub use writeback::*;
-use crate::isa::isa;
-use crate::isa::isa::InstrT;
 
 //this struct holds the Stateful components of the CPU:
 //  Each pipeline latch
@@ -18,30 +19,36 @@ use crate::isa::isa::InstrT;
 //  Instruction Memory
 //  Register Memory
 //  Data Memory
-struct Registers {
-    ifid: IFIDLatch,
-    idex: IDEXLatch,
-    exmem: EXMEMLatch,
-    memwb: MEMWBLatch,
 
-    pc: u32,
+#[derive(Clone)]
+pub struct Registers {
+    pub ifid: IFIDLatch,
+    pub idex: IDEXLatch,
+    pub exmem: EXMEMLatch,
+    pub memwb: MEMWBLatch,
 
-    instr_mem: Vec<u32>,
-    reg_mem: Vec<u32>,
-    data_mem: Vec<u32>,
+    pub pc: u32,
+
+    pub instr_mem: Vec<u32>,
+    pub reg_mem: Vec<u32>,
+    pub data_mem: HashMap<u32, u32>,
 }
 
 //this structs holds all the wiring of each stage
-struct Logic {
-    fetch: IFLogic,
-    decode: IDLogic,
-    execute: EXLogic,
-    memory: MEMLogic,
-    writeback: WBLogic,
+
+#[derive(Clone, Default)]
+pub struct Logic {
+    pub fetch: IFLogic,
+    pub decode: IDLogic,
+    pub execute: EXLogic,
+    pub memory: MEMLogic,
+    pub writeback: WBLogic,
 }
 
 impl Registers {
     fn update(&mut self, logic: &Logic) {
+        let old_rd = self.memwb.rd_index;
+
         // MEM-WB Latch
         self.memwb.added_pc = self.exmem.added_pc;
         self.memwb.alu_output = self.exmem.alu_output;
@@ -50,39 +57,121 @@ impl Registers {
 
         self.memwb.opcode = self.exmem.opcode;
 
+        println!("{}", old_rd);
+
         // Data Memory
 
         //insert code for Data Mem write here
         //check if instr. is a stor,
         if self.exmem.opcode == 0b0100011 {
-            //use these to find the right address to pull from
-            let which_word:usize = (self.exmem.alu_output as usize) / 4;
+            //use these to find the right address to pull from\
+            if self.exmem.alu_output == 0 {
+                panic!("Instruction tried storing value to data memory address 0.")
+            }
+            let which_word = (self.exmem.alu_output) / 4;
             let align = self.exmem.alu_output % 4;
-            if self.exmem.funct3 == 0b000 {
-                //Store Byte
-                self.data_mem[which_word] = match align {
-                    0 => (self.data_mem[which_word] & 0b11111111111111111111111100000000) + (self.exmem.mem_data_in & 0b11111111),
-                    1 => (self.data_mem[which_word] & 0b11111111111111110000000011111111) + ((self.exmem.mem_data_in & 0b11111111) << 8),
-                    2 => (self.data_mem[which_word] & 0b11111111000000001111111111111111) + ((self.exmem.mem_data_in & 0b11111111) << 16),
-                    3 => (self.data_mem[which_word] & 0b00000000111111111111111111111111) + ((self.exmem.mem_data_in & 0b11111111) << 24),
-                    _ => panic!("align value is larger than 3!")
+            if self.data_mem.contains_key(&which_word) {
+                if self.exmem.funct3 == 0b000 {
+                    //Store Byte
+                    self.data_mem.insert(
+                        which_word,
+                        match align {
+                            0 => {
+                                (self.data_mem.get(&which_word).unwrap()
+                                    & 0b11111111111111111111111100000000)
+                                    + (self.exmem.mem_data_in & 0b11111111)
+                            }
+                            1 => {
+                                (self.data_mem.get(&which_word).unwrap()
+                                    & 0b11111111111111110000000011111111)
+                                    + ((self.exmem.mem_data_in & 0b11111111) << 8)
+                            }
+                            2 => {
+                                (self.data_mem.get(&which_word).unwrap()
+                                    & 0b11111111000000001111111111111111)
+                                    + ((self.exmem.mem_data_in & 0b11111111) << 16)
+                            }
+                            3 => {
+                                (self.data_mem.get(&which_word).unwrap()
+                                    & 0b00000000111111111111111111111111)
+                                    + ((self.exmem.mem_data_in & 0b11111111) << 24)
+                            }
+                            _ => panic!("align value is larger than 3!"),
+                        },
+                    );
+                } else if self.exmem.funct3 == 0b010 {
+                    //Store Half-Word
+                    self.data_mem.insert(
+                        which_word,
+                        match align {
+                            0 => {
+                                (self.data_mem.get(&which_word).unwrap()
+                                    & 0b11111111111111110000000000000000)
+                                    + (self.exmem.mem_data_in & 0b1111111111111111)
+                            }
+                            1 => panic!("Misaligned store value!"),
+                            2 => {
+                                (self.data_mem.get(&which_word).unwrap()
+                                    & 0b00000000000000001111111111111111)
+                                    + ((self.exmem.mem_data_in & 0b1111111111111111) << 16)
+                            }
+                            3 => panic!("Misaligned store value!"),
+                            _ => panic!("Align value is larger thna 3!"),
+                        },
+                    );
+                } else if self.exmem.funct3 == 0b100 {
+                    //Store Word
+                    if align > 3 {
+                        panic!("align value is larger than 3!")
+                    }
+                    if align > 0 {
+                        panic!("Misaligned store value!")
+                    }
+
+                    self.data_mem.insert(which_word, self.exmem.mem_data_in);
+                } else {
+                    panic!("Invalid funct3 on a Store instruction!")
                 }
-            } else if self.exmem.funct3 == 0b010 {
-                //Store Half-Word
-                self.data_mem[which_word] = match align {
-                    0 => (self.data_mem[which_word] & 0b11111111111111110000000000000000) + (self.exmem.mem_data_in & 0b1111111111111111),
-                    1 => panic!("Misaligned store value!"),
-                    2 => (self.data_mem[which_word] & 0b00000000000000001111111111111111) + ((self.exmem.mem_data_in & 0b1111111111111111) << 16),
-                    3 => panic!("Misaligned store value!"),
-                    _ => panic!("Align value is larger thna 3!"),
+            } else {
+                //if there, the value is 0, must be initialized!!
+                if self.exmem.funct3 == 0b000 {
+                    //Store Byte
+                    self.data_mem.insert(
+                        which_word,
+                        match align {
+                            0 => self.exmem.mem_data_in & 0b11111111,
+                            1 => (self.exmem.mem_data_in & 0b11111111) << 8,
+                            2 => (self.exmem.mem_data_in & 0b11111111) << 16,
+                            3 => (self.exmem.mem_data_in & 0b11111111) << 24,
+                            _ => panic!("Align value is more than 3!"),
+                        },
+                    );
+                } else if self.exmem.funct3 == 0b001 {
+                    //Store Half-Word
+                    self.data_mem.insert(
+                        which_word,
+                        match align {
+                            0 => self.exmem.mem_data_in & 0b1111111111111111,
+                            1 => panic!("Misaligned store value!"),
+                            2 => (self.exmem.mem_data_in & 0b1111111111111111) << 16,
+                            3 => panic!("Misaligned store value!"),
+                            _ => panic!("Align value is larger thna 3!"),
+                        },
+                    );
+                } else if self.exmem.funct3 == 0b100 {
+                    //Store Word
+                    if align > 3 {
+                        panic!("align value is larger than 3!")
+                    }
+                    if align > 0 {
+                        panic!("Misaligned store value!")
+                    }
+
+                    self.data_mem.insert(which_word, self.exmem.mem_data_in);
+                } else {
+                    panic!("Invalid funct3 on a Store instruction!")
                 }
-            } else if self.exmem.funct3 == 0b100 {
-                //Store Word
-                if align > 3 {panic!("align value is larger than 3!")}
-                if align > 0 {panic!("Misaligned store value!")}
-                
-                self.data_mem[which_word] = self.exmem.mem_data_in;
-            } else { panic!("Invalid funct3 on a Store instruction!")}
+            }
         }
 
         //EX-MEM Latch
@@ -110,15 +199,18 @@ impl Registers {
         self.idex.funct7 = logic.decode.decode_funct7;
 
         // Register Memory. Write to it.
-        assert!(self.memwb.rd_index < 0b100000); //Register indices are always 5 bits or less.
-        if (self.memwb.rd_index != 0) {
-            self.reg_mem[self.memwb.rd_index as usize] = logic.writeback.wb_data;
+        assert!(old_rd < 0b100000); //Register indices are always 5 bits or less.
+        if (old_rd != 0) {
+            self.reg_mem[old_rd as usize] = logic.writeback.wb_data;
         }
 
         // IF-ID latch. Transfer
         self.ifid.base_pc = self.pc;
         self.ifid.added_pc = logic.fetch.pcadder_out;
         self.ifid.instruction = logic.fetch.instruction_out;
+
+        // Program Counter.
+        self.pc = logic.fetch.pcmux_out;
     }
 }
 
@@ -127,6 +219,9 @@ impl Logic {
         //=================================
         // IF Stage
         //=================================
+
+        //must update PCAdder first.
+        self.fetch.pcadder_out = state.pc + 4;
 
         //PCMux: First, check if opcode FROM EX STAGE is Jump, Branching, or neither
         if (state.idex.opcode == 0b1101111 || state.idex.opcode == 0b1100111) {
@@ -139,9 +234,12 @@ impl Logic {
             self.fetch.pcmux_out = self.fetch.pcadder_out;
         }
 
-        self.fetch.instruction_out = state.instr_mem[(state.pc / 4) as usize];
-
-        self.fetch.pcadder_out = state.pc + 4;
+        if ((state.pc / 4) as usize) >= state.instr_mem.len() {
+            //if reached end of program... put in NOPs to let the previous instructions finish.
+            self.fetch.instruction_out = 0;
+        } else {
+            self.fetch.instruction_out = state.instr_mem[(state.pc / 4) as usize];
+        }
 
         //==============================
         // ID Stage
@@ -156,14 +254,15 @@ impl Logic {
         // need to get bits (19-15) out. use mask, then shift right all the zero'd bits
         self.decode.decode_r1 = ((state.ifid.instruction & 0b11111000000000000000) >> 15) as u8;
         // need to get bits (24-20) out.
-        self.decode.decode_r2 = ((state.ifid.instruction & 0b1111100000000000000000000) >> 20) as u8;
+        self.decode.decode_r2 =
+            ((state.ifid.instruction & 0b1111100000000000000000000) >> 20) as u8;
         // need to get bits (11-7) out.
         self.decode.decode_rd = ((state.ifid.instruction & 0b111110000000) >> 7) as u8;
         // need to get the bits (14-12) out.
         self.decode.decode_funct3 = ((state.ifid.instruction & 0b111000000000000) >> 12) as u8;
         //need to get the bits (31-25) out.
-        self.decode.decode_funct7 = ((state.ifid.instruction & 0b11111110000000000000000000000000) >> 25) as u8;
-
+        self.decode.decode_funct7 =
+            ((state.ifid.instruction & 0b11111110000000000000000000000000) >> 25) as u8;
 
         // Register Memory: Read.
         assert!(self.decode.decode_r1 < 32 && self.decode.decode_r2 < 32);
@@ -171,60 +270,62 @@ impl Logic {
         self.decode.regmem_r2 = state.reg_mem[self.decode.decode_r2 as usize];
 
         // Immediates Decoder
-         //rearranges the immediates of an instruction by type, so they're where the ALU expects them.
-         let instr_type: InstrT = isa::get_instruction_type(self.decode.decode_opcode);
-         if matches!(instr_type, InstrT::Rtype) {
-             self.decode.immediates = 0; //Outputs a useless value. R-Type has no immediates.
-         } else if matches!(instr_type, InstrT::Itype) {
-             //in this one, simply take the 31st thru 12th bits! they're already where they want to be.
-             self.decode.immediates = ((state.ifid.instruction as i32) >> 20) as u32;
-         } else if matches!(instr_type, InstrT::Stype) {
-             //(31-25) goes to [11-5],  (11-7) goes to [4-0]. do each separately, then bitwise OR
- 
-             //                       the (31-25) is converted to signed so that it does an arithmetic right shift
-             self.decode.immediates = ((((state.ifid.instruction & 0b11111110000000000000000000000000)
-                 as i32)
-                 >> 20) as u32)
-                 | ((state.ifid.instruction & 0b111110000000) >> 7);
-         } else if matches!(instr_type, InstrT::Btype) {
-             //A (31) to [12] ,B (30-25) to [10-5], C (11-8) to [4-1], D (7) to [11]
-             let imm_a: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 19;
-             let imm_b: u32 = (state.ifid.instruction & 0b01111110000000000000000000000000) >> 20;
-             let imm_c: u32 = (state.ifid.instruction & 0b00000000000000000000111100000000) >> 7;
-             let imm_d: u32 = (state.ifid.instruction & 0b00000000000000000000000010000000) << 4;
-             //println!("{:#b}",imm_a);
-             //println!("{:#b}",imm_b);
-             //println!("{:#b}",imm_c);
-             //println!("{:#b}",imm_d);
- 
-             self.decode.immediates = ((((imm_a | imm_b | imm_c | imm_d) << 19) as i32) >> 19) as u32;
-         //the wonky shifting just sign-extends the 12-bit Imm preemptively
-         } else if matches!(instr_type, InstrT::Utype) {
-             //(31-12) goes to [31-12]... so just mask the rest!
-             self.decode.immediates = state.ifid.instruction & 0b11111111111111111111000000000000;
-         } else {
-             //only J-type left!  E  (31) to [20], F  (30-21) to [10-1], G  (20) to [11],  H  (19-12) to [19-12]
-             let imm_e: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 11;
-             let imm_f: u32 = (state.ifid.instruction & 0b01111111111000000000000000000000) >> 20;
-             let imm_g: u32 = (state.ifid.instruction & 0b00000000000100000000000000000000) >> 9;
-             let imm_h: u32 = state.ifid.instruction & 0b00000000000011111111000000000000;
-             println!("{:#b}", imm_e);
-             println!("{:#b}", imm_f);
-             println!("{:#b}", imm_g);
-             println!("{:#b}", imm_h);
- 
-             self.decode.immediates = ((((imm_e | imm_f | imm_g | imm_h) << 11) as i32) >> 11) as u32;
-             //same here, sign-shifts the 20-bit Imm
-         }
+        //rearranges the immediates of an instruction by type, so they're where the ALU expects them.
+        let instr_type: InstrT = isa::get_instruction_type(self.decode.decode_opcode);
+        if matches!(instr_type, InstrT::Rtype) {
+            self.decode.immediates = 0; //Outputs a useless value. R-Type has no immediates.
+        } else if matches!(instr_type, InstrT::Itype) {
+            //in this one, simply take the 31st thru 12th bits! they're already where they want to be.
+            self.decode.immediates = ((state.ifid.instruction as i32) >> 20) as u32;
+        } else if matches!(instr_type, InstrT::Stype) {
+            //(31-25) goes to [11-5],  (11-7) goes to [4-0]. do each separately, then bitwise OR
 
-         //======================
-         // EX Stage
-         //======================
+            //                       the (31-25) is converted to signed so that it does an arithmetic right shift
+            self.decode.immediates =
+                ((((state.ifid.instruction & 0b11111110000000000000000000000000) as i32) >> 20)
+                    as u32)
+                    | ((state.ifid.instruction & 0b111110000000) >> 7);
+        } else if matches!(instr_type, InstrT::Btype) {
+            //A (31) to [12] ,B (30-25) to [10-5], C (11-8) to [4-1], D (7) to [11]
+            let imm_a: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 19;
+            let imm_b: u32 = (state.ifid.instruction & 0b01111110000000000000000000000000) >> 20;
+            let imm_c: u32 = (state.ifid.instruction & 0b00000000000000000000111100000000) >> 7;
+            let imm_d: u32 = (state.ifid.instruction & 0b00000000000000000000000010000000) << 4;
+            //println!("{:#b}",imm_a);
+            //println!("{:#b}",imm_b);
+            //println!("{:#b}",imm_c);
+            //println!("{:#b}",imm_d);
 
-         // R1-PC Multiplexor.
-         // Decides if Operand 1 is the R1 value or the Program Count.
-         // Uses Instruction Type to decide.
-         let instr_type: InstrT = isa::get_instruction_type(state.idex.opcode);
+            self.decode.immediates =
+                ((((imm_a | imm_b | imm_c | imm_d) << 19) as i32) >> 19) as u32;
+        //the wonky shifting just sign-extends the 12-bit Imm preemptively
+        } else if matches!(instr_type, InstrT::Utype) {
+            //(31-12) goes to [31-12]... so just mask the rest!
+            self.decode.immediates = state.ifid.instruction & 0b11111111111111111111000000000000;
+        } else {
+            //only J-type left!  E  (31) to [20], F  (30-21) to [10-1], G  (20) to [11],  H  (19-12) to [19-12]
+            let imm_e: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 11;
+            let imm_f: u32 = (state.ifid.instruction & 0b01111111111000000000000000000000) >> 20;
+            let imm_g: u32 = (state.ifid.instruction & 0b00000000000100000000000000000000) >> 9;
+            let imm_h: u32 = state.ifid.instruction & 0b00000000000011111111000000000000;
+            println!("{:#b}", imm_e);
+            println!("{:#b}", imm_f);
+            println!("{:#b}", imm_g);
+            println!("{:#b}", imm_h);
+
+            self.decode.immediates =
+                ((((imm_e | imm_f | imm_g | imm_h) << 11) as i32) >> 11) as u32;
+            //same here, sign-shifts the 20-bit Imm
+        }
+
+        //======================
+        // EX Stage
+        //======================
+
+        // R1-PC Multiplexor.
+        // Decides if Operand 1 is the R1 value or the Program Count.
+        // Uses Instruction Type to decide.
+        let instr_type: InstrT = isa::get_instruction_type(state.idex.opcode);
 
         if (matches!(instr_type, InstrT::Utype)
             || matches!(instr_type, InstrT::Jtype)
@@ -234,7 +335,7 @@ impl Logic {
         } else {
             self.execute.op1 = state.idex.r1_data;
         }
-        
+
         // R2-Immediates Multiplexor.
         // Same thing for Op2, but between R2 value and Immediates value.
         if matches!(instr_type, InstrT::Rtype) {
@@ -249,22 +350,25 @@ impl Logic {
 
         // Checks based off the 3bit funct3-code and R1 & R2, if the instruction is a Branch, whether a branch happens or not.
         self.execute.branch_taken = match state.idex.funct3 {
-            0b000 => state.idex.r1_data == state.idex.r2_data,                  //BEQ
-            0b001 => state.idex.r1_data != state.idex.r2_data,                  //BNE
+            0b000 => state.idex.r1_data == state.idex.r2_data, //BEQ
+            0b001 => state.idex.r1_data != state.idex.r2_data, //BNE
             0b100 => (state.idex.r1_data as i32) < (state.idex.r2_data as i32), //BLT
             0b101 => (state.idex.r1_data as i32) > (state.idex.r2_data as i32), //BGE
-            0b110 => state.idex.r1_data < state.idex.r2_data,                   //BLTU
-            0b111 => state.idex.r1_data > state.idex.r2_data,                   //BGEU
-            _ => false,                                         //not a branching instruction.
+            0b110 => state.idex.r1_data < state.idex.r2_data,  //BLTU
+            0b111 => state.idex.r1_data > state.idex.r2_data,  //BGEU
+            _ => false,                                        //not a branching instruction.
         };
 
         //ALU
         //actually computes the instruction!  for signed operations, convert Ops to signed then convert result to unsigned.
-        println!("{}", self.execute.op1 as i32);
-        println!("{}", self.execute.op2 as i32);
-        println!("{}", ((self.execute.op1 as i32) + (self.execute.op2 as i32)) as u32);
+        println!("Op1: {}", self.execute.op1 as i32);
+        println!("Op2: {}", self.execute.op2 as i32);
+        println!(
+            "Out: {}",
+            ((self.execute.op1 as i32) + (self.execute.op2 as i32)) as u32
+        );
         self.execute.alu_output = match state.idex.opcode {
-            0b0110111 => self.execute.op2,               //LUI, just put in immediate as is
+            0b0110111 => self.execute.op2, //LUI, just put in immediate as is
             0b0010111 => self.execute.op1 + self.execute.op2, //AUIPC, add PC and  shifted Imm, store in RD
             0b1101111 => ((self.execute.op1 as i32) + (self.execute.op2 as i32)) as u32, //JAL, add PC and Imm, store in RD, jump there
             0b1100111 => {
@@ -304,7 +408,8 @@ impl Logic {
                 0b101 => match self.execute.op2 >> 5 {
                     0b0000000 => self.execute.op1 >> self.execute.op2, //SRLI, shift R1 right logically by shamt bits
                     0b0100000 => {
-                        ((self.execute.op1 as i32) >> ((self.execute.op2 - 0b010000000000) as i32)) as u32
+                        ((self.execute.op1 as i32) >> ((self.execute.op2 - 0b010000000000) as i32))
+                            as u32
                     } //SRAI, shift R1 right arithmetically by shamt bits
                     _ => panic!("Invalid upper Imm. bits for Right Shift Instruction!"),
                 },
@@ -332,7 +437,7 @@ impl Logic {
                         0
                     }
                 } //SLTU, unsigned less than
-                0b100 => self.execute.op1 ^ self.execute.op2,              //XOR, bitwise exclusive or
+                0b100 => self.execute.op1 ^ self.execute.op2, //XOR, bitwise exclusive or
                 0b101 => match state.idex.funct7 {
                     0b0000000 => self.execute.op1 >> (self.execute.op2 & 0b11111), //SRL, shift right logical. Shift R1 logically right by the lowest 5 bits or R2
                     0b0100000 => ((self.execute.op1 as i32) >> (self.execute.op2 & 0b11111)) as u32, //SRA, shift right arithmetic.
@@ -342,6 +447,7 @@ impl Logic {
                 0b111 => self.execute.op1 & self.execute.op2, //AND, bitwise and
                 _ => panic!("funct3-code is bigger than 3 bits! this shouldnt happen!!!"),
             },
+            0 => 0, //NOP Instruction. Does nothing.
             _ => panic!("Invalid or Unimplemented Instruction!"),
         };
 
@@ -352,55 +458,121 @@ impl Logic {
         //Reading Data Memory is the only thing that happens in this stage.
         //check if instruction is a load.
         if state.exmem.opcode == 0b0000011 {
-            let which_word: usize = (state.exmem.alu_output as usize) / 4;
+            let which_word = (state.exmem.alu_output) / 4;
             let align = state.exmem.alu_output % 4;
-            if state.exmem.funct3 == 0b000 {
-                //Load Byte, need to sign extend.
-                self.memory.mem_data_out = match align {
-                    0 => ((((state.data_mem[which_word] &  0b00000000000000000000000011111111) as i32 ) << 24 ) >> 24 ) as u32 ,
-                    1 => ((((state.data_mem[which_word] &  0b00000000000000001111111100000000) as i32 ) << 16  ) >> 24 ) as u32,
-                    2 => ((((state.data_mem[which_word] &  0b00000000111111110000000000000000) as i32 ) << 8 )  >> 24 ) as u32 ,
-                    3 => (((state.data_mem[which_word] &  0b11111111000000000000000000000000) as i32 ) >> 24) as u32,
-                    _ => panic!("Align is greater than 3!"),
+            if state.data_mem.contains_key(&which_word) {
+                if state.exmem.funct3 == 0b000 {
+                    //Load Byte, need to sign extend.
+                    self.memory.mem_data_out = match align {
+                        0 => {
+                            ((((state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000000000000000000011111111)
+                                as i32)
+                                << 24)
+                                >> 24) as u32
+                        }
+                        1 => {
+                            ((((state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000000000001111111100000000)
+                                as i32)
+                                << 16)
+                                >> 24) as u32
+                        }
+                        2 => {
+                            ((((state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000111111110000000000000000)
+                                as i32)
+                                << 8)
+                                >> 24) as u32
+                        }
+                        3 => {
+                            (((state.data_mem.get(&which_word).unwrap()
+                                & 0b11111111000000000000000000000000)
+                                as i32)
+                                >> 24) as u32
+                        }
+                        _ => panic!("Align is greater than 3!"),
+                    }
+                } else if state.exmem.funct3 == 0b001 {
+                    //Load Half-Word, need to sign extend.
+                    self.memory.mem_data_out = match align {
+                        0 => {
+                            ((((state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000000000001111111111111111)
+                                as i32)
+                                << 16)
+                                >> 16) as u32
+                        }
+                        1 => panic!("Misaligned Load!"),
+                        2 => {
+                            (((state.data_mem.get(&which_word).unwrap()
+                                & 0b11111111111111110000000000000000)
+                                as i32)
+                                >> 16) as u32
+                        }
+                        3 => panic!("Misaligned Load!"),
+                        _ => panic!("Align is greater than 3!"),
+                    }
+                } else if state.exmem.funct3 == 0b010 {
+                    //Load Word.
+                    if align < 3 {
+                        panic!("Align is greater than 3!")
+                    }
+                    if align < 0 {
+                        panic!("Misaligned Load!")
+                    }
+                    self.memory.mem_data_out = *state.data_mem.get(&which_word).unwrap();
+                } else if state.exmem.funct3 == 0b100 {
+                    //Load Byte Unsigned. No sign extend
+                    self.memory.mem_data_out = match align {
+                        0 => {
+                            (state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000000000000000000011111111)
+                        }
+                        1 => {
+                            (state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000000000001111111100000000)
+                                >> 8
+                        }
+                        2 => {
+                            (state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000111111110000000000000000)
+                                >> 16
+                        }
+                        3 => {
+                            (state.data_mem.get(&which_word).unwrap()
+                                & 0b11111111000000000000000000000000)
+                                >> 24
+                        }
+                        _ => panic!("Align is greater than 3!"),
+                    }
+                } else if state.exmem.funct3 == 0b101 {
+                    //Load Half Word Unsigned. No sign extend.
+                    self.memory.mem_data_out = match align {
+                        0 => {
+                            (state.data_mem.get(&which_word).unwrap()
+                                & 0b00000000000000001111111111111111)
+                        }
+                        1 => panic!("Misaligned Load!"),
+                        2 => {
+                            (state.data_mem.get(&which_word).unwrap()
+                                & 0b11111111111111110000000000000000)
+                                >> 16
+                        }
+                        3 => panic!("Misaligned Load!"),
+                        _ => panic!("Align is greater than 3!"),
+                    }
+                } else {
+                    panic!("Invalid funct3 for a Load Instruction!")
                 }
-            } else if state.exmem.funct3 == 0b001 {
-                //Load Half-Word, need to sign extend.
-                self.memory.mem_data_out = match align {
-                    0 => ((((state.data_mem[which_word] &  0b00000000000000001111111111111111) as i32 ) << 16 ) >> 16 ) as u32 ,
-                    1 => panic!("Misaligned Load!"),
-                    2 => (((state.data_mem[which_word] &  0b11111111111111110000000000000000) as i32 )  >> 16 ) as u32 ,
-                    3 => panic!("Misaligned Load!"),
-                    _ => panic!("Align is greater than 3!"),
-                }
-            } else if state.exmem.funct3 == 0b010 {
-                //Load Word.
-                if align < 3 {panic!("Align is greater than 3!")}
-                if align < 0 {panic!("Misaligned Load!")}
-                self.memory.mem_data_out = state.data_mem[which_word];
-            } else if state.exmem.funct3 == 0b100 {
-               //Load Byte Unsigned. No sign extend
-               self.memory.mem_data_out = match align {
-                    0 => (state.data_mem[which_word] &  0b00000000000000000000000011111111)  ,
-                    1 => (state.data_mem[which_word] &  0b00000000000000001111111100000000) >> 8,
-                    2 => (state.data_mem[which_word] &  0b00000000111111110000000000000000) >> 16,
-                    3 => (state.data_mem[which_word] &  0b11111111000000000000000000000000) >> 24,
-                    _ => panic!("Align is greater than 3!"),
-               }
-            } else if state.exmem.funct3 == 0b101 {
-                //Load Half Word Unsigned. No sign extend.
-                self.memory.mem_data_out = match align {
-                    0 => (state.data_mem[which_word] &  0b00000000000000001111111111111111)  ,
-                    1 => panic!("Misaligned Load!"),
-                    2 => (state.data_mem[which_word] &  0b11111111111111110000000000000000) >> 16,
-                    3 => panic!("Misaligned Load!"),
-                    _ => panic!("Align is greater than 3!"),
-                }
-            } else { panic!("Invalid funct3 for a Load Instruction!")}
+            } else {
+                //if this value has never been accessed before, it is trivially zero!
+                self.memory.mem_data_out = 0;
+            }
         } else {
             //if no value is read... output useless value
             self.memory.mem_data_out = 0xdeadbeef;
         }
-        
 
         // =========================
         // WB Stage
@@ -420,8 +592,10 @@ impl Logic {
             //all other opcodes return the ALU's result to the RD
             self.writeback.wb_data = state.memwb.alu_output;
         }
- 
-
-         
     }
+}
+
+pub fn step(state: &mut Registers, logic: &mut Logic) {
+    state.update(logic);
+    logic.update(state);
 }

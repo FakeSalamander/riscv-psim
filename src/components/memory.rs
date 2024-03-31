@@ -1,6 +1,7 @@
 use crate::components::*;
 
 //the EX-MEM Latch
+#[derive(Clone, Default)]
 pub struct EXMEMLatch {
     pub added_pc: u32,
     pub alu_output: u32,
@@ -12,6 +13,7 @@ pub struct EXMEMLatch {
 }
 
 //wires for the MEM stage
+#[derive(Clone, Default)]
 pub struct MEMLogic {
     pub mem_data_out: u32,
 }

@@ -1,6 +1,7 @@
 use crate::components::*;
 
 //the ID-EX Latch
+#[derive(Clone, Default)]
 pub struct IDEXLatch {
     pub base_pc: u32,
     pub added_pc: u32,
@@ -16,6 +17,7 @@ pub struct IDEXLatch {
 }
 
 //holds the wires for the EX Stage
+#[derive(Clone, Default)]
 pub struct EXLogic {
     //pub formux_r1: u32,
     //pub formux_r2: u32,

@@ -2,6 +2,7 @@ use crate::components::*;
 
 
 //The IF-ID Latch
+#[derive(Clone, Default)]
 pub struct IFIDLatch {
     pub base_pc: u32,
     pub added_pc: u32,
@@ -9,6 +10,7 @@ pub struct IFIDLatch {
 }
 
 //holds all of the wiring of the ID stage
+#[derive(Clone, Default)]
 pub struct IDLogic {
     pub decode_r1: u8,
     pub decode_r2: u8,

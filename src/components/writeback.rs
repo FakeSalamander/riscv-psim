@@ -1,5 +1,6 @@
 use crate::components::*;
 
+#[derive(Clone, Default)]
 pub struct MEMWBLatch {
     pub added_pc: u32,
     pub alu_output: u32,
@@ -9,6 +10,7 @@ pub struct MEMWBLatch {
     pub opcode: u8,
 }
 
+#[derive(Clone, Default)]
 pub struct WBLogic {
     pub wb_data: u32,
 }
