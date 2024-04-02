@@ -58,8 +58,7 @@ fn main() {
     while !(end_of_program) {
         //make backup, if needed.
         /*
-        if backups.len() < step_count {
-            backups.push(Snapshot {
+        if backups.len() < step_count {            backups.push(Snapshot {
                 state: state.clone(),
                 logic: logic.clone(),
             });
