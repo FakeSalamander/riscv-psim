@@ -4,8 +4,8 @@ mod fetch;
 mod memory;
 mod writeback;
 
-use crate::isa::isa;
-use crate::isa::isa::InstrT;
+pub use crate::isa::isa;
+pub use crate::isa::isa::InstrT;
 pub use decode::*;
 pub use execute::*;
 pub use fetch::*;
