@@ -218,108 +218,6 @@ impl Registers {
 
 impl Logic {
     fn update(&mut self, state: &Registers) {
-        //=================================
-        // IF Stage
-        //=================================
-
-        //must update PCAdder first.
-        self.fetch.pcadder_out = state.pc + 4;
-
-        //PCMux: First, check if opcode FROM EX STAGE is Jump, Branching, or neither
-        if (state.idex.opcode == 0b1101111 || state.idex.opcode == 0b1100111) {
-            self.fetch.pcmux_out = self.execute.alu_output; //initiates jump by setting PC to result of address adition
-        } else if (state.idex.opcode == 0b1100011 && self.execute.branch_taken) {
-            //if branch taken!
-            self.fetch.pcmux_out = self.execute.alu_output; //initiates jump
-        } else {
-            //if not branch, or branch not taken
-            self.fetch.pcmux_out = self.fetch.pcadder_out;
-        }
-
-        if ((state.pc / 4) as usize) >= state.instr_mem.len() {
-            //if reached end of program... put in NOPs to let the previous instructions finish.
-            self.fetch.instruction_out = 0;
-        } else {
-            self.fetch.instruction_out = state.instr_mem[(state.pc / 4) as usize];
-        }
-
-        //==============================
-        // ID Stage
-        //==============================
-
-        // Decoder
-        //gets the opcode, r1 index, r2 index, and destination register index out of the instruction, even if they end up being unused.
-        //uses bit-wise AND operation on a mask in order to get the desired bits, dividing to rem
-
-        // need to get lowest 7 bits out, just use a mask to get (6-0)
-        self.decode.decode_opcode = (state.ifid.instruction & 0b1111111) as u8;
-        // need to get bits (19-15) out. use mask, then shift right all the zero'd bits
-        self.decode.decode_r1 = ((state.ifid.instruction & 0b11111000000000000000) >> 15) as u8;
-        // need to get bits (24-20) out.
-        self.decode.decode_r2 =
-            ((state.ifid.instruction & 0b1111100000000000000000000) >> 20) as u8;
-        // need to get bits (11-7) out.
-        self.decode.decode_rd = ((state.ifid.instruction & 0b111110000000) >> 7) as u8;
-        // need to get the bits (14-12) out.
-        self.decode.decode_funct3 = ((state.ifid.instruction & 0b111000000000000) >> 12) as u8;
-        //need to get the bits (31-25) out.
-        self.decode.decode_funct7 =
-            ((state.ifid.instruction & 0b11111110000000000000000000000000) >> 25) as u8;
-
-        // Register Memory: Read.
-        assert!(self.decode.decode_r1 < 32 && self.decode.decode_r2 < 32);
-        self.decode.regmem_r1 = state.reg_mem[self.decode.decode_r1 as usize];
-        self.decode.regmem_r2 = state.reg_mem[self.decode.decode_r2 as usize];
-
-        // Immediates Decoder
-        //rearranges the immediates of an instruction by type, so they're where the ALU expects them.
-        let instr_type: InstrT = isa::get_instruction_type(self.decode.decode_opcode);
-        if matches!(instr_type, InstrT::Rtype) {
-            self.decode.immediates = 0; //Outputs a useless value. R-Type has no immediates.
-        } else if matches!(instr_type, InstrT::Itype) {
-            //in this one, simply take the 31st thru 12th bits! they're already where they want to be.
-            self.decode.immediates = ((state.ifid.instruction as i32) >> 20) as u32;
-        } else if matches!(instr_type, InstrT::Stype) {
-            //(31-25) goes to [11-5],  (11-7) goes to [4-0]. do each separately, then bitwise OR
-
-            //                       the (31-25) is converted to signed so that it does an arithmetic right shift
-            self.decode.immediates =
-                ((((state.ifid.instruction & 0b11111110000000000000000000000000) as i32) >> 20)
-                    as u32)
-                    | ((state.ifid.instruction & 0b111110000000) >> 7);
-        } else if matches!(instr_type, InstrT::Btype) {
-            //A (31) to [12] ,B (30-25) to [10-5], C (11-8) to [4-1], D (7) to [11]
-            let imm_a: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 19;
-            let imm_b: u32 = (state.ifid.instruction & 0b01111110000000000000000000000000) >> 20;
-            let imm_c: u32 = (state.ifid.instruction & 0b00000000000000000000111100000000) >> 7;
-            let imm_d: u32 = (state.ifid.instruction & 0b00000000000000000000000010000000) << 4;
-            //println!("{:#b}",imm_a);
-            //println!("{:#b}",imm_b);
-            //println!("{:#b}",imm_c);
-            //println!("{:#b}",imm_d);
-
-            self.decode.immediates =
-                ((((imm_a | imm_b | imm_c | imm_d) << 19) as i32) >> 19) as u32;
-        //the wonky shifting just sign-extends the 12-bit Imm preemptively
-        } else if matches!(instr_type, InstrT::Utype) {
-            //(31-12) goes to [31-12]... so just mask the rest!
-            self.decode.immediates = state.ifid.instruction & 0b11111111111111111111000000000000;
-        } else {
-            //only J-type left!  E  (31) to [20], F  (30-21) to [10-1], G  (20) to [11],  H  (19-12) to [19-12]
-            let imm_e: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 11;
-            let imm_f: u32 = (state.ifid.instruction & 0b01111111111000000000000000000000) >> 20;
-            let imm_g: u32 = (state.ifid.instruction & 0b00000000000100000000000000000000) >> 9;
-            let imm_h: u32 = state.ifid.instruction & 0b00000000000011111111000000000000;
-            println!("{:#b}", imm_e);
-            println!("{:#b}", imm_f);
-            println!("{:#b}", imm_g);
-            println!("{:#b}", imm_h);
-
-            self.decode.immediates =
-                ((((imm_e | imm_f | imm_g | imm_h) << 11) as i32) >> 11) as u32;
-            //same here, sign-shifts the 20-bit Imm
-        }
-
         //======================
         // EX Stage
         //======================
@@ -476,6 +374,108 @@ impl Logic {
             _ => panic!("Invalid or Unimplemented Instruction!"),
         };
 
+        //=================================
+        // IF Stage
+        //=================================
+
+        //must update PCAdder first.
+        self.fetch.pcadder_out = state.pc + 4;
+
+        //PCMux: First, check if opcode FROM EX STAGE is Jump, Branching, or neither
+        if (state.idex.opcode == 0b1101111 || state.idex.opcode == 0b1100111) {
+            self.fetch.pcmux_out = self.execute.alu_output; //initiates jump by setting PC to result of address adition
+        } else if (state.idex.opcode == 0b1100011 && self.execute.branch_taken) {
+            //if branch taken!
+            self.fetch.pcmux_out = self.execute.alu_output; //initiates jump
+        } else {
+            //if not branch, or branch not taken
+            self.fetch.pcmux_out = self.fetch.pcadder_out;
+        }
+
+        if ((state.pc / 4) as usize) >= state.instr_mem.len() {
+            //if reached end of program... put in NOPs to let the previous instructions finish.
+            self.fetch.instruction_out = 0;
+        } else {
+            self.fetch.instruction_out = state.instr_mem[(state.pc / 4) as usize];
+        }
+
+        //==============================
+        // ID Stage
+        //==============================
+
+        // Decoder
+        //gets the opcode, r1 index, r2 index, and destination register index out of the instruction, even if they end up being unused.
+        //uses bit-wise AND operation on a mask in order to get the desired bits, dividing to rem
+
+        // need to get lowest 7 bits out, just use a mask to get (6-0)
+        self.decode.decode_opcode = (state.ifid.instruction & 0b1111111) as u8;
+        // need to get bits (19-15) out. use mask, then shift right all the zero'd bits
+        self.decode.decode_r1 = ((state.ifid.instruction & 0b11111000000000000000) >> 15) as u8;
+        // need to get bits (24-20) out.
+        self.decode.decode_r2 =
+            ((state.ifid.instruction & 0b1111100000000000000000000) >> 20) as u8;
+        // need to get bits (11-7) out.
+        self.decode.decode_rd = ((state.ifid.instruction & 0b111110000000) >> 7) as u8;
+        // need to get the bits (14-12) out.
+        self.decode.decode_funct3 = ((state.ifid.instruction & 0b111000000000000) >> 12) as u8;
+        //need to get the bits (31-25) out.
+        self.decode.decode_funct7 =
+            ((state.ifid.instruction & 0b11111110000000000000000000000000) >> 25) as u8;
+
+        // Register Memory: Read.
+        assert!(self.decode.decode_r1 < 32 && self.decode.decode_r2 < 32);
+        self.decode.regmem_r1 = state.reg_mem[self.decode.decode_r1 as usize];
+        self.decode.regmem_r2 = state.reg_mem[self.decode.decode_r2 as usize];
+
+        // Immediates Decoder
+        //rearranges the immediates of an instruction by type, so they're where the ALU expects them.
+        let instr_type: InstrT = isa::get_instruction_type(self.decode.decode_opcode);
+        if matches!(instr_type, InstrT::Rtype) {
+            self.decode.immediates = 0; //Outputs a useless value. R-Type has no immediates.
+        } else if matches!(instr_type, InstrT::Itype) {
+            //in this one, simply take the 31st thru 12th bits! they're already where they want to be.
+            self.decode.immediates = ((state.ifid.instruction as i32) >> 20) as u32;
+        } else if matches!(instr_type, InstrT::Stype) {
+            //(31-25) goes to [11-5],  (11-7) goes to [4-0]. do each separately, then bitwise OR
+
+            //                       the (31-25) is converted to signed so that it does an arithmetic right shift
+            self.decode.immediates =
+                ((((state.ifid.instruction & 0b11111110000000000000000000000000) as i32) >> 20)
+                    as u32)
+                    | ((state.ifid.instruction & 0b111110000000) >> 7);
+        } else if matches!(instr_type, InstrT::Btype) {
+            //A (31) to [12] ,B (30-25) to [10-5], C (11-8) to [4-1], D (7) to [11]
+            let imm_a: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 19;
+            let imm_b: u32 = (state.ifid.instruction & 0b01111110000000000000000000000000) >> 20;
+            let imm_c: u32 = (state.ifid.instruction & 0b00000000000000000000111100000000) >> 7;
+            let imm_d: u32 = (state.ifid.instruction & 0b00000000000000000000000010000000) << 4;
+            //println!("{:#b}",imm_a);
+            //println!("{:#b}",imm_b);
+            //println!("{:#b}",imm_c);
+            //println!("{:#b}",imm_d);
+
+            self.decode.immediates =
+                ((((imm_a | imm_b | imm_c | imm_d) << 19) as i32) >> 19) as u32;
+        //the wonky shifting just sign-extends the 12-bit Imm preemptively
+        } else if matches!(instr_type, InstrT::Utype) {
+            //(31-12) goes to [31-12]... so just mask the rest!
+            self.decode.immediates = state.ifid.instruction & 0b11111111111111111111000000000000;
+        } else {
+            //only J-type left!  E  (31) to [20], F  (30-21) to [10-1], G  (20) to [11],  H  (19-12) to [19-12]
+            let imm_e: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 11;
+            let imm_f: u32 = (state.ifid.instruction & 0b01111111111000000000000000000000) >> 20;
+            let imm_g: u32 = (state.ifid.instruction & 0b00000000000100000000000000000000) >> 9;
+            let imm_h: u32 = state.ifid.instruction & 0b00000000000011111111000000000000;
+            println!("{:#b}", imm_e);
+            println!("{:#b}", imm_f);
+            println!("{:#b}", imm_g);
+            println!("{:#b}", imm_h);
+
+            self.decode.immediates =
+                ((((imm_e | imm_f | imm_g | imm_h) << 11) as i32) >> 11) as u32;
+            //same here, sign-shifts the 20-bit Imm
+        }
+
         // =========================
         // MEM Stage
         // =========================
@@ -604,7 +604,7 @@ impl Logic {
         // =========================
 
         // Just need to handle WB Multiplexor.
-        if state.memwb.opcode == 0b11011111 || state.memwb.opcode == 0b1100111 {
+        if state.memwb.opcode == 0b1101111 || state.memwb.opcode == 0b1100111 {
             //JAL, JALR, store (pc+4) into RD
             self.writeback.wb_data = state.memwb.added_pc;
         } else if state.memwb.opcode == 0b0000011 {

@@ -1,4 +1,5 @@
-use std::{hash::Hash, io::stdin};
+use std::time::Duration;
+use std::{hash::Hash, io::stdin, thread::sleep};
 
 use components::*;
 
@@ -75,6 +76,7 @@ fn run_program(state: &mut Registers, logic: &mut Logic) {
         print!("What now? [n - next cycle, b - prev. cycle]");
         let user_input = stdin();
         */
+        //sleep(Duration::new(1, 0));
 
         step(state, logic);
 
@@ -91,7 +93,7 @@ fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
     //for now, I'll just make it display the registers.
     print!("STEP {:?}:\n", step);
     for i in 0..32 {
-        print!("r{:?}: {:#34b}\n", i, state.reg_mem[i]);
+        print!("r{:?}: {:?}\n", i, state.reg_mem[i]);
     }
 
     print!("RDIndex: {}\n", state.memwb.rd_index);
@@ -151,11 +153,6 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        //ADDITIONAL SETUP:
-
-        //a vector of snapshots to make rewinding possible.
-        let mut backups: Vec<Snapshot> = Vec::new();
-
         run_program(&mut state, &mut logic);
 
         assert_eq!(state.reg_mem[0], 0);
@@ -197,11 +194,6 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        //ADDITIONAL SETUP:
-
-        //a vector of snapshots to make rewinding possible.
-        let mut backups: Vec<Snapshot> = Vec::new();
-
         run_program(&mut state, &mut logic);
 
         // rd = imm << 12
@@ -241,11 +233,6 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        //ADDITIONAL SETUP:
-
-        //a vector of snapshots to make rewinding possible.
-        let mut backups: Vec<Snapshot> = Vec::new();
-
         run_program(&mut state, &mut logic);
 
         // rd = (imm << 12) + PC
@@ -258,7 +245,262 @@ pub mod instr_tests {
     }
 
     #[test]
-    fn smoke_test() {
+    fn jalr() {
+        // A single huge program with many varied instructions.
+        // Serves as a simple "are there bugs?" test, like a cheksum.
+        let instructions = Vec::<u32>::from([
+            0b00000000000100000000000010010011, //0: addi $r1, $r0, 1
+            0b00000000001000000000000100010011, //4: addi $r2, $r0, 2
+            0b00000000100000000000000110010011, //8: addi $r3, $r0, 8
+            //____imm____||_r1|000|_rd||_op__|
+            0b00000001100000011000001101100111, //12: jalr $r6, $r3, 24      //jump to instr $r3 + 24 (32)
+            0b00000000000000000000000000000000, //16: nop
+            0b00000000000000000000000000000000, //20: nop
+            0b00000000000000000000000000000000, //24: nop
+            0b00000000001000000000001000010011, //28: addi $r4, $r0, 2
+            0b00000000000100000000001010010011, //32: addi $r5, $r0, 1
+            0b00000000000000000000000000000000, //36: nop
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 1);
+        assert_eq!(state.reg_mem[2], 2);
+        assert_eq!(state.reg_mem[3], 8);
+        assert_eq!(state.reg_mem[4], 0);
+        assert_eq!(state.reg_mem[5], 1);
+        assert_eq!(state.reg_mem[6], 16);
+        for i in 7..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn jal() {
+        // A single huge program with many varied instructions.
+        // Serves as a simple "are there bugs?" test, like a cheksum.
+        let instructions = Vec::<u32>::from([
+            0b00000000000100000000000010010011, //0: addi $r1, $r0, 1
+            0b00000000001000000000000100010011, //4: addi $r2, $r0, 2
+            0b00000000001100000000000110010011, //8: addi $r3, $r0, 3
+            //_|________|
+            0b00000001010000000000001101101111, //12: jal $r6, 20      //jump 5instr forward to 32
+            0b00000000000000000000000000000000, //16: nop
+            0b00000000000000000000000000000000, //20: nop
+            0b00000000000000000000000000000000, //24: nop
+            0b00000000001000000000001000010011, //28: addi $r4, $r0, 2
+            0b00000000000100000000001010010011, //32: addi $r5, $r0, 1
+            0b00000000000000000000000000000000, //36: nop
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 1);
+        assert_eq!(state.reg_mem[2], 2);
+        assert_eq!(state.reg_mem[3], 3);
+        assert_eq!(state.reg_mem[4], 0);
+        assert_eq!(state.reg_mem[5], 1);
+        assert_eq!(state.reg_mem[6], 16);
+        for i in 7..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn beq() {
+        // A single huge program with many varied instructions.
+        // Serves as a simple "are there bugs?" test, like a cheksum.
+        let instructions = Vec::<u32>::from([
+            0b00000000000100000000000010010011, //0: addi $r1, $r0, 1
+            0b00000000001000000000000100010011, //4: addi $r2, $r0, 2
+            0b00000000001100000000000110010011, //8: addi $r3, $r0, 3
+            0b00000000000000000000000000000000, //12: nop
+            0b00000000000000000000000000000000, //16: nop
+            0b00000000000000000000000000000000, //20: nop
+            //||____||_r2||_r1|000|__|||__op_|
+            0b00000010001000100000000001100011, //24: beq $r2, $r4, 32  //if $r2 == $r4, jump to 56.
+            0b00000000000000000000000000000000, //28: nop
+            0b00000000000000000000000000000000, //32: nop
+            0b00000000000000000000000000000000, //36: nop
+            0b00000000001000000000001000010011, //40: addi $r4, $r0, 2
+            0b00000000000100000000001010010011, //44: addi $r5, $r0, 1
+            0b00000000000000000000000000000000, //48: nop
+            0b00000001010000000000001101101111, //52: jal $r6, -40      //jump 10instr back to PC 12.
+            0b00000000000000000000000000000000, //56: nop
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 1);
+        assert_eq!(state.reg_mem[2], 2);
+        assert_eq!(state.reg_mem[3], 3);
+        assert_eq!(state.reg_mem[4], 2);
+        assert_eq!(state.reg_mem[5], 1);
+        assert_eq!(state.reg_mem[6], 56);
+        for i in 7..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn bne() {
+        // A single huge program with many varied instructions.
+        // Serves as a simple "are there bugs?" test, like a cheksum.
+        let instructions = Vec::<u32>::from([
+            0b00000000000100000000000010010011, //0: addi $r1, $r0, 1
+            0b00000000001000000000000100010011, //4: addi $r2, $r0, 2
+            0b00000000001100000000000110010011, //8: addi $r3, $r0, 3
+            0b00000000000000000000000000000000, //12: nop
+            0b00000000000000000000000000000000, //16: nop
+            0b00000000000000000000000000000000, //20: nop
+            //||____||_r2||_r1|001|__|||__op_|
+            0b00000010100000100001000001100011, //24: bne $r4, $r8, 32  //if $r4 != $r8, jump to 56.
+            0b00000000000000000000000000000000, //28: nop
+            0b00000000000000000000000000000000, //32: nop
+            0b00000000000000000000000000000000, //36: nop
+            0b00000000001000000000001000010011, //40: addi $r4, $r0, 2
+            0b00000000000100000000001010010011, //44: addi $r5, $r0, 1
+            0b00000000000000000000000000000000, //48: nop
+            0b00000001010000000000001101101111, //52: jal $r6, -40      //jump 10instr back to PC 12.
+            0b00000000000000000000000000000000, //56: nop
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 1);
+        assert_eq!(state.reg_mem[2], 2);
+        assert_eq!(state.reg_mem[3], 3);
+        assert_eq!(state.reg_mem[4], 2);
+        assert_eq!(state.reg_mem[5], 1);
+        assert_eq!(state.reg_mem[6], 56);
+        for i in 7..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn blt() {
+        // A single huge program with many varied instructions.
+        // Serves as a simple "are there bugs?" test, like a cheksum.
+        let instructions = Vec::<u32>::from([
+            0b00000000000100000000000010010011, //0: addi $r1, $r0, 1
+            0b00000000001000000000000100010011, //4: addi $r2, $r0, 2
+            0b00000000001100000000000110010011, //8: addi $r3, $r0, 3
+            0b00000000000000000000000000000000, //12: nop
+            0b00000000000000000000000000000000, //16: nop
+            0b00000000000000000000000000000000, //20: nop
+            //||____||_r2||_r1|100|__|||__op_|
+            0b00000010010000001100000001100011, //24: blt $r1, $r4, 32  //if $r1 < $r4, jump to 56.
+            0b00000000000000000000000000000000, //28: nop
+            0b00000000000000000000000000000000, //32: nop
+            0b00000000000000000000000000000000, //36: nop
+            0b00000000001000000000001000010011, //40: addi $r4, $r0, 2
+            0b00000000000100000000001010010011, //44: addi $r5, $r0, 1
+            0b00000000000000000000000000000000, //48: nop
+            0b00000001010000000000001101101111, //52: jal $r6, -40      //jump 10instr back to PC 12.
+            0b00000000000000000000000000000000, //56: nop
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 1);
+        assert_eq!(state.reg_mem[2], 2);
+        assert_eq!(state.reg_mem[3], 3);
+        assert_eq!(state.reg_mem[4], 2);
+        assert_eq!(state.reg_mem[5], 1);
+        assert_eq!(state.reg_mem[6], 56);
+        for i in 7..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn addi() {
         // A single huge program with many varied instructions.
         // Serves as a simple "are there bugs?" test, like a cheksum.
         let instructions = Vec::<u32>::from([
@@ -286,9 +528,6 @@ pub mod instr_tests {
         let mut logic = Logic::default();
 
         //ADDITIONAL SETUP:
-
-        //a vector of snapshots to make rewinding possible.
-        let mut backups: Vec<Snapshot> = Vec::new();
 
         run_program(&mut state, &mut logic);
 
