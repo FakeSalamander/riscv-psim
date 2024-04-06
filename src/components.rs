@@ -64,12 +64,17 @@ impl Registers {
         //insert code for Data Mem write here
         //check if instr. is a stor,
         if self.exmem.opcode == 0b0100011 {
+            println!("Storing value to Data Mem!");
             //use these to find the right address to pull from\
             if self.exmem.alu_output == 0 {
                 panic!("Instruction tried storing value to data memory address 0.")
             }
             let which_word = (self.exmem.alu_output) / 4;
             let align = self.exmem.alu_output % 4;
+            println!(
+                "whichword: {:?} , Align: {:?}, Funct3: {:?} to-store: {:#034b}",
+                which_word, align, self.exmem.funct3, self.exmem.mem_data_in
+            );
             if self.data_mem.contains_key(&which_word) {
                 if self.exmem.funct3 == 0b000 {
                     //Store Byte
@@ -99,7 +104,7 @@ impl Registers {
                             _ => panic!("align value is larger than 3!"),
                         },
                     );
-                } else if self.exmem.funct3 == 0b010 {
+                } else if self.exmem.funct3 == 0b001 {
                     //Store Half-Word
                     self.data_mem.insert(
                         which_word,
@@ -119,7 +124,7 @@ impl Registers {
                             _ => panic!("Align value is larger thna 3!"),
                         },
                     );
-                } else if self.exmem.funct3 == 0b100 {
+                } else if self.exmem.funct3 == 0b010 {
                     //Store Word
                     if align > 3 {
                         panic!("align value is larger than 3!")
@@ -158,7 +163,7 @@ impl Registers {
                             _ => panic!("Align value is larger thna 3!"),
                         },
                     );
-                } else if self.exmem.funct3 == 0b100 {
+                } else if self.exmem.funct3 == 0b010 {
                     //Store Word
                     if align > 3 {
                         panic!("align value is larger than 3!")
@@ -223,10 +228,10 @@ impl Logic {
         //======================
 
         // Forwarding Multiplexors. Decides if it must perform EX-EX or MEM-EX forwarding.
-        if state.idex.r1_index == state.exmem.rd_index {
+        if (state.idex.r1_index == state.exmem.rd_index) && state.idex.r1_index != 0 {
             //need to EX-EX forward!
             self.execute.formux_r1 = state.exmem.alu_output;
-        } else if state.idex.r1_index == state.memwb.rd_index {
+        } else if state.idex.r1_index == state.memwb.rd_index && state.idex.r1_index != 0 {
             //need to MEM-EX forward!
             self.execute.formux_r1 = state.memwb.alu_output;
         } else {
@@ -234,10 +239,10 @@ impl Logic {
             self.execute.formux_r1 = state.idex.r1_data;
         }
 
-        if state.idex.r2_index == state.exmem.rd_index {
+        if state.idex.r2_index == state.exmem.rd_index && state.idex.r2_index != 0 {
             //need to EX-EX forward!
             self.execute.formux_r2 = state.exmem.alu_output;
-        } else if state.idex.r2_index == state.memwb.rd_index {
+        } else if state.idex.r2_index == state.memwb.rd_index && state.idex.r2_index != 0 {
             //need to MEM-EX forward!
             self.execute.formux_r2 = state.memwb.alu_output;
         } else {
@@ -414,8 +419,16 @@ impl Logic {
         // need to get bits (24-20) out.
         self.decode.decode_r2 =
             ((state.ifid.instruction & 0b1111100000000000000000000) >> 20) as u8;
-        // need to get bits (11-7) out.
-        self.decode.decode_rd = ((state.ifid.instruction & 0b111110000000) >> 7) as u8;
+        // need to get bits (11-7) out... unless B or S, those have no rd
+        let instr_type: InstrT = isa::get_instruction_type(self.decode.decode_opcode);
+        if matches!(instr_type, InstrT::Stype) || matches!(instr_type, InstrT::Stype) {
+            //This operation has no register output. discard write to $r0
+            self.decode.decode_rd = 0;
+        } else {
+            //isn't S or B type, needs an rd.
+            self.decode.decode_rd = ((state.ifid.instruction & 0b111110000000) >> 7) as u8;
+        }
+
         // need to get the bits (14-12) out.
         self.decode.decode_funct3 = ((state.ifid.instruction & 0b111000000000000) >> 12) as u8;
         //need to get the bits (31-25) out.
@@ -429,7 +442,6 @@ impl Logic {
 
         // Immediates Decoder
         //rearranges the immediates of an instruction by type, so they're where the ALU expects them.
-        let instr_type: InstrT = isa::get_instruction_type(self.decode.decode_opcode);
         if matches!(instr_type, InstrT::Rtype) {
             self.decode.immediates = 0; //Outputs a useless value. R-Type has no immediates.
         } else if matches!(instr_type, InstrT::Itype) {
