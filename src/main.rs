@@ -2,6 +2,7 @@ use std::time::Duration;
 use std::{hash::Hash, io::stdin, thread::sleep};
 
 use components::*;
+use isa::isa::get_instruction_type;
 
 pub mod components;
 pub mod isa;
@@ -91,6 +92,7 @@ fn run_program(state: &mut Registers, logic: &mut Logic) {
 
 fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
     //for now, I'll just make it display the registers.
+    /*
     print!("STEP {:?}:\n", step);
     for i in 0..32 {
         print!("r{:?}: {:#034b}\n", i, state.reg_mem[i]);
@@ -99,6 +101,268 @@ fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
     print!("RDIndex: {}\n", state.memwb.rd_index);
     print!("ALU_out: {}\n", state.memwb.alu_output);
     print!("WB_mux:  {}\n", logic.writeback.wb_data);
+    */
+
+    println!("                                                                   ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────{:#07b}────┐", state.memwb.rd_index);
+    let if_instr = display_instruction(&logic.fetch.instruction_out);
+    let id_instr = display_instruction(&state.ifid.instruction);
+    let ex_instr = display_instruction(&state.idex.instruction);
+    let mem_instr = display_instruction(&state.exmem.instruction);
+    let wb_instr = display_instruction(&state.memwb.instruction);
+    println!(
+        "-IF:{}---------------ID:{}-----------------------EX:{}-------MEM:{}-------WB:{}-------",
+        if_instr, id_instr, ex_instr, mem_instr, wb_instr
+    );
+    println!("                                                                   │ ┌───────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────{:#010x}──┐ │", logic.writeback.wb_data);
+    println!("                                                                   │ │                                   │                                                                                           │ │");
+    println!("┌──────{:#010x}──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐                                                 │ │", logic.execute.alu_output);
+    println!("│                                                                  │ │                                   │                                         │                                                 │ │");
+    println!("│ ┌─────────────────────┐          ┌─────┐                         │ │                           ┌─────┐ │                                         │  ┌─────┐                      ┌─────┐           │ │" );
+    println!("│ │                     │          │IF/ID│                         │ │                           │ID/EX│ │                                         │  │ EX/ │                      │ MEM │           │ │");
+    println!("│ │         ┌─┐    ┌─\\  │{:#010x}│     │                         │ │                           │     │ │                                         │  │ MEM │                      │ /WB │           │ │", logic.fetch.pcadder_out);
+    println!("│ │         │4├───►│  │ │    │     │     │                         │ │                           │     │ │                                         │  │     │                      │     │           │ │");
+    println!("│ │         └─┘    │+ ├─┴────┴────►│added├─{:#010x}───────────────────────────────────────────►│added├───{:#010x}──────────────────────────────┼─►│added├───────{:#010x}────►│added├───┐       │ │",state.ifid.added_pc, state.idex.added_pc, state.exmem.added_pc);
+    println!("│ │              ┌►│  │            │  pc │                         │ │                           │  pc │ │                                         │  │  pc │                      │  pc │   │       │ │");
+    println!("│ │              │ └─/             │     │                         │ │                           │     │ │                                         │  │     │                      │     │{:#010x} │ │", state.memwb.added_pc);
+    println!("│ │              │                 │     │                         │ │                           │     │ │ ┌─{:#010x}───────────┐                │  │     │                      │     │   │       │ │", state.idex.base_pc);
+    println!("│ │              ├────────────────►│base ├─{:#010x}───────────────────────────────────────────►│base ├───┘                      │ ┌─\\            │  │     │                      │     │   │       │ │", state.ifid.base_pc);
+    println!("│ │              │                 │  pc │                         │ │                           │  pc │ │             ┌──\\       └─┤  │           │  │     │   ┌───{:#010x}────►│ALU  ├─┐ │ WB    │ │", state.exmem.alu_output);
+    println!("│ │ PC           │  ┌────────┐     │     │                         │ │  ┌─────────────────┐      │     │ ├────MEM-EX──►│   │        │  ├─┐         │  │     │   │                  │  Out│ │ │ Mux.  │ │");
+    println!("│ │ Mux.         │  │ Instr. │     │     │   ┌───────┐             │ │  │  Register Mem.  │      │     │ │             │ R1├─────┬──┤  │ │         │  │     │   │                  │     │ │ │ ┌─\\   │ │");
+    println!("│ │ ┌─\\     ┌──┐ │  │  Mem.  │     │     │ ┌►│Decoder├─{:#07b}───┐ │ └──┤Wb data      Reg1├─┬───►│R1   ├───{:#010x}─►│   │     │  └─/  ▼         │  │     │   │                  │     │ │ └►│  │  │ │", logic.decode.decode_r1, state.idex.r1_data);
+    println!("│ └►│  │    │PC│ │  │        │     │     │ │ │       │           │ │    │                 │ │    │ Data│ │             │   │     │     ┌─────────┐ │  │     │   │                  │     │ │   │  │  │ │");
+    println!("│   │  ├─┬─►│  ├─┼─►│addr    │     │     │ │ │       ├─{:#07b}─┐ │ └────┤Wb idx           │ │    │     │ │ ┌───EX-EX──►└──/      │     │Op1      │ │  │     │   │  ┌──────────┐    │     │ └─┬►│  ├──┘ │", logic.decode.decode_r2);
+    println!("└──►│  │ │  │  │ │  │     ins├─┬──►│instr├─┤ │       │         │ │      │                 │ │    │     │ │ │                     │     │         │ │  │     │   │  │ DATA MEM.│    │     │   │ │  │    │");
+    println!("    └─/  │  └──┘ │  └────────┘ │   │     │ │ │ opcode├───┐     │ └─────►│R1 idx           │ │    │     │ └──────MEM-EX──►┌──\\    │     │   ALU   │ │  │     │   │  │      Read├─┬─►│Mem  ├─┬──►│  │    │");
+    println!("         │ STALL │             │   │     │ │ │       │   │     │        │                 │ │    │     │   │             │   │   │     │      Out├─┼─►│ALU  ├───┼──┤Addr   Out│ │  │  Out│ │ │ └─/     │");
+    println!("         │       │             │   │     │ │ │ rd idx├─┐ │     └───────►│R2 idx       Reg2├─┼─┬─►│R2   ├─────{:#010x}─►│ R2│   │     │Op2      │ │  │  Out│   │  │          │ │  │     │ │ │         │", state.idex.r2_data);
+    println!(" {:#010x}   {:#010x}       │   │     │ │ └───────┘ │ │              └─────────────────┘ │ │  │ Data│   │             │   ├─┐ │     └─────────┘ │  │     │   │  │          │ │  │     │ │{:#010x} │", logic.fetch.pcmux_out, state.pc, state.memwb.alu_output);
+    println!("                               │   │     │ │           │ │ ┌──────┐                {:#010x} │  │     │   ├─────EX-EX──►│   │ │ │  ┌─\\  ▲         │  │     │ ┌────┤DataIn    │ │  │     │ │           │", logic.decode.regmem_r1);
+    println!("                      {:#010x}   │     │ │           │ └►│ Imm. │                           │  │     │   │             └──/  ├───►│  │ │ {:#010x} │     │ │ │  └──────────┘ │  │     │{:#010x}   │", logic.fetch.instruction_out, logic.execute.alu_output, state.memwb.mem_data_out);
+    println!("                                   │     │ │           │   │Decode│                  {:#010x}  │     │   │                   │ │  │  ├─┘            │     │ │ │               │  │     │             │", logic.decode.regmem_r2);
+    println!("                                   │     │ ├──────────────►│      ├─{:#010x}─┐                 │     │   │ ┌─{:#010x}──────────►│  │              │     │ │ │      {:#010x}  │     │             │", logic.decode.immediates, state.idex.immediates, logic.memory.mem_data_out );
+    println!("                                   │     │ │           │   └──────┘            └────────────────►│Imms.├─────┘                 │ │  └─/               │     │ │ │                  │     │             │");
+    println!("                                   │     │ {:#010x}  │                                         │     │   │                   │ │                    │     │ │ │                  │     │             │", state.ifid.instruction);
+    println!("                                   │     │             └────────────{:#07b}─────────────────────►│Rd Id├───────┐               ├────────{:#010x}───►│Mem  ├─┴────{:#010x}      │     │             │", logic.decode.decode_rd, logic.execute.formux_r2, state.exmem.mem_data_in);
+    println!("                                   │     │                                                       │     │   │   │               │ │                    │  In │   │                  │     │             │");
+    println!("                                   │     │                                                       │     │   │   │               │ │  ┌─────────┐       │     │   │                  │     │             │");
+    println!("                                   │     │                                                       │     │   │   │               │ └─►│ Branch? │       │     │   │                  │     │             │");
+    println!("                                   │     │                                                       │     │   │   │               │    │         │       │     │   │                  │     │             │");
+    println!("                                   │     │                                                       │     │   │   │               └───►│    {}    │       │     │   │                  │     │             │", if logic.execute.branch_taken {"Y"} else {"N"});
+    println!("                                   │     │                                                       │     │   │   │                    └─────────┘       │     │   │                  │     │             │");
+    println!("                                   │     │                                                       │     │   │   │                                      │     │   │                  │     │             │");
+    println!("                                   │     │                                                       │     │   │   └────────────{:#07b}──────────────────►│Rd Id├────────{:#07b}──────►│Rd In├─────────────┘", state.idex.rd_index, state.exmem.rd_index);
+    println!("                                   └─────┘                                                       └─────┘   │                                          └─────┘   │                  └─────┘              ");
+    println!("                                    STALL                                                         STALL    │                                           STALL    │                   STALL               ");
+    println!("                                                                                                           └─{:#010x}─────────────────────────────────────────┘                                      ", state.exmem.alu_output);
+
+    println!("");
+    for r in 0..32 {
+        print!("$r{:#02}: {:#010x}   ", r, state.reg_mem[r]);
+        if (r + 1) % 8 == 0 {
+            print!("\n");
+        }
+    }
+}
+
+fn display_instruction(instr: &u32) -> String {
+    //converts a 32-bit instruction into a string of human-readable assembly
+    let opcode = instr & 0b1111111;
+    let rd = ((instr & 0b111110000000) >> 7);
+    let funct3 = ((instr & 0b111000000000000) >> 12);
+    let funct7 = ((instr & 0b11111110000000000000000000000000) >> 25);
+    let r1 = ((instr & 0b11111000000000000000) >> 15);
+    let r2 = ((&0b1111100000000000000000000) >> 20);
+
+    let typ = get_instruction_type(opcode as u8);
+
+    let mut assembly: String = "".to_string();
+
+    //Note: the immediates of LUI and AUIPC are the only ones to be unsigned, since they get pushed all the way to the top of their output.
+    if opcode == 0b0110111 {
+        //LUI
+        let imm = (instr & 0b11111111111111111111) >> 12;
+        assembly = "lui $r".to_owned() + &rd.to_string() + ", " + &imm.to_string();
+        //         6                     2               2       7
+        // 17 chars at most
+    } else if opcode == 0b0010111 {
+        //AUIPC
+        let imm = (instr & 0b11111111111111111111) >> 12;
+        assembly = "auipc $r".to_owned() + &rd.to_string() + ", " + &imm.to_string();
+        // 19 at most
+    } else if opcode == 0b1101111 {
+        //JAL
+        let imm_e: u32 = (instr & 0b10000000000000000000000000000000) >> 11;
+        let imm_f: u32 = (instr & 0b01111111111000000000000000000000) >> 20;
+        let imm_g: u32 = (instr & 0b00000000000100000000000000000000) >> 9;
+        let imm_h: u32 = instr & 0b00000000000011111111000000000000;
+
+        let imm = (((imm_e | imm_f | imm_g | imm_h) << 11) as i32) >> 11;
+        assembly = "jal $r".to_owned() + &rd.to_string() + ", " + &imm.to_string();
+        // 17 at most
+    } else if opcode == 0b1100111 {
+        let imm = ((*instr as i32) >> 20);
+
+        assembly = "jalr $r".to_owned()
+            + &rd.to_string()
+            + ", $r"
+            + &r1.to_string()
+            + ", "
+            + &imm.to_string();
+        // 7 + 2 + 5 + 2 + 2 + 7
+        // 25 at most
+    } else if opcode == 0b1100011 {
+        //Branches! need to look at funct3 to decide which.
+
+        //A (31) to [12] ,B (30-25) to [10-5], C (11-8) to [4-1], D (7) to [11]
+        let imm_a: u32 = (((instr & 0b10000000000000000000000000000000) as i32) >> 19) as u32;
+        let imm_b: u32 = (instr & 0b01111110000000000000000000000000) >> 20;
+        let imm_c: u32 = (instr & 0b00000000000000000000111100000000) >> 7;
+        let imm_d: u32 = (instr & 0b00000000000000000000000010000000) << 4;
+        //println!("{:#b}",imm_a);
+        //println!("{:#b}",imm_b);
+        //println!("{:#b}",imm_c);
+        //println!("{:#b}",imm_d);
+
+        let imm = ((((imm_a | imm_b | imm_c | imm_d) << 19) as i32) >> 19);
+        let instr_name = match funct3 {
+            0b000 => "beq",
+            0b001 => "bne",
+            0b100 => "blt",
+            0b101 => "bge",
+            0b110 => "bltu",
+            0b111 => "bgeu",
+            _ => panic!("Invalid funct3 for a branch! {:b}", instr),
+        };
+        assembly = instr_name.to_owned()
+            + " $r"
+            + &r1.to_string()
+            + ", $r"
+            + &r2.to_string()
+            + ", "
+            + &imm.to_string();
+    } else if opcode == 0b0000011 {
+        //Load! Look at funct3 to decide which.
+        let imm = ((*instr as i32) >> 20);
+
+        let instr_name = match funct3 {
+            0b000 => "lb",
+            0b001 => "lh",
+            0b010 => "lw",
+            0b100 => "lbu",
+            0b101 => "lhu",
+            _ => panic!("Invalid funct3 for a load! {:b}", instr),
+        };
+        assembly = instr_name.to_owned()
+            + " $r"
+            + &rd.to_string()
+            + ", "
+            + &imm.to_string()
+            + "($r"
+            + &r1.to_string()
+            + ")";
+    } else if opcode == 0b0100011 {
+        // Store! Look at funct3 to decide which.
+
+        let imm = (((instr & 0b11111110000000000000000000000000) as i32) >> 20)
+            | (((instr & 0b111110000000) >> 7) as i32);
+
+        let instr_name = match funct3 {
+            0b000 => "sb",
+            0b001 => "sh",
+            0b010 => "sw",
+            _ => panic!("Invalid funct3 for a store! {:b}", instr),
+        };
+
+        assembly = instr_name.to_owned()
+            + " $r"
+            + &r2.to_string()
+            + ", "
+            + &imm.to_string()
+            + "($r"
+            + &r1.to_string()
+            + ")";
+    } else if opcode == 0b0010011 {
+        // Register-Immediate Operation! Look at funct3 to figure which.
+        let imm = ((*instr as i32) >> 20);
+        //use r2 as shamt for the shifts, they take up same space in instruction.
+
+        let instr_name = match funct3 {
+            0b000 => "addi",
+            0b010 => "slti",
+            0b011 => "sltiu",
+            0b100 => "xori",
+            0b110 => "ori",
+            0b111 => "andi",
+
+            0b001 => "slli",
+            0b101 => match funct7 {
+                0b0000000 => "srli",
+                0b0100000 => "srai",
+                _ => "wrsh!!",
+            },
+            _ => panic!("Invalid funct3 for an R-I op! {:b}", instr),
+        };
+
+        if funct3 == 0b001 || funct3 == 0b101 {
+            //shifts use the shamt instead of the full immediate field.
+            let assembly = instr_name.to_owned()
+                + " $r"
+                + &rd.to_string()
+                + ", $r"
+                + &r1.to_string()
+                + ", "
+                + &r2.to_string();
+        } else {
+            //for the rest..
+            assembly = instr_name.to_owned()
+                + " $r"
+                + &rd.to_string()
+                + ", $r"
+                + &r1.to_string()
+                + ", "
+                + &imm.to_string();
+        }
+    } else if opcode == 0b0110011 {
+        //Register-Register Instructions! Look at funct3/7 to see which.
+        // No immediates.
+        let instr_name = match funct3 {
+            0b000 => match funct7 {
+                0b0000000 => "add",
+                0b0100000 => "sub",
+                _ => panic!("invalid funct7 for add/sub! {:b}", instr),
+            },
+            0b001 => "sll",
+            0b010 => "slt",
+            0b011 => "sltu",
+            0b100 => "xor",
+            0b101 => match funct7 {
+                0b0000000 => "srl",
+                0b0100000 => "sra",
+                _ => panic!("invalid funct7 for srl/a! {:b}", instr),
+            },
+            0b110 => "or",
+            0b111 => "and",
+            _ => panic!("Invalid funct3 for an R-R op! {:b}", instr),
+        };
+
+        assembly = instr_name.to_owned()
+            + " $r"
+            + &rd.to_string()
+            + ", $r"
+            + &r1.to_string()
+            + ", $r"
+            + &r2.to_string();
+    } else if opcode == 0 {
+        assembly = "nop".to_owned();
+    } else {
+        assembly = "".to_owned();
+        panic!("Invalid instruction opcode! {:b}", instr);
+    }
+    while assembly.len() < 25 {
+        assembly += "-";
+    }
+    return assembly;
 }
 
 /*

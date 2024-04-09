@@ -57,6 +57,8 @@ impl Registers {
 
         self.memwb.opcode = self.exmem.opcode;
 
+        self.memwb.instruction = self.exmem.instruction;
+
         println!("{}", old_rd);
 
         // Data Memory
@@ -190,6 +192,8 @@ impl Registers {
         self.exmem.opcode = self.idex.opcode;
         self.exmem.funct3 = self.idex.funct3;
 
+        self.exmem.instruction = self.idex.instruction;
+
         // ID-EX Latch
         self.idex.base_pc = self.ifid.base_pc;
         self.idex.added_pc = self.ifid.added_pc;
@@ -204,6 +208,8 @@ impl Registers {
         self.idex.funct7 = logic.decode.decode_funct7;
         self.idex.r2_index = logic.decode.decode_r2;
         self.idex.r1_index = logic.decode.decode_r1;
+
+        self.idex.instruction = self.ifid.instruction;
 
         // Register Memory. Write to it.
         assert!(old_rd < 0b100000); //Register indices are always 5 bits or less.
@@ -333,6 +339,10 @@ impl Logic {
             0b111 => state.idex.r1_data > state.idex.r2_data,  //BGEU
             _ => false,                                        //not a branching instruction.
         };
+
+        if state.idex.opcode != 0b1100011 {
+            self.execute.branch_taken = false;
+        } //if it's not a branch, should be false regardless.
 
         //ALU
         //actually computes the instruction!  for signed operations, convert Ops to signed then convert result to unsigned.

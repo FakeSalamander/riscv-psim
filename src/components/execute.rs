@@ -16,6 +16,8 @@ pub struct IDEXLatch {
     pub funct7: u8,
     pub r2_index: u8,
     pub r1_index: u8,
+
+    pub instruction: u32,
 }
 
 //holds the wires for the EX Stage

@@ -8,6 +8,8 @@ pub struct MEMWBLatch {
     pub rd_index: u8,
 
     pub opcode: u8,
+
+    pub instruction: u32,
 }
 
 #[derive(Clone, Default)]
