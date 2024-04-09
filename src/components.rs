@@ -223,37 +223,84 @@ impl Registers {
 
 impl Logic {
     fn update(&mut self, state: &Registers) {
+        // =========================
+        // WB Stage
+        // =========================
+
+        // Just need to handle WB Multiplexor.
+        if state.memwb.opcode == 0b1101111 || state.memwb.opcode == 0b1100111 {
+            //JAL, JALR, store (pc+4) into RD
+            self.writeback.wb_data = state.memwb.added_pc;
+        } else if state.memwb.opcode == 0b0000011 {
+            // LB, LH, LW, LBU, LHU. The load instructions all load the memory read data into RD
+            self.writeback.wb_data = state.memwb.mem_data_out;
+        } else if state.memwb.opcode == 0b1100011 || state.memwb.opcode == 0b0100011 {
+            // Branches & Stores. These write nothing to RD at all!
+            self.writeback.wb_data = 0xdeadbeef; //special value representing null
+        } else {
+            //all other opcodes return the ALU's result to the RD
+            self.writeback.wb_data = state.memwb.alu_output;
+        }
+
         //======================
         // EX Stage
         //======================
 
+        //figures out Instruction Type of the instruction from the ID-EX Latch.
+        // used by many EX-stage components
+        let instr_type: InstrT = isa::get_instruction_type(state.idex.opcode);
+
         // Forwarding Multiplexors. Decides if it must perform EX-EX or MEM-EX forwarding.
-        if (state.idex.r1_index == state.exmem.rd_index) && state.idex.r1_index != 0 {
-            //need to EX-EX forward!
-            self.execute.formux_r1 = state.exmem.alu_output;
-        } else if state.idex.r1_index == state.memwb.rd_index && state.idex.r1_index != 0 {
-            //need to MEM-EX forward!
-            self.execute.formux_r1 = state.memwb.alu_output;
-        } else {
-            // no forwarding needed!
+        // R1 first.
+
+        if state.idex.r1_index == 0 {
+            // if R1 is $r0, do NOT forward. it is a constant register.
             self.execute.formux_r1 = state.idex.r1_data;
+        } else if matches!(instr_type, InstrT::Utype) || matches!(instr_type, InstrT::Jtype) {
+            // U-type & J-type have no R1. do nothing.
+            self.execute.formux_r1 = state.idex.r1_data;
+        } else {
+            // Forwarding might be needed. Check RD index of instructions further along.
+            if state.idex.r1_index == state.exmem.rd_index {
+                //need to EX-EX forward!
+                println!("EX-EX forward!");
+                self.execute.formux_r1 = state.exmem.alu_output;
+            } else if state.idex.r1_index == state.memwb.rd_index {
+                //need to MEM-EX forward!
+                println!("EX-MEM Forward!");
+                self.execute.formux_r1 = self.writeback.wb_data;
+            } else {
+                // no forwarding needed!
+                self.execute.formux_r1 = state.idex.r1_data;
+            }
         }
 
-        if state.idex.r2_index == state.exmem.rd_index && state.idex.r2_index != 0 {
-            //need to EX-EX forward!
-            self.execute.formux_r2 = state.exmem.alu_output;
-        } else if state.idex.r2_index == state.memwb.rd_index && state.idex.r2_index != 0 {
-            //need to MEM-EX forward!
-            self.execute.formux_r2 = state.memwb.alu_output;
+        if state.idex.r2_index == 0 {
+            // if R2 is $r0, do NOT forward. it is a constant register.
+            self.execute.formux_r2 = state.idex.r2_data;
+        } else if matches!(instr_type, InstrT::Utype)
+            || matches!(instr_type, InstrT::Jtype)
+            || matches!(instr_type, InstrT::Itype)
+        {
+            // U-type, J-type, & I-type have no R2. do nothing.
+            self.execute.formux_r2 = state.idex.r2_data;
         } else {
-            // no forwarding needed!
-            self.execute.formux_r2 = state.idex.r1_data;
+            // Forwarding might be needed. Check RD index of instructions further along.
+            if state.idex.r2_index == state.exmem.rd_index {
+                //need to EX-EX forward!
+                self.execute.formux_r2 = state.exmem.alu_output;
+            } else if state.idex.r2_index == state.memwb.rd_index {
+                //need to MEM-EX forward!
+                self.execute.formux_r2 = state.memwb.alu_output;
+            } else {
+                // no forwarding needed!
+                self.execute.formux_r2 = state.idex.r1_data;
+            }
         }
 
         // R1-PC Multiplexor.
         // Decides if Operand 1 is the R1 value or the Program Count.
         // Uses Instruction Type to decide.
-        let instr_type: InstrT = isa::get_instruction_type(state.idex.opcode);
 
         if (matches!(instr_type, InstrT::Utype)
             || matches!(instr_type, InstrT::Jtype)
@@ -457,7 +504,9 @@ impl Logic {
                     | ((state.ifid.instruction & 0b111110000000) >> 7);
         } else if matches!(instr_type, InstrT::Btype) {
             //A (31) to [12] ,B (30-25) to [10-5], C (11-8) to [4-1], D (7) to [11]
-            let imm_a: u32 = (state.ifid.instruction & 0b10000000000000000000000000000000) >> 19;
+            let imm_a: u32 = (((state.ifid.instruction & 0b10000000000000000000000000000000)
+                as i32)
+                >> 19) as u32;
             let imm_b: u32 = (state.ifid.instruction & 0b01111110000000000000000000000000) >> 20;
             let imm_c: u32 = (state.ifid.instruction & 0b00000000000000000000111100000000) >> 7;
             let imm_d: u32 = (state.ifid.instruction & 0b00000000000000000000000010000000) << 4;
@@ -552,7 +601,7 @@ impl Logic {
                     }
                 } else if state.exmem.funct3 == 0b010 {
                     //Load Word.
-                    if align < 3 {
+                    if align > 3 {
                         panic!("Align is greater than 3!")
                     }
                     if align < 0 {
@@ -609,25 +658,6 @@ impl Logic {
         } else {
             //if no value is read... output useless value
             self.memory.mem_data_out = 0xdeadbeef;
-        }
-
-        // =========================
-        // WB Stage
-        // =========================
-
-        // Just need to handle WB Multiplexor.
-        if state.memwb.opcode == 0b1101111 || state.memwb.opcode == 0b1100111 {
-            //JAL, JALR, store (pc+4) into RD
-            self.writeback.wb_data = state.memwb.added_pc;
-        } else if state.memwb.opcode == 0b0000011 {
-            // LB, LH, LW, LBU, LHU. The load instructions all load the memory read data into RD
-            self.writeback.wb_data = state.memwb.mem_data_out;
-        } else if state.memwb.opcode == 0b1100011 || state.memwb.opcode == 0b0100011 {
-            // Branches & Stores. These write nothing to RD at all!
-            self.writeback.wb_data = 0xdeadbeef; //special value representing null
-        } else {
-            //all other opcodes return the ALU's result to the RD
-            self.writeback.wb_data = state.memwb.alu_output;
         }
     }
 }
