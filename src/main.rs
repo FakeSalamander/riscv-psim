@@ -126,21 +126,21 @@ fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
     println!("│ │              │ └─/             │     │                         │ │                           │     │ │                                         │  │     │                      │     │{:#010x} │ │", state.memwb.added_pc);
     println!("│ │              │                 │     │                         │ │                           │     │ │ ┌─{:#010x}───────────┐                │  │     │                      │     │   │       │ │", state.idex.base_pc);
     println!("│ │              ├────────────────►│base ├─{:#010x}───────────────────────────────────────────►│base ├───┘                      │ ┌─\\            │  │     │                      │     │   │       │ │", state.ifid.base_pc);
-    println!("│ │              │                 │  pc │                         │ │                           │  pc │ │             ┌──\\       └►│{} │           │  │     │   ┌───{:#010x}────►│ALU  ├─┐ │ WB    │ │", if logic.execute.pc_used {"O"} else {" "} ,state.exmem.alu_output);
-    println!("│ │ PC           │  ┌────────┐     │     │                         │ │  ┌─────────────────┐      │     │ ├────MEM-EX──►│{}  │        │  ├─┐         │  │     │   │                  │  Out│ │ │ Mux.  │ │", if logic.execute.r1_forwarded == 2 {"O"} else {" "});
-    println!("│ │ Mux.         │  │ Instr. │     │     │   ┌───────┐             │ │  │  Register Mem.  │      │     │ │             │ R1├─────┬─►│{} │ │         │  │     │   │                  │     │ │ │ ┌─\\   │ │", if !logic.execute.pc_used {"O"} else {" "});
-    println!("│ │ ┌─\\     ┌──┐ │  │  Mem.  │     │     │ ┌►│Decoder├─{:#07b}───┐ │ └──┤Wb data      Reg1├─┬───►│R1   ├───{:#010x}─►│{}  │     │  └─/  ▼         │  │     │   │                  │     │ │ └►│{} │  │ │", logic.decode.decode_r1, state.idex.r1_data, if logic.execute.r1_forwarded == 0 {"O"} else {" "}, if logic.writeback.wb_used == 2 {"O"} else {" "});
-    println!("│ └►│{} │    │PC│ │  │        │     │     │ │ │       │           │ │    │                 │ │    │ Data│ │             │   │     │     ┌─────────┐ │  │     │   │                  │     │ │   │  │  │ │", if !logic.fetch.jumped {"O"} else {" "});
-    println!("│   │  ├─┬─►│  ├─┼─►│addr    │     │     │ │ │       ├─{:#07b}─┐ │ └────┤Wb idx           │ │    │     │ │ ┌───EX-EX──►└{}─/      │     │Op1      │ │  │     │   │  ┌──────────┐    │     │ └─┬►│{} ├──┘ │", logic.decode.decode_r2, if logic.execute.r1_forwarded == 1 {"O"} else {"─"}, if logic.writeback.wb_used == 0 {"O"} else {" "});
-    println!("└──►│{} │ │  │  │ │  │     ins├─┬──►│instr├─┤ │       │         │ │      │                 │ │    │     │ │ │                     │     │         │ │  │     │   │  │ DATA MEM.│    │     │   │ │  │    │", if logic.fetch.jumped {"O"} else {" "});
-    println!("    └─/  │  └──┘ │  └────────┘ │   │     │ │ │ opcode├───┐     │ └─────►│R1 idx           │ │    │     │ └──────MEM-EX──►┌{}─\\    │     │   ALU   │ │  │     │   │  │      Read├─┬─►│Mem  ├─┬──►│{} │    │", if logic.execute.r1_forwarded == 2 {"O"} else {"─"}, if logic.writeback.wb_used == 1 {"O"} else {" "});
+    println!("│ │              │                 │  pc │                         │ │                           │  pc │ │             ┌──\\       └►│{} │           │  │     │   ┌───{:#010x}────►│ALU  ├─┐ │ WB    │ │", if logic.execute.pc_used {"►"} else {" "} ,state.exmem.alu_output);
+    println!("│ │ PC           │  ┌────────┐     │     │                         │ │  ┌─────────────────┐      │     │ ├────MEM-EX──►│{}  │        │  ├─┐         │  │     │   │                  │  Out│ │ │ Mux.  │ │", if logic.execute.r1_forwarded == 2 {"►"} else {" "});
+    println!("│ │ Mux.         │  │ Instr. │     │     │   ┌───────┐             │ │  │  Register Mem.  │      │     │ │             │ R1├─────┬─►│{} │ │         │  │     │   │                  │     │ │ │ ┌─\\   │ │", if !logic.execute.pc_used {"►"} else {" "});
+    println!("│ │ ┌─\\     ┌──┐ │  │  Mem.  │     │     │ ┌►│Decoder├─{:#07b}───┐ │ └──┤Wb data      Reg1├─┬───►│R1   ├───{:#010x}─►│{}  │     │  └─/  ▼         │  │     │   │                  │     │ │ └►│{} │  │ │", logic.decode.decode_r1, state.idex.r1_data, if logic.execute.r1_forwarded == 0 {"►"} else {" "}, if logic.writeback.wb_used == 2 {"►"} else {" "});
+    println!("│ └►│{} │    │PC│ │  │        │     │     │ │ │       │           │ │    │                 │ │    │ Data│ │             │   │     │     ┌─────────┐ │  │     │   │                  │     │ │   │  │  │ │", if !logic.fetch.jumped {"►"} else {" "});
+    println!("│   │  ├─┬─►│  ├─┼─►│addr    │     │     │ │ │       ├─{:#07b}─┐ │ └────┤Wb idx           │ │    │     │ │ ┌───EX-EX──►└{}─/      │     │Op1      │ │  │     │   │  ┌──────────┐    │     │ └─┬►│{} ├──┘ │", logic.decode.decode_r2, if logic.execute.r1_forwarded == 1 {"►"} else {"─"}, if logic.writeback.wb_used == 0 {"►"} else {" "});
+    println!("└──►│{} │ │  │  │ │  │     ins├─┬──►│instr├─┤ │       │         │ │      │                 │ │    │     │ │ │                     │     │         │ │  │     │   │  │ DATA MEM.│    │     │   │ │  │    │", if logic.fetch.jumped {"►"} else {" "});
+    println!("    └─/  │  └──┘ │  └────────┘ │   │     │ │ │ opcode├───┐     │ └─────►│R1 idx           │ │    │     │ └──────MEM-EX──►┌{}─\\    │     │   ALU   │ │  │     │   │  │      Read├─┬─►│Mem  ├─┬──►│{} │    │", if logic.execute.r1_forwarded == 2 {"►"} else {"─"}, if logic.writeback.wb_used == 1 {"►"} else {" "});
     println!("         │ STALL │             │   │     │ │ │       │   │     │        │                 │ │    │     │   │             │   │   │     │      Out├─┼─►│ALU  ├───┼──┤Addr   Out│ │  │  Out│ │ │ └─/     │");
-    println!("         │       │             │   │     │ │ │ rd idx├─┐ │     └───────►│R2 idx       Reg2├─┼─┬─►│R2   ├─────{:#010x}─►│{}  │   │     │Op2      │ │  │  Out│   │  │          │ │  │     │ │ │         │", state.idex.r2_data, if logic.execute.r1_forwarded == 0 {"O"} else {" "});
+    println!("         │       │             │   │     │ │ │ rd idx├─┐ │     └───────►│R2 idx       Reg2├─┼─┬─►│R2   ├─────{:#010x}─►│{}  │   │     │Op2      │ │  │  Out│   │  │          │ │  │     │ │ │         │", state.idex.r2_data, if logic.execute.r1_forwarded == 0 {"►"} else {" "});
     println!(" {:#010x}   {:#010x}       │   │     │ │ └───────┘ │ │              └─────────────────┘ │ │  │ Data│   │             │ R2├─┐ │     └─────────┘ │  │     │   │  │          │ │  │     │ │{:#010x} │", logic.fetch.pcmux_out, state.pc, state.memwb.alu_output);
-    println!("                               │   │     │ │           │ │ ┌──────┐                {:#010x} │  │     │   ├─────EX-EX──►│{}  │ │ │  ┌─\\  ▲         │  │     │ ┌────┤DataIn    │ │  │     │ │           │", logic.decode.regmem_r1, if logic.execute.r1_forwarded == 1 {"O"} else {" "});
-    println!("                      {:#010x}   │     │ │           │ └►│ Imm. │                           │  │     │   │             └──/  ├───►│{} │ │ {:#010x} │     │ │ │  └──────────┘ │  │     │{:#010x}   │", logic.fetch.instruction_out,if !logic.execute.imm_used {"O"} else {" "} ,logic.execute.alu_output, state.memwb.mem_data_out);
+    println!("                               │   │     │ │           │ │ ┌──────┐                {:#010x} │  │     │   ├─────EX-EX──►│{}  │ │ │  ┌─\\  ▲         │  │     │ ┌────┤DataIn    │ │  │     │ │           │", logic.decode.regmem_r1, if logic.execute.r1_forwarded == 1 {"►"} else {" "});
+    println!("                      {:#010x}   │     │ │           │ └►│ Imm. │                           │  │     │   │             └──/  ├───►│{} │ │ {:#010x} │     │ │ │  └──────────┘ │  │     │{:#010x}   │", logic.fetch.instruction_out,if !logic.execute.imm_used {"►"} else {" "} ,logic.execute.alu_output, state.memwb.mem_data_out);
     println!("                                   │     │ │           │   │Decode│                  {:#010x}  │     │   │                   │ │  │  ├─┘            │     │ │ │               │  │     │             │", logic.decode.regmem_r2);
-    println!("                                   │     │ ├──────────────►│      ├─{:#010x}─┐                 │     │   │ ┌─{:#010x}──────────►│{} │              │     │ │ │      {:#010x}  │     │             │", logic.decode.immediates, state.idex.immediates, if logic.execute.imm_used {"O"} else {" "}, logic.memory.mem_data_out );
+    println!("                                   │     │ ├──────────────►│      ├─{:#010x}─┐                 │     │   │ ┌─{:#010x}──────────►│{} │              │     │ │ │      {:#010x}  │     │             │", logic.decode.immediates, state.idex.immediates, if logic.execute.imm_used {"►"} else {" "}, logic.memory.mem_data_out );
     println!("                                   │     │ │           │   └──────┘            └────────────────►│Imms.├─────┘                 │ │  └─/               │     │ │ │                  │     │             │");
     println!("                                   │     │ {:#010x}  │                                         │     │   │                   │ │                    │     │ │ │                  │     │             │", state.ifid.instruction);
     println!("                                   │     │             └────────────{:#07b}─────────────────────►│Rd Id├───────┐               ├────────{:#010x}───►│Mem  ├─┴────{:#010x}      │     │             │", logic.decode.decode_rd, logic.execute.formux_r2, state.exmem.mem_data_in);
@@ -1607,9 +1607,9 @@ pub mod instr_tests {
             0b00000000000000000000000000000000,
             //I-Type:           f3
             //|__imm_____||_r1|110|_rd||__op_|
-            0b01111111000100001110001000010011, //xori $r4, $r1, 0b011111110001
-            0b01111111000100010110001010010011, //xori $r5, $r2, 0b011111110001
-            0b01111111000100011110001100010011, //xori $r6, $r3, 0b011111110001
+            0b01111111000100001110001000010011, //ori $r4, $r1, 0b011111110001
+            0b01111111000100010110001010010011, //ori $r5, $r2, 0b011111110001
+            0b01111111000100011110001100010011, //ori $r6, $r3, 0b011111110001
         ]);
 
         //CPU SETUP: Initializes the state and logic structs.
@@ -1658,9 +1658,9 @@ pub mod instr_tests {
             0b00000000000000000000000000000000,
             //I-Type:           f3
             //|__imm_____||_r1|111|_rd||__op_|
-            0b01111110111100001111001000010011, //andi $r4, $r1, 0b011111111111
-            0b01111110111100010111001010010011, //andi $r5, $r2, 0b011111111111
-            0b01111110111100011111001100010011, //andi $r6, $r3, 0b011111111111
+            0b01111110111100001111001000010011, //andi $r4, $r1, 0b011111101111
+            0b01111110111100010111001010010011, //andi $r5, $r2, 0b011111101111
+            0b01111110111100011111001100010011, //andi $r6, $r3, 0b011111101111
         ]);
 
         //CPU SETUP: Initializes the state and logic structs.
@@ -2178,6 +2178,221 @@ pub mod instr_tests {
         assert_eq!(state.reg_mem[5], 0b011111111101);
         assert_eq!(state.reg_mem[6], 0b011111110111);
         assert_eq!(state.reg_mem[7], 0b011111111111);
+        for i in 8..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn srl() {
+        // Shift Right Logical
+        // rd = r1 << shf  {shift 0's into new bits}
+        let instructions = Vec::<u32>::from([
+            0b10010010010010010011000010110111, //lui $r1, 0b10010010010010010011
+            0b00000000000100000000001100010011, //addi $r6, $r0, 1
+            0b00000000001000000000001110010011, //addi $r7, $r0, 2
+            0b00000000001100000000010000010011, //addi $r8, $r0, 3
+            0b00000001111100000000010010010011, //addi $r9, $r0, 31
+            // R-type: Shift variation
+            //0000000|_r2||_r1|101|_rd||__op_|
+            0b00000000011000001101000100110011, //srl $r2, $r1, $r6
+            0b00000000011100001101000110110011, //srl $r3, $r1, $r7
+            0b00000000100000001101001000110011, //srl $r4, $r1, $r8
+            0b00000000100100001101001010110011, //srl $r5, $r1, $r9
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        //Checks for output correctness.
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 0b10010010010010010011 << 12);
+        assert_eq!(state.reg_mem[2], 0b10010010010010010011 << 11);
+        assert_eq!(state.reg_mem[3], 0b10010010010010010011 << 10);
+        assert_eq!(state.reg_mem[4], 0b10010010010010010011 << 9);
+        assert_eq!(state.reg_mem[5], 1);
+        assert_eq!(state.reg_mem[6], 1);
+        assert_eq!(state.reg_mem[7], 2);
+        assert_eq!(state.reg_mem[8], 3);
+        assert_eq!(state.reg_mem[9], 31);
+        for i in 10..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn sra() {
+        // Shift Right Arithmetic
+        // rd = r1 << r2 {shift sign bit into new bits}
+        let instructions = Vec::<u32>::from([
+            0b10010010010010010011000010110111, //lui $r1, 0b10010010010010010011
+            0b01010010010010010011000100110111, //lui $r2, 0b01010010010010010011
+            0b00000000000100000000010110010011, //addi $r11, $r0, 1
+            0b00000000001000000000011000010011, //addi $r12, $r0, 2
+            0b00000000001100000000011010010011, //addi $r13, $r0, 3
+            0b00000001111100000000011100010011, //addi $r14, $r0, 31
+            // R-type: Shift variation
+            //0100000|_r2||_r1|101|_rd||__op_|
+            0b01000000101100001101000110110011, //srai $r3, $r1, $r11
+            0b01000000110000001101001000110011, //srai $r4, $r1, $r12
+            0b01000000110100001101001010110011, //srai $r5, $r1, $r13
+            0b01000000111000001101001100110011, //srai $r6, $r1, $r14
+            0b01000000101100010101001110110011, //srai $r7, $r2, $r11
+            0b01000000110000010101010000110011, //srai $r8, $r2, $r12
+            0b01000000110100010101010010110011, //srai $r9, $r2, $r13
+            0b01000000111000010101010100110011, //srai $r10, $r2, $r14
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        run_program(&mut state, &mut logic);
+
+        //Checks for output correctness.
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 0b10010010010010010011 << 12);
+        assert_eq!(state.reg_mem[2], 0b01010010010010010011 << 12);
+        assert_eq!(state.reg_mem[3], 0b110010010010010010011 << 11);
+        assert_eq!(state.reg_mem[4], 0b1110010010010010010011 << 10);
+        assert_eq!(state.reg_mem[5], 0b11110010010010010010011 << 9);
+        assert_eq!(state.reg_mem[6], 0b11111111111111111111111111111111);
+        assert_eq!(state.reg_mem[7], 0b01010010010010010011 << 11);
+        assert_eq!(state.reg_mem[8], 0b01010010010010010011 << 10);
+        assert_eq!(state.reg_mem[9], 0b01010010010010010011 << 9);
+        assert_eq!(state.reg_mem[10], 0);
+        assert_eq!(state.reg_mem[11], 1);
+        assert_eq!(state.reg_mem[12], 2);
+        assert_eq!(state.reg_mem[13], 3);
+        assert_eq!(state.reg_mem[14], 31);
+
+        for i in 15..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn or() {
+        // OR:
+        // rd = r1 | r2
+        let instructions = Vec::<u32>::from([
+            0b00000000000100000000000010010011, //addi $r1, $r0, 1
+            0b00000000001000000000000100010011, //addi $r2, $r0, 2
+            0b00000000011000010000000110010011, //addi $r3, $r2, 6
+            0b01111111000100000000001110010011, //addi $r7, $r0, 0b011111110001
+            //R-Type:           f3
+            //0000000|_r2||_r1|110|_rd||__op_|
+            0b00000000011100001110001000110011, //or $r4, $r1, $r7
+            0b00000000011100010110001010110011, //or $r5, $r2, $r7
+            0b00000000011100011110001100110011, //or $r6, $r3, $r7
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        //ADDITIONAL SETUP:
+
+        run_program(&mut state, &mut logic);
+
+        //Checks for output correctness.
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 1);
+        assert_eq!(state.reg_mem[2], 2);
+        assert_eq!(state.reg_mem[3], 8);
+        assert_eq!(state.reg_mem[4], 0b011111110001);
+        assert_eq!(state.reg_mem[5], 0b011111110011);
+        assert_eq!(state.reg_mem[6], 0b011111111001);
+        assert_eq!(state.reg_mem[7], 0b011111110001);
+        for i in 8..32 {
+            assert_eq!(state.reg_mem[i], 0);
+        }
+    }
+
+    #[test]
+    fn and() {
+        // AND:
+        // rd = r1 & r2
+        let instructions = Vec::<u32>::from([
+            0b00000001000100000000000010010011, //addi $r1, $r0, 17
+            0b00000001001000000000000100010011, //addi $r2, $r0, 18
+            0b00000001100000000000000110010011, //addi $r3, $r0, 24
+            0b01111110111100000000001110010011, //addi $r7, $r0, 0b011111101111
+            //R-Type:           f3
+            //0000000|_r2||_r1|111|_rd||__op_|
+            0b00000000011100001111001000110011, //and $r4, $r1, $r7
+            0b00000000011100010111001010110011, //and $r5, $r2, $r7
+            0b00000000011100011111001100110011, //and $r6, $r3, $r7
+        ]);
+
+        //CPU SETUP: Initializes the state and logic structs.
+        let mut state = Registers {
+            ifid: IFIDLatch::default(),
+            idex: IDEXLatch::default(),
+            exmem: EXMEMLatch::default(),
+            memwb: MEMWBLatch::default(),
+
+            pc: 0,
+
+            instr_mem: instructions,
+            reg_mem: vec![0; 32], //makes a vector of 32 zeroes.
+            data_mem: HashMap::new(),
+        };
+
+        let mut logic = Logic::default();
+
+        //ADDITIONAL SETUP:
+
+        run_program(&mut state, &mut logic);
+
+        //Checks for output correctness.
+        assert_eq!(state.reg_mem[0], 0);
+        assert_eq!(state.reg_mem[1], 17);
+        assert_eq!(state.reg_mem[2], 18);
+        assert_eq!(state.reg_mem[3], 24);
+        assert_eq!(state.reg_mem[4], 1);
+        assert_eq!(state.reg_mem[5], 2);
+        assert_eq!(state.reg_mem[6], 8);
+        assert_eq!(state.reg_mem[7], 0b011111101111);
         for i in 8..32 {
             assert_eq!(state.reg_mem[i], 0);
         }
