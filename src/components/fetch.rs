@@ -6,4 +6,7 @@ pub struct IFLogic {
     pub pcmux_out: u32,
     pub instruction_out: u32,
     pub pcadder_out: u32,
+
+    //used to visually display the PCmux
+    pub jumped: bool,
 }

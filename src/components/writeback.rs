@@ -15,4 +15,7 @@ pub struct MEMWBLatch {
 #[derive(Clone, Default)]
 pub struct WBLogic {
     pub wb_data: u32,
+
+    //just used to visually display the multiplexor
+    pub wb_used: u8, //0 if ALU, 2 if Mem, 3 if PC
 }

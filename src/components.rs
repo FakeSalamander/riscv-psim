@@ -59,24 +59,24 @@ impl Registers {
 
         self.memwb.instruction = self.exmem.instruction;
 
-        println!("{}", old_rd);
+        //println!("Old RD:{}", old_rd);
 
         // Data Memory
 
         //insert code for Data Mem write here
         //check if instr. is a stor,
         if self.exmem.opcode == 0b0100011 {
-            println!("Storing value to Data Mem!");
+            //println!("Storing value to Data Mem!");
             //use these to find the right address to pull from\
             if self.exmem.alu_output == 0 {
                 panic!("Instruction tried storing value to data memory address 0.")
             }
             let which_word = (self.exmem.alu_output) / 4;
             let align = self.exmem.alu_output % 4;
-            println!(
+            /*println!(
                 "whichword: {:?} , Align: {:?}, Funct3: {:?} to-store: {:#034b}",
                 which_word, align, self.exmem.funct3, self.exmem.mem_data_in
-            );
+            );*/
             if self.data_mem.contains_key(&which_word) {
                 if self.exmem.funct3 == 0b000 {
                     //Store Byte
@@ -236,12 +236,15 @@ impl Logic {
         // Just need to handle WB Multiplexor.
         if state.memwb.opcode == 0b1101111 || state.memwb.opcode == 0b1100111 {
             //JAL, JALR, store (pc+4) into RD
+            self.writeback.wb_used = 2;
             self.writeback.wb_data = state.memwb.added_pc;
         } else if state.memwb.opcode == 0b0000011 {
             // LB, LH, LW, LBU, LHU. The load instructions all load the memory read data into RD
+            self.writeback.wb_used = 1;
             self.writeback.wb_data = state.memwb.mem_data_out;
         } else if state.memwb.opcode == 0b1100011 || state.memwb.opcode == 0b0100011 {
             // Branches & Stores. These write nothing to RD at all!
+            self.writeback.wb_used = 3;
             self.writeback.wb_data = 0xdeadbeef; //special value representing null
         } else {
             //all other opcodes return the ALU's result to the RD
@@ -261,46 +264,56 @@ impl Logic {
 
         if state.idex.r1_index == 0 {
             // if R1 is $r0, do NOT forward. it is a constant register.
+            self.execute.r1_forwarded = 0;
             self.execute.formux_r1 = state.idex.r1_data;
         } else if matches!(instr_type, InstrT::Utype) || matches!(instr_type, InstrT::Jtype) {
             // U-type & J-type have no R1. do nothing.
+            self.execute.r1_forwarded = 0;
             self.execute.formux_r1 = state.idex.r1_data;
         } else {
             // Forwarding might be needed. Check RD index of instructions further along.
             if state.idex.r1_index == state.exmem.rd_index {
                 //need to EX-EX forward!
-                println!("EX-EX forward!");
+                //println!("EX-EX forward!");
+                self.execute.r1_forwarded = 1;
                 self.execute.formux_r1 = state.exmem.alu_output;
             } else if state.idex.r1_index == state.memwb.rd_index {
                 //need to MEM-EX forward!
-                println!("EX-MEM Forward!");
+                //println!("EX-MEM Forward!");
+                self.execute.r1_forwarded = 2;
                 self.execute.formux_r1 = self.writeback.wb_data;
             } else {
                 // no forwarding needed!
+                self.execute.r1_forwarded = 0;
                 self.execute.formux_r1 = state.idex.r1_data;
             }
         }
 
         if state.idex.r2_index == 0 {
             // if R2 is $r0, do NOT forward. it is a constant register.
+            self.execute.r2_forwarded = 0;
             self.execute.formux_r2 = state.idex.r2_data;
         } else if matches!(instr_type, InstrT::Utype)
             || matches!(instr_type, InstrT::Jtype)
             || matches!(instr_type, InstrT::Itype)
         {
             // U-type, J-type, & I-type have no R2. do nothing.
+            self.execute.r2_forwarded = 0;
             self.execute.formux_r2 = state.idex.r2_data;
         } else {
             // Forwarding might be needed. Check RD index of instructions further along.
             if state.idex.r2_index == state.exmem.rd_index {
                 //need to EX-EX forward!
+                self.execute.r2_forwarded = 1;
                 self.execute.formux_r2 = state.exmem.alu_output;
             } else if state.idex.r2_index == state.memwb.rd_index {
                 //need to MEM-EX forward!
+                self.execute.r2_forwarded = 2;
                 self.execute.formux_r2 = state.memwb.alu_output;
             } else {
                 // no forwarding needed!
-                self.execute.formux_r2 = state.idex.r1_data;
+                self.execute.r2_forwarded = 0;
+                self.execute.formux_r2 = state.idex.r2_data;
             }
         }
 
@@ -313,16 +326,20 @@ impl Logic {
             || matches!(instr_type, InstrT::Btype))
         {
             self.execute.op1 = state.idex.base_pc;
+            self.execute.pc_used = true;
         } else {
             self.execute.op1 = self.execute.formux_r1;
+            self.execute.pc_used = false;
         }
 
         // R2-Immediates Multiplexor.
         // Same thing for Op2, but between R2 value and Immediates value.
         if matches!(instr_type, InstrT::Rtype) {
             self.execute.op2 = self.execute.formux_r2;
+            self.execute.imm_used = false;
         } else {
             self.execute.op2 = state.idex.immediates;
+            self.execute.imm_used = true;
         }
 
         // Branch Comparator.
@@ -346,12 +363,12 @@ impl Logic {
 
         //ALU
         //actually computes the instruction!  for signed operations, convert Ops to signed then convert result to unsigned.
-        println!("Op1: {}", self.execute.op1 as i32);
-        println!("Op2: {}", self.execute.op2 as i32);
-        println!(
+        //println!("Op1: {}", self.execute.op1 as i32);
+        //println!("Op2: {}", self.execute.op2 as i32);
+        /*println!(
             "Out: {}",
             ((self.execute.op1 as i32) + (self.execute.op2 as i32)) as u32
-        );
+        ); */
         self.execute.alu_output = match state.idex.opcode {
             0b0110111 => self.execute.op2, //LUI, just put in immediate as is
             0b0010111 => self.execute.op1 + self.execute.op2, //AUIPC, add PC and  shifted Imm, store in RD
@@ -445,12 +462,15 @@ impl Logic {
 
         //PCMux: First, check if opcode FROM EX STAGE is Jump, Branching, or neither
         if (state.idex.opcode == 0b1101111 || state.idex.opcode == 0b1100111) {
+            self.fetch.jumped = true;
             self.fetch.pcmux_out = self.execute.alu_output; //initiates jump by setting PC to result of address adition
         } else if (state.idex.opcode == 0b1100011 && self.execute.branch_taken) {
             //if branch taken!
+            self.fetch.jumped = true;
             self.fetch.pcmux_out = self.execute.alu_output; //initiates jump
         } else {
             //if not branch, or branch not taken
+            self.fetch.jumped = false;
             self.fetch.pcmux_out = self.fetch.pcadder_out;
         }
 
@@ -497,6 +517,13 @@ impl Logic {
         self.decode.regmem_r1 = state.reg_mem[self.decode.decode_r1 as usize];
         self.decode.regmem_r2 = state.reg_mem[self.decode.decode_r2 as usize];
 
+        //secret forwarding! takes care of small data hazard that wouldn't happen in-model.
+        if self.decode.decode_r1 == state.memwb.rd_index {
+            self.decode.regmem_r1 = self.writeback.wb_data;
+        } else if self.decode.decode_r2 == state.memwb.rd_index {
+            self.decode.regmem_r2 = self.writeback.wb_data;
+        }
+
         // Immediates Decoder
         //rearranges the immediates of an instruction by type, so they're where the ALU expects them.
         if matches!(instr_type, InstrT::Rtype) {
@@ -537,10 +564,10 @@ impl Logic {
             let imm_f: u32 = (state.ifid.instruction & 0b01111111111000000000000000000000) >> 20;
             let imm_g: u32 = (state.ifid.instruction & 0b00000000000100000000000000000000) >> 9;
             let imm_h: u32 = state.ifid.instruction & 0b00000000000011111111000000000000;
-            println!("{:#b}", imm_e);
-            println!("{:#b}", imm_f);
-            println!("{:#b}", imm_g);
-            println!("{:#b}", imm_h);
+            //println!("{:#b}", imm_e);
+            //println!("{:#b}", imm_f);
+            //println!("{:#b}", imm_g);
+            //println!("{:#b}", imm_h);
 
             self.decode.immediates =
                 ((((imm_e | imm_f | imm_g | imm_h) << 11) as i32) >> 11) as u32;
