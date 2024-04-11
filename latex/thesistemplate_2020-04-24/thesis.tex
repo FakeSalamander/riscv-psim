@@ -140,6 +140,8 @@ Of the countless pieces of hardware to study and delve into within this field, t
 
 Therefore, the aim of this project is to develop a pedagogical simulator program, developed in the Rust programming language and capable of running on modern computers, that simulates a simple RISC-V CPU at the hardware level, running assembly code and then transparently displaying how the code and computed information traverse the inside of the processor. While simple, the simulated CPU implements a 5-stage pipeline design similar to the ones that are mandatory for modern CPUs. The project also seeks to include some user-facing features, like a graphical interface and the ability to step through and rewind through the execution of a program, to make the simulator more intuitive to use.
 
+The results are promising, but with room for improvement. Certain useful features have been deemed to be beyond the scope of the current project, but the finished simulator fully supports the 32-bit RISC-V Base Integer specifications, and features a GUI, support for user-inputted programs, and rewinding capabilities for its ease of use as well.
+
 \chapter*{Background}
 \section{An abstract view of how a CPU functions}
 In order to build and understand the design of a CPU, we must first understand what it, in general terms, does. We've already established that a CPU carries out a program consisting of instructions from its ISA. However, what exactly do those instructions demand the CPU do, and what does the CPU have access to to carry it out?
@@ -248,13 +250,13 @@ Most of the components shown here have already been explained earlier, albeit wi
 
 This is enough to understand the CPU simulator, for the most part; rather than simply take in a machine-code program and execute it as efficiently as possible, which would be trivial to do in a modern high-level programming language, the simulator represents each of these components individually as structs, so that the flow of data through the CPU circuits can be displayed accurately.
 
-\chapter*{CPU-Simulator Features}
+\chapter*{CPU and Simulator Design}
 
-Before looking at the build of the actual CPU simulator, it is worth going over the features that this simulator seeks to implement.
+Before looking at the build of the actual CPU simulator program, it is worth going over one, in particular, of the features that this simulator seeks to implement.
 
 \section{Pipelining}
 
-The most major of these features, Pipelining, must be described first: It is not a feature of the simulator as much as it is a feature of the CPU itself that this program simulates, and the design of the CPU itself must be majorly altered in order for it to be successfully implemented. However, this feature is quite powerful, and used near-universally in RISC-V CPU designs (CITATION NEEDED), and so the simulator is made with it in mind.
+This feature, Pipelining, must be described first: It is not a feature of the simulator as much as it is a feature of the CPU itself that this program simulates, and the design of the CPU itself must be majorly altered in order for it to be successfully implemented. However, this feature is quite powerful, and used near-universally in RISC-V CPU designs (CITATION NEEDED), and so the simulator is made with it in mind.
 
 The previously-described CPU design has one simple issue: It is painfully slow. This design is capable of executing one instruction per cycle: one instruction per full use of each of the CPU's parts. This may seem good, but at any given moment, most of the CPU is actually going unused: The decoder is waiting on the instruction memory to fetch the instruction it needs to decode, which is waited upon by the register memory that needs the register indices to fetch their data, which is waited upon by the ALU that wants its inputs, so on.
 When, say, the ALU is firing and computing, the data memory, decoder, instruction memory, and so on are all entirely dormant. They could, theoretically, be doing something useful at the same time; but because our design handles one instruction at a time, the components before the ALU have already done their part and the components after the ALU are waiting on it to finish and present its output. Theoretically, one could be multiplying efficiency of this CPU many times.
@@ -424,6 +426,20 @@ In fact, you could achieve the same result by stalling the instruction 2 cycles,
 It has to do with \textit{Branching} control instructions, or Branches. A Branch is similar to a jump, but it also makes some sort of logical comparison between two inputted register value. If the comparison resolves to true, the Branch jumps to the destination; if it's false, the jump is not taken and the program continues to the next sequential instruction. Branches are the main option assembly programs have for introducing, well, branching pathways to the control flow of their code, and what compilers most heavily use when compiling if-statements and loops from high-level programming languages.
 
 Well, as it turns out, handling jumps  with the flushing method is actually a small optimization that potentially saves time for \textit{branching} control instructions. Branching control instructions are almost the same as jump instructions: there's just an extra subcomponent in the EX stage that compares its values to check if the Branch is to be taken, which decides if the Program Count is changed or left alone. However since we cannot know whether the branch will be taken or not \textit{until} the EX stage, this causes a difference between the flushing and stalling methods: In the stalling method, the instruction after the Branch has to get stalled regardless of whether the Branch gets taken or not; it has to start stalling right away. In the flushing method, the CPU flushes and jumps as usual if the Branch gets taken; however, if it does not get taken, the Stall Control simply... doesn't do anything. Those two "erroneous instructions" are actually now the correct path forward for the program to take, and it just lets them happen. So, flushing the Branches instead of stalling them makes no diffence if the branch is taken, but saves cycles if it isn't! This method is also called the "Fetch and Cancel When Taken" method of handling control hazards, since the "cancel" or flush only happens if the Branch is taken.
+
+\subsection{Final CPU Design}
+
+(INSERT FIANLIZED CPU DESIGN HERE)
+
+The final design of the CPU we will simulate is therefore as shown above. Instruction, Decoder, Registers, Arithmetic, Data Memory, and Writeback; built with the intent that the simulator will display its own internal state to a similar level of granularity as the diagram above.
+
+The flow of instructions through the wires is separated into 5 arbitrary stages in order to \textbf{Pipeline} them for major performance boosts, with the separation enforced by a set of Latches.
+
+Then, in order to deal with the correctness hazards that this pipelining incurrs, additional \textbf{Forwarding} pathways and a \textbf{Stall control} in the latches are implemented to sidesteps those hazards, while also minimizing the performance loss incurred.
+
+\section{Simulator Design}
+
+The actual simulator is a program written in the Rust programming language, and aims to faithfully replicate the operation of the CPU at the same level of abstraction used in the diagrams above! as a result, it can be compiled and run on most modern personal computers.
 
 \section{CPU-Simulator Features}
 

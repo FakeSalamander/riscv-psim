@@ -11,10 +11,12 @@
 \contentsline {subsection}{\numberline {0.7.3}Stalling}{13}{}%
 \contentsline {subsection}{\numberline {0.7.4}Forwarding}{14}{}%
 \contentsline {subsection}{\numberline {0.7.5}Control Hazards}{15}{}%
-\contentsline {section}{\numberline {0.8}CPU-Simulator Features}{16}{}%
-\contentsline {section}{\numberline {0.9}Bibliographies}{16}{}%
-\contentsline {subsection}{\numberline {0.9.1}Tips for Bibliographies}{17}{}%
-\contentsline {section}{\numberline {0.10}Anything else?}{17}{}%
+\contentsline {subsection}{\numberline {0.7.6}Final CPU Design}{16}{}%
+\contentsline {section}{\numberline {0.8}Simulator Design}{17}{}%
+\contentsline {section}{\numberline {0.9}CPU-Simulator Features}{17}{}%
+\contentsline {section}{\numberline {0.10}Bibliographies}{17}{}%
+\contentsline {subsection}{\numberline {0.10.1}Tips for Bibliographies}{17}{}%
+\contentsline {section}{\numberline {0.11}Anything else?}{18}{}%
 \contentsline {chapter}{Chapter 1: Mathematics and Science}{19}{}%
 \contentsline {section}{\numberline {1.1}Math}{19}{}%
 \contentsline {section}{\numberline {1.2}Chemistry 101: Symbols}{19}{}%
