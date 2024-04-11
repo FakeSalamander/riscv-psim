@@ -61,11 +61,11 @@ fn main() {
 
     let mut logic = Logic::default();
 
-    run_program(&mut state, &mut logic);
+    run_program(&mut state, &mut logic, true);
 }
 
 //Actually runs the program in the simulated CPU
-fn run_program(state: &mut Registers, logic: &mut Logic) {
+fn run_program(state: &mut Registers, logic: &mut Logic, interactive: bool) {
     //ADDITIONAL SETUP:
 
     //a vector of snapshots to make rewinding possible.
@@ -95,9 +95,14 @@ fn run_program(state: &mut Registers, logic: &mut Logic) {
         display_cpu(&state, &logic);
 
         //get user input for next step.
-        println!("What now? [n - next cycle, b - prev. cycle]:");
         user_input.clear();
-        stdin.read_line(user_input);
+        if interactive {
+            println!("What now? [n - next cycle, b - prev. cycle]:");
+            stdin.read_line(user_input);
+        } else {
+            //if this is a test, dont get user input, just go to next step every time.
+            user_input.push_str("n\n");
+        }
         println!("{}", user_input);
 
         if user_input == "n\n" {
@@ -453,7 +458,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -497,7 +502,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         // rd = imm << 12
@@ -539,7 +544,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         // rd = (imm << 12) + PC
@@ -587,7 +592,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -636,7 +641,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -690,7 +695,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -744,7 +749,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -798,7 +803,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -852,7 +857,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -906,7 +911,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -960,7 +965,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1006,7 +1011,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.data_mem[&2], 0b11111111111111111111000000000000);
@@ -1048,7 +1053,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.data_mem[&2], 0b11111111111111110101000000000000);
@@ -1092,7 +1097,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.data_mem[&2], 0b11111111111111110101000000001000);
@@ -1147,7 +1152,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[1], 0);
@@ -1208,7 +1213,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[1], 0);
@@ -1271,7 +1276,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[1], 0);
@@ -1330,7 +1335,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[1], 0);
@@ -1391,7 +1396,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[1], 0);
@@ -1438,7 +1443,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1495,7 +1500,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1560,7 +1565,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1615,7 +1620,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1666,7 +1671,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1717,7 +1722,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1767,7 +1772,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1815,7 +1820,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1868,7 +1873,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1920,7 +1925,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -1965,7 +1970,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2017,7 +2022,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2079,7 +2084,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2146,7 +2151,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2203,7 +2208,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2253,7 +2258,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2310,7 +2315,7 @@ pub mod instr_tests {
 
         let mut logic = Logic::default();
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2368,7 +2373,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
@@ -2418,7 +2423,7 @@ pub mod instr_tests {
 
         //ADDITIONAL SETUP:
 
-        run_program(&mut state, &mut logic);
+        run_program(&mut state, &mut logic, false);
 
         //Checks for output correctness.
         assert_eq!(state.reg_mem[0], 0);
