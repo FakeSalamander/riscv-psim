@@ -10,6 +10,18 @@ pub struct MEMWBLatch {
     pub opcode: u8,
 
     pub instruction: u32,
+    pub wb_stall: u8, //stall or bubble?
+}
+
+impl MEMWBLatch {
+    pub fn bubble(&mut self) {
+        self.added_pc = 0;
+        self.alu_output = 0;
+        self.mem_data_out = 0;
+        self.rd_index = 0;
+        self.opcode = 0;
+        self.instruction = 0;
+    }
 }
 
 #[derive(Clone, Default)]

@@ -1,3 +1,6 @@
+use std::env;
+use std::fs::read_to_string;
+use std::io;
 use std::time::Duration;
 use std::{hash::Hash, io::stdin, thread::sleep};
 
@@ -17,17 +20,30 @@ fn main() {
     use crate::components::*;
     use std::collections::hash_map::*;
 
-    println!("Hello, world!");
+    //get commandline arguments
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 2 {
+        panic!("The program needs 1 filename, and just 1, as its argument.");
+    }
+    //now args[1] is the filename...
+    println!("{}", args[1]);
 
     // code for obtaining instructions here. Not sure how to do it... from a file, maybe?
 
-    let instructions = Vec::<u32>::from([
+    let mut instructions = Vec::new();
+
+    for line in read_to_string(&args[1]).unwrap().lines() {
+        instructions.push(u32::from_str_radix(line, 2).unwrap());
+    }
+
+    /*let instructions = Vec::<u32>::from([
         0b00000000000100000000000010010011,
         0b00000000001000000000000100010011,
         0b00000000011000010000000110010011,
         0b00000000001000000000001000010011,
         0b00000000000100000000001010010011,
-    ]);
+    ]);*/
 
     //CPU SETUP: Initializes the state and logic structs.
     let mut state = Registers {
@@ -45,15 +61,16 @@ fn main() {
 
     let mut logic = Logic::default();
 
+    run_program(&mut state, &mut logic);
+}
+
+//Actually runs the program in the simulated CPU
+fn run_program(state: &mut Registers, logic: &mut Logic) {
     //ADDITIONAL SETUP:
 
     //a vector of snapshots to make rewinding possible.
     let mut backups: Vec<Snapshot> = Vec::new();
 
-    run_program(&mut state, &mut logic);
-}
-
-fn run_program(state: &mut Registers, logic: &mut Logic) {
     //when a program is <eop_buffer> instructions past the last instruction, the program is done executing.
     let eop_buffer = 7;
     let eop_program_count: u32 = ((state.instr_mem.len() as u32) + eop_buffer) * 4;
@@ -61,38 +78,54 @@ fn run_program(state: &mut Registers, logic: &mut Logic) {
     let mut end_of_program = false;
     let mut step_count = 0;
 
+    //used for getting user input
+    let user_input = &mut String::new();
+    let stdin = stdin();
+
     while !(end_of_program) {
         //make backup, if needed.
-        /*
-        if backups.len() < step_count {            backups.push(Snapshot {
+
+        if backups.len() < step_count {
+            backups.push(Snapshot {
                 state: state.clone(),
                 logic: logic.clone(),
             });
         }
-        */
 
-        display_cpu(&state, &logic, &step_count);
+        display_cpu(&state, &logic);
 
-        /*
-        print!("What now? [n - next cycle, b - prev. cycle]");
-        let user_input = stdin();
-        */
-        //sleep(Duration::new(1, 0));
+        //get user input for next step.
+        println!("What now? [n - next cycle, b - prev. cycle]:");
+        user_input.clear();
+        stdin.read_line(user_input);
+        println!("{}", user_input);
 
-        step(state, logic);
+        if user_input == "n\n" {
+            //if n, proceed to next step.
+            step(state, logic);
 
-        step_count += 1;
-        //check if program is over
-        //println!("PC: {}", state.pc);
-        if state.pc >= eop_program_count {
-            end_of_program = true;
+            step_count += 1;
+            //check if program is over
+            //println!("PC: {}", state.pc);
+            if state.pc >= eop_program_count {
+                end_of_program = true;
+            }
+        } else if user_input == "b\n" {
+            //load backup, go one step back!!
+            if step_count == 0 {
+                println!("Can't go back any further!");
+            } else {
+                step_count -= 1;
+                //             state = &mut backups[step_count].state;
+                //           logic = &mut backups[step_count].logic;
+            }
         }
     }
 }
 
-fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
-    //for now, I'll just make it display the registers.
-    /*
+//Displays the current state of the CPU in an ASCII-based UI
+fn display_cpu(state: &Registers, logic: &Logic) {
+    /* OLD diplay function
     print!("STEP {:?}:\n", step);
     for i in 0..32 {
         print!("r{:?}: {:#034b}\n", i, state.reg_mem[i]);
@@ -102,6 +135,8 @@ fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
     print!("ALU_out: {}\n", state.memwb.alu_output);
     print!("WB_mux:  {}\n", logic.writeback.wb_data);
     */
+
+    println!("*********************************************************************************************************************************************************************************************************");
 
     println!("                                                                   ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────{:#07b}────┐", state.memwb.rd_index);
     let if_instr = display_instruction(&logic.fetch.instruction_out);
@@ -153,11 +188,11 @@ fn display_cpu(state: &Registers, logic: &Logic, step: &i32) {
     println!("                                   │     │                                                       │     │   │   │                                      │     │   │                  │     │             │");
     println!("                                   │     │                                                       │     │   │   └────────────{:#07b}──────────────────►│Rd Id├────────{:#07b}──────►│Rd In├─────────────┘", state.idex.rd_index, state.exmem.rd_index);
     println!("                                   └─────┘                                                       └─────┘   │                                          └─────┘   │                  └─────┘              ");
-    println!("                                    STALL                                                         STALL    │                                           STALL    │                   STALL               ");
+    println!("                                    {}                                                         {}    │                                           {}    │                   {}               ", match state.ifid.id_stall {0 => "PASS ", 1 => "STALL", _ => "BUBBL"}, match state.idex.ex_stall {0 => "PASS ", 1 => "STALL", _ => "BUBBL"}, match state.exmem.mem_stall {0 => "PASS ", 1 => "STALL", _ => "BUBBL"}, match state.memwb.wb_stall {0 => "PASS ", 1 => "STALL", _ => "BUBBL"});
     println!("                                                                                                           └─{:#010x}─────────────────────────────────────────┘                                      ", state.exmem.alu_output);
 
     println!("");
-    println!("*********************************************REGISTER MEMORY********************************************************************************************************************************************");
+    println!("*********************************************REGISTER MEMORY*********************************************************************************************************************************************");
     for r in 0..32 {
         print!("$r{:#02}: {:#010x}   ", r, state.reg_mem[r]);
         if (r + 1) % 8 == 0 {
@@ -527,13 +562,14 @@ pub mod instr_tests {
             0b00000000100000000000000110010011, //8: addi $r3, $r0, 8
             //____imm____||_r1|000|_rd||_op__|
             0b00000001100000011000001101100111, //12: jalr $r6, $r3, 24      //jump to instr $r3 + 24 (32)
-            0b00000000000000000000000000000000, //16: nop
-            0b00000000000000000000000000000000, //20: nop
+            0b00000000100000011000000110010011, //16: addi $r3, $r3, 8
+            0b00000000100000011000000110010011, //20: addi $r3, $r3, 8
             0b00000000000000000000000000000000, //24: nop
             0b00000000001000000000001000010011, //28: addi $r4, $r0, 2
             0b00000000000100000000001010010011, //32: addi $r5, $r0, 1
             0b00000000000000000000000000000000, //36: nop
         ]);
+        //instructions 16-28 should get skipped
 
         //CPU SETUP: Initializes the state and logic structs.
         let mut state = Registers {

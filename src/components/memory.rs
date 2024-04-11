@@ -12,6 +12,20 @@ pub struct EXMEMLatch {
     pub funct3: u8,
 
     pub instruction: u32,
+    pub mem_stall: u8, //stall or bubble?
+}
+
+impl EXMEMLatch {
+    pub fn bubble(&mut self) {
+        self.added_pc = 0;
+        self.alu_output = 0xdeadbeef; //cannot write to Data Mem address 0, so just in case.
+        self.mem_data_in = 0;
+        self.rd_index = 0;
+        self.opcode = 0;
+        self.funct3 = 0;
+
+        self.instruction = 0;
+    }
 }
 
 //wires for the MEM stage

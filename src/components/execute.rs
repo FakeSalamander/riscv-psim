@@ -18,6 +18,24 @@ pub struct IDEXLatch {
     pub r1_index: u8,
 
     pub instruction: u32,
+    pub ex_stall: u8, //Stall or Bubble?
+}
+
+impl IDEXLatch {
+    pub fn bubble(&mut self) {
+        self.base_pc = 0;
+        self.added_pc = 0;
+
+        self.r1_data = 0;
+        self.r2_data = 0;
+        self.immediates = 0;
+        self.rd_index = 0;
+        self.opcode = 0;
+        self.funct3 = 0;
+        self.r1_index = 0;
+        self.r2_index = 0;
+        self.instruction = 0;
+    }
 }
 
 //holds the wires for the EX Stage

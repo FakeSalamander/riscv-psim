@@ -1,12 +1,21 @@
 use crate::components::*;
 
-
 //The IF-ID Latch
 #[derive(Clone, Default)]
 pub struct IFIDLatch {
     pub base_pc: u32,
     pub added_pc: u32,
     pub instruction: u32,
+
+    pub id_stall: u8, //stall, bubble, or neither?
+}
+
+impl IFIDLatch {
+    pub fn bubble(&mut self) {
+        self.base_pc = 0;
+        self.added_pc = 0;
+        self.instruction = 0;
+    }
 }
 
 //holds all of the wiring of the ID stage

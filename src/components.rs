@@ -50,14 +50,17 @@ impl Registers {
         let old_rd = self.memwb.rd_index;
 
         // MEM-WB Latch
-        self.memwb.added_pc = self.exmem.added_pc;
-        self.memwb.alu_output = self.exmem.alu_output;
-        self.memwb.mem_data_out = logic.memory.mem_data_out;
-        self.memwb.rd_index = self.exmem.rd_index;
+        // Pass only if not stall!
+        if self.memwb.wb_stall != 1 {
+            self.memwb.added_pc = self.exmem.added_pc;
+            self.memwb.alu_output = self.exmem.alu_output;
+            self.memwb.mem_data_out = logic.memory.mem_data_out;
+            self.memwb.rd_index = self.exmem.rd_index;
 
-        self.memwb.opcode = self.exmem.opcode;
+            self.memwb.opcode = self.exmem.opcode;
 
-        self.memwb.instruction = self.exmem.instruction;
+            self.memwb.instruction = self.exmem.instruction;
+        }
 
         //println!("Old RD:{}", old_rd);
 
@@ -182,34 +185,39 @@ impl Registers {
         }
 
         //EX-MEM Latch
+        //only update if not stalled!
+        if self.exmem.mem_stall != 1 {
+            self.exmem.added_pc = self.idex.added_pc;
+            self.exmem.alu_output = logic.execute.alu_output;
+            self.exmem.mem_data_in = logic.execute.formux_r2;
+            //self.exmem.mem_data_in = self.idex.r2_data;
+            self.exmem.rd_index = self.idex.rd_index;
 
-        self.exmem.added_pc = self.idex.added_pc;
-        self.exmem.alu_output = logic.execute.alu_output;
-        //self.exmem.mem_data_in = logic.execute.formux_r2;
-        self.exmem.mem_data_in = self.idex.r2_data;
-        self.exmem.rd_index = self.idex.rd_index;
+            self.exmem.opcode = self.idex.opcode;
+            self.exmem.funct3 = self.idex.funct3;
 
-        self.exmem.opcode = self.idex.opcode;
-        self.exmem.funct3 = self.idex.funct3;
-
-        self.exmem.instruction = self.idex.instruction;
+            self.exmem.instruction = self.idex.instruction;
+        }
 
         // ID-EX Latch
-        self.idex.base_pc = self.ifid.base_pc;
-        self.idex.added_pc = self.ifid.added_pc;
+        //only update if not  stalled!
+        if self.idex.ex_stall != 1 {
+            self.idex.base_pc = self.ifid.base_pc;
+            self.idex.added_pc = self.ifid.added_pc;
 
-        self.idex.r1_data = logic.decode.regmem_r1;
-        self.idex.r2_data = logic.decode.regmem_r2;
-        self.idex.immediates = logic.decode.immediates;
-        self.idex.rd_index = logic.decode.decode_rd;
+            self.idex.r1_data = logic.decode.regmem_r1;
+            self.idex.r2_data = logic.decode.regmem_r2;
+            self.idex.immediates = logic.decode.immediates;
+            self.idex.rd_index = logic.decode.decode_rd;
 
-        self.idex.opcode = logic.decode.decode_opcode;
-        self.idex.funct3 = logic.decode.decode_funct3;
-        self.idex.funct7 = logic.decode.decode_funct7;
-        self.idex.r2_index = logic.decode.decode_r2;
-        self.idex.r1_index = logic.decode.decode_r1;
+            self.idex.opcode = logic.decode.decode_opcode;
+            self.idex.funct3 = logic.decode.decode_funct3;
+            self.idex.funct7 = logic.decode.decode_funct7;
+            self.idex.r2_index = logic.decode.decode_r2;
+            self.idex.r1_index = logic.decode.decode_r1;
 
-        self.idex.instruction = self.ifid.instruction;
+            self.idex.instruction = self.ifid.instruction;
+        }
 
         // Register Memory. Write to it.
         assert!(old_rd < 0b100000); //Register indices are always 5 bits or less.
@@ -218,9 +226,11 @@ impl Registers {
         }
 
         // IF-ID latch. Transfer
-        self.ifid.base_pc = self.pc;
-        self.ifid.added_pc = logic.fetch.pcadder_out;
-        self.ifid.instruction = logic.fetch.instruction_out;
+        if self.ifid.id_stall != 1 {
+            self.ifid.base_pc = self.pc;
+            self.ifid.added_pc = logic.fetch.pcadder_out;
+            self.ifid.instruction = logic.fetch.instruction_out;
+        }
 
         // Program Counter.
         self.pc = logic.fetch.pcmux_out;
@@ -700,6 +710,26 @@ impl Logic {
 }
 
 pub fn step(state: &mut Registers, logic: &mut Logic) {
+    //Checks if Stalling or Bubbling is needed
+    //Check if a jump is performed! those always need a stall on the NEXT step
+    let must_stall_next = logic.fetch.jumped;
+
     state.update(logic);
+
+    //always do this inbetween!!!that way the right instructions get stalled/bubbled, but their logic is not allowed to propagate.
+    if must_stall_next {
+        //If there is a jump, need to bubble IF and ID of now... so the ID and EX of next step!
+        state.ifid.id_stall = 2; //bubble flag  on
+        state.ifid.bubble();
+
+        state.idex.ex_stall = 2; //bubble flag on
+        state.idex.bubble();
+    } else {
+        state.ifid.id_stall = 0;
+        state.idex.ex_stall = 0;
+        state.exmem.mem_stall = 0;
+        state.memwb.wb_stall = 0;
+    }
+
     logic.update(state);
 }
