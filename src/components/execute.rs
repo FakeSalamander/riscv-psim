@@ -1,7 +1,7 @@
 use crate::components::*;
 
 //the ID-EX Latch
-#[derive(Clone, Default)]
+#[derive(Clone, Copy, Default)]
 pub struct IDEXLatch {
     pub base_pc: u32,
     pub added_pc: u32,

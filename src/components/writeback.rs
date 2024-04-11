@@ -1,6 +1,6 @@
 use crate::components::*;
 
-#[derive(Clone, Default)]
+#[derive(Clone, Copy, Default)]
 pub struct MEMWBLatch {
     pub added_pc: u32,
     pub alu_output: u32,

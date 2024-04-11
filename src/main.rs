@@ -72,7 +72,7 @@ fn run_program(state: &mut Registers, logic: &mut Logic) {
     let mut backups: Vec<Snapshot> = Vec::new();
 
     //when a program is <eop_buffer> instructions past the last instruction, the program is done executing.
-    let eop_buffer = 7;
+    let eop_buffer = 5;
     let eop_program_count: u32 = ((state.instr_mem.len() as u32) + eop_buffer) * 4;
 
     let mut end_of_program = false;
@@ -116,8 +116,8 @@ fn run_program(state: &mut Registers, logic: &mut Logic) {
                 println!("Can't go back any further!");
             } else {
                 step_count -= 1;
-                //             state = &mut backups[step_count].state;
-                //           logic = &mut backups[step_count].logic;
+                *state = backups[step_count].state.clone();
+                *logic = backups[step_count].logic.clone();
             }
         }
     }
@@ -156,7 +156,7 @@ fn display_cpu(state: &Registers, logic: &Logic) {
     println!("│ │                     │          │IF/ID│                         │ │                           │ID/EX│ │                                         │  │ EX/ │                      │ MEM │           │ │");
     println!("│ │         ┌─┐    ┌─\\  │{:#010x}│     │                         │ │                           │     │ │                                         │  │ MEM │                      │ /WB │           │ │", logic.fetch.pcadder_out);
     println!("│ │         │4├───►│  │ │    │     │     │                         │ │                           │     │ │                                         │  │     │                      │     │           │ │");
-    println!("│ │         └─┘    │+ ├─┴────┴────►│added├─{:#010x}───────────────────────────────────────────►│added├───{:#010x}──────────────────────────────┼─►│added├───────{:#010x}────►│added├───┐       │ │",state.ifid.added_pc, state.idex.added_pc, state.exmem.added_pc);
+    println!("│ │         └─┘    │+ ├─┴────┴────►│added├─{:#010x}───────────────────────────────────────────►│added├───{:#010x}────────────────────────────────►│added├───────{:#010x}────►│added├───┐       │ │",state.ifid.added_pc, state.idex.added_pc, state.exmem.added_pc);
     println!("│ │              ┌►│  │            │  pc │                         │ │                           │  pc │ │                                         │  │  pc │                      │  pc │   │       │ │");
     println!("│ │              │ └─/             │     │                         │ │                           │     │ │                                         │  │     │                      │     │{:#010x} │ │", state.memwb.added_pc);
     println!("│ │              │                 │     │                         │ │                           │     │ │ ┌─{:#010x}───────────┐                │  │     │                      │     │   │       │ │", state.idex.base_pc);
@@ -170,7 +170,7 @@ fn display_cpu(state: &Registers, logic: &Logic) {
     println!("└──►│{} │ │  │  │ │  │     ins├─┬──►│instr├─┤ │       │         │ │      │                 │ │    │     │ │ │                     │     │         │ │  │     │   │  │ DATA MEM.│    │     │   │ │  │    │", if logic.fetch.jumped {"►"} else {" "});
     println!("    └─/  │  └──┘ │  └────────┘ │   │     │ │ │ opcode├───┐     │ └─────►│R1 idx           │ │    │     │ └──────MEM-EX──►┌{}─\\    │     │   ALU   │ │  │     │   │  │      Read├─┬─►│Mem  ├─┬──►│{} │    │", if logic.execute.r1_forwarded == 2 {"►"} else {"─"}, if logic.writeback.wb_used == 1 {"►"} else {" "});
     println!("         │ STALL │             │   │     │ │ │       │   │     │        │                 │ │    │     │   │             │   │   │     │      Out├─┼─►│ALU  ├───┼──┤Addr   Out│ │  │  Out│ │ │ └─/     │");
-    println!("         │       │             │   │     │ │ │ rd idx├─┐ │     └───────►│R2 idx       Reg2├─┼─┬─►│R2   ├─────{:#010x}─►│{}  │   │     │Op2      │ │  │  Out│   │  │          │ │  │     │ │ │         │", state.idex.r2_data, if logic.execute.r1_forwarded == 0 {"►"} else {" "});
+    println!("         │       │             │   │     │ │ │ rd idx├─┐ │     └───────►│R2 idx       Reg2├───┬─►│R2   ├─────{:#010x}─►│{}  │   │     │Op2      │ │  │  Out│   │  │          │ │  │     │ │ │         │", state.idex.r2_data, if logic.execute.r1_forwarded == 0 {"►"} else {" "});
     println!(" {:#010x}   {:#010x}       │   │     │ │ └───────┘ │ │              └─────────────────┘ │ │  │ Data│   │             │ R2├─┐ │     └─────────┘ │  │     │   │  │          │ │  │     │ │{:#010x} │", logic.fetch.pcmux_out, state.pc, state.memwb.alu_output);
     println!("                               │   │     │ │           │ │ ┌──────┐                {:#010x} │  │     │   ├─────EX-EX──►│{}  │ │ │  ┌─\\  ▲         │  │     │ ┌────┤DataIn    │ │  │     │ │           │", logic.decode.regmem_r1, if logic.execute.r1_forwarded == 1 {"►"} else {" "});
     println!("                      {:#010x}   │     │ │           │ └►│ Imm. │                           │  │     │   │             └──/  ├───►│{} │ │ {:#010x} │     │ │ │  └──────────┘ │  │     │{:#010x}   │", logic.fetch.instruction_out,if !logic.execute.imm_used {"►"} else {" "} ,logic.execute.alu_output, state.memwb.mem_data_out);

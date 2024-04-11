@@ -1,7 +1,7 @@
 use crate::components::*;
 
 //the EX-MEM Latch
-#[derive(Clone, Default)]
+#[derive(Clone, Copy, Default)]
 pub struct EXMEMLatch {
     pub added_pc: u32,
     pub alu_output: u32,

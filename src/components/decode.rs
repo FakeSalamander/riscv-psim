@@ -1,7 +1,7 @@
 use crate::components::*;
 
 //The IF-ID Latch
-#[derive(Clone, Default)]
+#[derive(Clone, Copy, Default)]
 pub struct IFIDLatch {
     pub base_pc: u32,
     pub added_pc: u32,
