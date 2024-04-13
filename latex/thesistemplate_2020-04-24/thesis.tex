@@ -439,7 +439,21 @@ Then, in order to deal with the correctness hazards that this pipelining incurrs
 
 \section{Simulator Design}
 
-The actual simulator is a program written in the Rust programming language, and aims to faithfully replicate the operation of the CPU at the same level of abstraction used in the diagrams above! as a result, it can be compiled and run on most modern personal computers.
+The actual simulator is a program written in the Rust programming language, and aims to faithfully replicate the operation of the CPU at the same level of abstraction used in the diagrams above! as a result, it can be compiled and run on most modern personal computers. Its final iteration fully supports the Risc-V 32-bit Base Integer Instruction Set, with the exception of system-call instructions that are meaningless without the context of an OS outside the program, and the failsafe for a particular Data Hazard that turned out to be rather difficult to impelement.
+
+The goal of the simulator itself is simple: to take in a machine-code RISC-V program as input, set up a virtual construct in Rust that replicates the low-level, semi-abstracted model of a CPU that has been discussed in the background chapter, and then run said program through it in a way where the simulated CPU's internal state is always transparent. Other goals, such as a User Interface, are additional features and not part of the core design. This design was eventually accomplished, though the project had to go through a major restart partway.
+
+The first draft was quite neat in theory, though rather idealistic. The core idea is to rely on the way that the diagrams above dive the CPU into separate "subcomponents", such as the Program Counter or the ALU, which only pass along information through predefined wires; this is something the final design will keep.
+
+The core idea of the first draft is that each of these subcomponents should be represented by its own unique "struct" in Rust; despite the name, these are much closer to the Classes and Objects of Object-Oriented Programming Languages like Python and C++, made to hold a specific set of variables as well as functions tailored to those variables. Every "subcomponent" on the graph would be represented with its own unique struct: It would have variables for both every input and output connection it had with other subcomponents; and if it was a stateful subcomponent that stores data, like the Program Counter or any of the three Memories (Instruction, Register, Data), it would also have variables for recording said state. References to the structs that they need to fetch input data from, as well as functions to fetch said data and to perform the subcomponent's intended purpose complete the struct. Then, all of this would be hooked up to some sort of master "setup" and "step" functions; the former would initialize all these structs and insert the program into the Instruction Memory, while the latter would activate these structs one by one to perform a single full CPU cycle, over and over.
+
+The advantages of such a design are apparent: The different structs are entirely separate from one another, making them easy to test on an individual level and to see the state of any one given subcomponent at a time. It also meant that the layout of the code resembled the design of the actual CPU somewhat intuitivelty.
+
+However, this design also has two glaring flaws: The first is that it was incredibly memory-unsafe, and
+
+
+
+
 
 \section{CPU-Simulator Features}
 
