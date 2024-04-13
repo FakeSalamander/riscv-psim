@@ -43,6 +43,8 @@ pub struct Logic {
     pub execute: EXLogic,
     pub memory: MEMLogic,
     pub writeback: WBLogic,
+
+    pub pc_stall: bool,
 }
 
 impl Registers {
@@ -76,6 +78,12 @@ impl Registers {
             }
             let which_word = (self.exmem.alu_output) / 4;
             let align = self.exmem.alu_output % 4;
+
+            //check if MEM-MEM forwarding is needed! if yes, perform it and flip the bit off.
+            if logic.memory.memmem_fwd {
+                self.exmem.mem_data_in = logic.memory.memmem_data;
+            }
+
             /*println!(
                 "whichword: {:?} , Align: {:?}, Funct3: {:?} to-store: {:#034b}",
                 which_word, align, self.exmem.funct3, self.exmem.mem_data_in
@@ -232,8 +240,10 @@ impl Registers {
             self.ifid.instruction = logic.fetch.instruction_out;
         }
 
-        // Program Counter.
-        self.pc = logic.fetch.pcmux_out;
+        // Program Counter. simply updates itself, unless stalling
+        if !logic.pc_stall {
+            self.pc = logic.fetch.pcmux_out;
+        }
     }
 }
 
@@ -702,9 +712,26 @@ impl Logic {
                 //if this value has never been accessed before, it is trivially zero!
                 self.memory.mem_data_out = 0;
             }
+
+            //read next instr in EX-stage; check if MEM-MEM forwarding will be needed next cycle.
+            // if the next instruction is a Store AND it stores from the same register that this instr. loads to...
+            if state.idex.opcode == 0b0100011 && state.exmem.rd_index == state.idex.r2_index {
+                self.memory.memmem_fwd = true;
+                self.memory.memmem_data = self.memory.mem_data_out;
+                self.memory.memmem_timer = 1;
+            } else {
+                self.memory.memmem_fwd = false;
+            }
         } else {
             //if no value is read... output useless value
             self.memory.mem_data_out = 0xdeadbeef;
+
+            //also means there will be no mem-mem forwarding, so tick timer down.
+            if self.memory.memmem_timer > 0 {
+                self.memory.memmem_timer -= 1
+            } else {
+                self.memory.memmem_fwd = false;
+            }
         }
     }
 }
@@ -712,19 +739,35 @@ impl Logic {
 pub fn step(state: &mut Registers, logic: &mut Logic) {
     //Checks if Stalling or Bubbling is needed
     //Check if a jump is performed! those always need a stall on the NEXT step
-    let must_stall_next = logic.fetch.jumped;
+    let must_jump_stall_next = logic.fetch.jumped;
+
+    //if there's a Load in EX stage and an ALU instruction in the ID stage, using the same register...
 
     state.update(logic);
 
     //always do this inbetween!!!that way the right instructions get stalled/bubbled, but their logic is not allowed to propagate.
-    if must_stall_next {
+    if must_jump_stall_next {
         //If there is a jump, need to bubble IF and ID of now... so the ID and EX of next step!
+        logic.pc_stall = false;
         state.ifid.id_stall = 2; //bubble flag  on
         state.ifid.bubble();
 
         state.idex.ex_stall = 2; //bubble flag on
         state.idex.bubble();
+
+        state.exmem.mem_stall = 0;
+        state.memwb.wb_stall = 0;
+    /* } else if must_load_alu_stall {
+    //If there is a load-ALU stall, need to stall IF and ID,  and bubble EX.
+    logic.pc_stall = true; //freezes the PC
+    state.ifid.id_stall = 1; //stall flag on
+    state.idex.ex_stall = 2; //bubble flag on
+    state.idex.bubble();
+
+    state.exmem.mem_stall = 0;
+    state.memwb.wb_stall = 0; */
     } else {
+        logic.pc_stall = false;
         state.ifid.id_stall = 0;
         state.idex.ex_stall = 0;
         state.exmem.mem_stall = 0;
@@ -732,4 +775,31 @@ pub fn step(state: &mut Registers, logic: &mut Logic) {
     }
 
     logic.update(state);
+}
+
+//checks if a LOAD-ALU hazard is going to happen.
+pub fn check_load_alu(state: &mut Registers, logic: &mut Logic) -> bool {
+    //EX instr. needs to be a load.
+    if state.idex.opcode != 0b0000011 {
+        return false;
+    }
+    //ID instr. needs to use the ALU. NOP does not.
+    if logic.decode.decode_opcode == 0 {
+        return false;
+    }
+
+    //if the $r being loaded to is $r0 for some reason, this isnt needed.
+    if state.idex.rd_index == 0 {
+        return false;
+    }
+
+    //if the $r being loaded to isnt being used in the next instr. this isnt needed.
+    if state.idex.rd_index != logic.decode.decode_r1
+        && state.idex.rd_index != logic.decode.decode_r2
+    {
+        return false;
+    }
+
+    // if all above are true, then Load-ALU is needed!
+    return true;
 }

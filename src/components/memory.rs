@@ -32,4 +32,9 @@ impl EXMEMLatch {
 #[derive(Clone, Default)]
 pub struct MEMLogic {
     pub mem_data_out: u32,
+
+    pub memmem_fwd: bool,
+    pub memmem_data: u32,
+
+    pub memmem_timer: u8,
 }
