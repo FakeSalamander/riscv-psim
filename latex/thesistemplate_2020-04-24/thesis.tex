@@ -43,6 +43,18 @@
 %\usepackage{biblatex-chicago}
 %\bibliography{thesis}
 
+
+%package used to write code snippets in rust.
+\usepackage{listings, listings-rust}
+
+
+\lstset{
+  language=Rust,
+  style=colouredRust,
+}
+
+
+
 % \usepackage{times} % other fonts are available like times, bookman, charter, palatino
 
 \title{My Final College Paper}
@@ -142,7 +154,7 @@ Therefore, the aim of this project is to develop a pedagogical simulator program
 
 The results are promising, but with room for improvement. Certain useful features have been deemed to be beyond the scope of the current project, but the finished simulator fully supports the 32-bit RISC-V Base Integer specifications, and features a GUI, support for user-inputted programs, and rewinding capabilities for its ease of use as well.
 
-\chapter*{Background}
+\chapter{Background}
 \section{An abstract view of how a CPU functions}
 In order to build and understand the design of a CPU, we must first understand what it, in general terms, does. We've already established that a CPU carries out a program consisting of instructions from its ISA. However, what exactly do those instructions demand the CPU do, and what does the CPU have access to to carry it out?
 
@@ -250,7 +262,7 @@ Most of the components shown here have already been explained earlier, albeit wi
 
 This is enough to understand the CPU simulator, for the most part; rather than simply take in a machine-code program and execute it as efficiently as possible, which would be trivial to do in a modern high-level programming language, the simulator represents each of these components individually as structs, so that the flow of data through the CPU circuits can be displayed accurately.
 
-\chapter*{CPU and Simulator Design}
+\chapter{CPU and Simulator Design}
 
 Before looking at the build of the actual CPU simulator program, it is worth going over one, in particular, of the features that this simulator seeks to implement.
 
@@ -443,16 +455,65 @@ The actual simulator is a program written in the Rust programming language, and 
 
 The goal of the simulator itself is simple: to take in a machine-code RISC-V program as input, set up a virtual construct in Rust that replicates the low-level, semi-abstracted model of a CPU that has been discussed in the background chapter, and then run said program through it in a way where the simulated CPU's internal state is always transparent. Other goals, such as a User Interface, are additional features and not part of the core design. This design was eventually accomplished, though the project had to go through a major restart partway.
 
+\subsection*{First Draft}
+
 The first draft was quite neat in theory, though rather idealistic. The core idea is to rely on the way that the diagrams above dive the CPU into separate "subcomponents", such as the Program Counter or the ALU, which only pass along information through predefined wires; this is something the final design will keep.
 
 The core idea of the first draft is that each of these subcomponents should be represented by its own unique "struct" in Rust; despite the name, these are much closer to the Classes and Objects of Object-Oriented Programming Languages like Python and C++, made to hold a specific set of variables as well as functions tailored to those variables. Every "subcomponent" on the graph would be represented with its own unique struct: It would have variables for both every input and output connection it had with other subcomponents; and if it was a stateful subcomponent that stores data, like the Program Counter or any of the three Memories (Instruction, Register, Data), it would also have variables for recording said state. References to the structs that they need to fetch input data from, as well as functions to fetch said data and to perform the subcomponent's intended purpose complete the struct. Then, all of this would be hooked up to some sort of master "setup" and "step" functions; the former would initialize all these structs and insert the program into the Instruction Memory, while the latter would activate these structs one by one to perform a single full CPU cycle, over and over.
 
 The advantages of such a design are apparent: The different structs are entirely separate from one another, making them easy to test on an individual level and to see the state of any one given subcomponent at a time. It also meant that the layout of the code resembled the design of the actual CPU somewhat intuitivelty.
 
-However, this design also has two glaring flaws: The first is that it was incredibly memory-unsafe, and
+However, this design also has two glaring flaws: The first is more manageable, and it is simply that the design's method of passing data between structs, that being of giving each struct a persistent reference to the structures that send information to it, is entirely incompatible with Rust's memory-safety failsafes. Well, the idea of doing that, in itself, is not, but the problem comes from the fact that, due to the CPU's cyclical nature, these links of one struct borrowing a refference to the previous struct eventually form a loop. The details are not relevant to this project, but using such persistent references in a loop with no clear top-level "owner" goes against the language's philosophy to the point of not being allowed at all. This issue could've been resolved on its own if it was the only problem with the design; for example, by simply having the step function handle all the wiring itself and using the subcomponent structs for their internal computations only.
 
+That said, the second issue is that the design was unbearably repetitive, to the point of being confusing to look at. The distinct input-output variables on each struct meant that every piece of information in the CPU essentially took up two variables instead of one, and the process of computing a piece of data and sending it to the next subcomponent in the stage became a chore with many unecessary middle-man steps inbetween.
 
+\subsection*{Final design}
 
+The second and final iteration of the simulator took a slightly different approach, one that relies more closely on the nature of this CPU as being ultimately made of logic gates and wires, and employs style of design often used to simulate simpler logic gate machines.
+
+The idea now is to divide the CPU design into two categories, and therefore two structs: Its State and its Logic. The State consists of all the naturally  stateful elements of the CPU as described before: The Program Counter, the three Memories, and also all of the Latches, which essentially store the supposed current state of the wires they are supposed to clamp down on. The Logic stores everything else that has no state; or, rather, it stores all of the \textit{wires}, since that is all else that matters. A subcomponent like the ALU has no internal state; it reads data of the two operands and the opcode, and calculates its output solely off of that; even to be accurately rerpesented, this representation can be done simply as a piece of code that performs the ALU's function. Even the wires are only stored in persistent variables for the sake of visually displaying the CPU's state later. So, the entirety of the CPU is separated into a State struct and a Logic struct, and each struct has an "Update" function written to it that takes the other struct as a mutable reference and  updates the state of all its own variables at once: For the State Struct, this means handling memory changes like updating the PC, enacting the write of data into the Writeback register, and Storing data into the Data Memory when Store instructions pass by. For the Logic struct, it means reading the state of latches and registers and determining what signals should be traveling through the wire as a result of their changes.
+
+(DIAGRAM OF CPU, COLOR-CODED FOR STATE AND LOGIC MAYBE?)
+
+This setup is so useful because it makes the actual update of a CPU cycle incredibly simple: Just run the update function for the State struct, followed by the update function for the Logic Struct. This is not entirely true, as the implementation of stalling will complicate things a little, But for the most part, this makes up the base of the simulated CPU and the process for executing one of its cycles:
+
+\begin{lstlisting}
+	struct State {
+		pc : u32,
+		instr_mem : Vec<u32>
+		// ... more State variables
+	}
+
+	struct Logic {
+		added_pc : u32,
+		instruction_out : u32,
+		//... more Logic variables
+	}
+
+	impl State {
+		fn update(&mut self, &mut logic: Logic){
+			self.pc = logic.added_pc:
+			//... more State updates
+		}
+	}
+
+	impl Logic {
+		fn update(&mut self, &mut state: State){
+			self.added_pc = state.pc + 4;
+			self.instruction_out = state.instr_mem[(state.pc / 4)]
+			//... more Logic updates
+		}
+	}
+
+	fn step(state: &mut State, logic: &mut Logic) {
+		state.update(logic);
+		logic.update(state);
+	}
+\end{lstlisting}
+
+This code is entirely functional as a rough base for the simulator's design; all the ,main body of the program needs to do outside of this function is to initalize the two structs, get the user-fed instruction into the instruction memory, and then run the $update(state, logic)$ function repeatedly until the program has run its course!
+
+Other features can and will be implemented as well, of course; but, the design shown above is a sweeping generalization. It's worth taking a closer look at what the final, detailed program looks like, now that its basic structure is understood.
 
 
 \section{CPU-Simulator Features}
