@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex thesis"] 1713074845.34657 "thesis.aux" "thesis.bbl" "thesis" 1713074872.18196 0
+["bibtex thesis"] 1713126671.31964 "thesis.aux" "thesis.bbl" "thesis" 1713131606.8813 0
   "./APA/apa-good.bst" 1709498026.60253 29521 681759d6fea01a76087da65eae747ed5 ""
   "./thesis.bib" 1709588347.32836 5528 a78bad4ccfb7ae2bba3e2b34168ecb8d ""
-  "thesis.aux" 1713074871.60078 7111 96a2dccff82732d410852d3284915a15 "pdflatex"
+  "thesis.aux" 1713131606.60846 7111 3107f2ca5e0fadc80aa26fe84cb554ed "pdflatex"
   (generated)
   "thesis.bbl"
   "thesis.blg"
   (rewritten before read)
-["pdflatex"] 1713074870.72366 "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" "thesis.pdf" "thesis" 1713074872.18221 0
-  "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" 1713074870.49747 82222 d65e42ff863112214654bd03698136c2 ""
+["pdflatex"] 1713131605.98834 "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" "thesis.pdf" "thesis" 1713131606.88146 0
+  "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" 1713131605.75846 89227 3bf69df66e7dce85fd52c765d231cbf1 ""
   "/opt/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1713041416 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/opt/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1713041416 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1713041416 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
@@ -22,6 +22,7 @@
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm" 1713041416 940 228d6584342e91276bf566bcf9716b83 ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1713041416 1324 c910af8c371558dc20f2d7822f66fe64 ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmex10.tfm" 1713041416 992 662f679a0b3d2d53c1b94050fdaa3f50 ""
+  "/opt/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmitt10.tfm" 1713041416 768 2297ad2ac26f37e67f756dad27c77d68 ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1713041416 1524 4414a8315f39513458b80dfc63bff03a ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1713041416 1512 f21f83efb36853c0b70002322c1ab3ad ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm" 1713041416 1520 eccf95517727cb11801f4f1aee3a21b4 ""
@@ -41,6 +42,7 @@
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/latex-fonts/lasy7.tfm" 1713041416 520 a74c6ed8cb48679fdc3ea874d9d34a7e ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/latex-fonts/lasy8.tfm" 1713041416 520 7bb3abb160b19e0ed6ac404bb59052b7 ""
   "/opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1713041416 32080 340ef9bf63678554ee606688e7b5339d ""
+  "/opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb" 1713041416 26057 fad158094905eaf20f4ae3782af0c45c ""
   "/opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1713041416 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
   "/opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb" 1713041416 36741 fa121aac0049305630cf160b86157ee4 ""
   "/opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb" 1713041416 35469 70d41d2b9ea31d5d813066df7c99281c ""
@@ -103,12 +105,12 @@
   "listings-rust.sty" 1713073838.35611 12271 441435634f54a6459e4e2a6911352eff ""
   "reedthesis.cls" 1709498026.60586 8293 480a01b2533a1585368760477c470aa0 ""
   "subdivision.pdf" 1709498026.60919 11808 5cb09e199f00728bd95a288d1958f4c8 ""
-  "thesis.aux" 1713074871.60078 7111 96a2dccff82732d410852d3284915a15 "pdflatex"
-  "thesis.bbl" 1713074845.5381 3807 f8ebcac383855ef03017b04c63166ff5 "bibtex thesis"
-  "thesis.lof" 1713074871.60411 554 e64888d0a613a269d2759ab98e53ec01 "pdflatex"
-  "thesis.lot" 1713074871.60411 344 b01e3308424059124c2b5e7c9009d5c5 "pdflatex"
-  "thesis.tex" 1713074870.49747 82222 d65e42ff863112214654bd03698136c2 ""
-  "thesis.toc" 1713074871.60411 2581 ef974c96b40b760f5058fddf0295fb9d "pdflatex"
+  "thesis.aux" 1713131606.60846 7111 3107f2ca5e0fadc80aa26fe84cb554ed "pdflatex"
+  "thesis.bbl" 1713126671.50959 3807 f8ebcac383855ef03017b04c63166ff5 "bibtex thesis"
+  "thesis.lof" 1713131606.60846 554 ec9aed5b72ff598b359ab293ad4345a3 "pdflatex"
+  "thesis.lot" 1713131606.60846 344 2e8dabe085f3bb51fed996c6250fcc8b "pdflatex"
+  "thesis.tex" 1713131605.75846 89227 3bf69df66e7dce85fd52c765d231cbf1 ""
+  "thesis.toc" 1713131606.60846 2581 719877ab97dd27da7aa41b7320850a44 "pdflatex"
   (generated)
   "thesis.aux"
   "thesis.lof"

@@ -515,6 +515,103 @@ This code is entirely functional as a rough base for the simulator's design; all
 
 Other features can and will be implemented as well, of course; but, the design shown above is a sweeping generalization. It's worth taking a closer look at what the final, detailed program looks like, now that its basic structure is understood.
 
+\subsection*{Structs and Sub-Structs}
+
+The final design could indeed have just unceremoniously dumped all of its State and Logic variables into their respective structs; but this would've made a rather huge mess, resulted in individual wires (especially different wires that carry the same piece of data at different stages) being hard to keep track of, and would've been rather confusing and inelegant in general; this is one of the issues the first draft design sought to resolve. Therefore, the final design for the structs instead looks like this:
+
+\begin{lstlisting}
+	#[derive(Clone)]
+	pub struct Registers {
+		pub ifid: IFIDLatch,
+		pub idex: IDEXLatch,
+		pub exmem: EXMEMLatch,
+		pub memwb: MEMWBLatch,
+
+		pub pc: u32,
+
+		pub instr_mem: Vec<u32>,
+		pub reg_mem: Vec<u32>,
+		pub data_mem: HashMap<u32, u32>,
+	}
+
+	//this structs holds all the wiring of each stage
+
+	#[derive(Clone, Default)]
+	pub struct Logic {
+		pub fetch: IFLogic,
+		pub decode: IDLogic,
+		pub execute: EXLogic,
+		pub memory: MEMLogic,
+		pub writeback: WBLogic,
+
+		pub pc_stall: bool,
+	}
+\end{lstlisting}
+
+Rather than having a soup of variables, all of the states tied to a specific latch and all the wires tied to a specific pipeline stage are sequestered off in their own sub-struct; when used like this, these sub-structs are just fancy ways of holding variables and don't get in the way like they did in the previous design. It also allows for said sub-structs to be stored in their own file, leading to a much cleaner folder structure for the source code. In a way, these sub-structs are effectively just organizational folders for the variables within the program.
+
+\begin{lstlisting}
+use crate::components::*;
+
+//The IF-ID Latch
+#[derive(Clone, Copy, Default)]
+pub struct IFIDLatch {
+    pub base_pc: u32,
+    pub added_pc: u32,
+    pub instruction: u32,
+
+    pub id_stall: u8, //stall, bubble, or neither?
+}
+
+impl IFIDLatch {
+    pub fn bubble(&mut self) {
+        self.base_pc = 0;
+        self.added_pc = 0;
+        self.instruction = 0;
+    }
+}
+
+//holds all of the wiring of the ID stage
+#[derive(Clone, Default)]
+pub struct IDLogic {
+    pub decode_r1: u8,
+    pub decode_r2: u8,
+    pub decode_opcode: u8,
+    pub decode_rd: u8,
+    pub decode_funct3: u8,
+    pub decode_funct7: u8,
+
+    pub regmem_r1: u32,
+    pub regmem_r2: u32,
+
+    pub immediates: u32,
+}
+\end{lstlisting}
+(FOOTNOTE EXPLAINING THIS IS DECODE.RS)
+(MAYBE DIAGRAM OF DECODE STAGE TO COMPARE?)
+
+This is an example of one such file; in genral, everything is stored as simply as possible, with the data types one would expect: Most wires carry a 32-bit unsigned integer; since this is a 32-bit system, that is the format that the CPU preferst to handle its data in. while wires for the smalled opcode, funct-3, and funct-7 all use unsigned 8-bit integers. Technically, the latter should use u7, u3, and u7 respectively, but establishing custom-length integer data types just for them was deemed to not be a very high priority.
+
+The instruction memory and register memory are simply represented as u32 Vectors, with the former having a length equal to the number of instructions in the program and the other having 32 integers exactly; this makes accessing registers incredibly intuitive, as the nth register can be found in $state.reg_mem[n]$. The data memory is orders of magnitude larger than the first two though, and is going to consist mostly of empty addresses, so using a vector would have been incredibly wasteful; instead, it uses a hashmap of 32-bit integers with numbered keys, matching the size of a "word" that the \textit{Store Word} and \textit{Load Word} instructions use. This means that the smaller load-store instructions need to slice off part of the accessed word, but this was fairly manageable.
+
+It is worth noting that there are some wires which aren't often shown in CPU design diagrams, but are nonetheless present in a real CPU, and therefore in our simulation too. For example, the Forwarding Multiplexors are only shown as having the base, EX-EX, and MEM-EX register values going into them, but in reality they also read a few other values, such as the opcode and register indices of the current and next two instructions, to decide which forwarding, if any, should ocurr.
+
+Ultimately, this makes the storing and accessing of information about the CPU pretty intuitive, which will come in very handy for the User Interface.
+
+\subsection*{Update Functions}
+
+Unfortunately, the two update functions aren't quite as simple. In a sense, they are: Each one goes has the struct going through all of its variables and updating them according to the internal logic of the CPU design. However, this updating needs to be done in just the right order in order to make things work properly. This is one case where building a virtual simulator is actually harder than making a real CPU: In a real CPU, all of this happens instantaenously and at the exact same time, literally within that given CPU clock cycle, and so it does not need to worry about this. But the simulated CPU runs one-step-at-a-time, and doing certain updates before others can cause massive errors. For example, the latches in the State struct's update function need to be updated in order from right to left, starting with the MEM-WB latch and ending with the IF-ID latch. Otherwise, if the IF-ID latch updates before the ID-EX latch, the information it was supposed to send directly over, like the base PC and added PC, that information vanishes for good. The problem is especially tricky with the Logic update function where, thanks to forwarding and writebacks, certain computations of a pipeline stage rely on information from a stage further to the right. Thankfully, part of the job of the latches here is to serve as a stopgap to separate the stages, so the issue is merely annoying rather than impossible.
+
+A lot of the desired ordering was figured out, in part, by writing a large amount of test cases and catching any correctness errors, though that will be discussed in detail later.
+
+Its ordering aside, the actual code contained within is mostly understandable, just there to perform the functions that those sub-components would in a real CPU. The decoder code takes an instruction and separates it into its relevant pieces using bit-masks and bit-shifts; the register memory writes and reads data off the 32 general-purpose registers, so on. The most crucial one is the ALU, since that's  utlimately where the actual computation of most instructions takes place, and even that one is farily simple: It takes in the two operands, looks at the opcode to figure out what sort of arithmetic operation it's supposed to perform and spits out the output to $logic.execute.alu_out$. To whomever is interested in more details, the update functions and my comments on them can be found in the $components.rs$ file, right under the structs.
+
+\subsection*{Stalling}
+
+There is one piece of the core simulator that doesn't fit neatly into the description above.
+
+
+
 
 \section{CPU-Simulator Features}
 
