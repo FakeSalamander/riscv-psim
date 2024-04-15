@@ -107,6 +107,7 @@ You can always change the way your abbreviations are formatted. Play around with
 		\textbf{ALU}    & Arithmetic Logic Unit                 \\
 		\textbf{CISC}   & Complex Instruction Set Computer      \\
 		\textbf{CPU}    & Central Processing Unit               \\
+		\textbf{GUI}    & Graphical User Interface              \\
 		\textbf{ISA}    & Instruction Set Architecture          \\
 		\textbf{RISC}   & Reduced Instruction Set Computer      \\
 		\textbf{RISC-V} & Reduced Instruction Set Computer Five \\
@@ -608,12 +609,82 @@ Its ordering aside, the actual code contained within is mostly understandable, j
 
 \subsection*{Stalling}
 
-There is one piece of the core simulator that doesn't fit neatly into the description above.
+There is one piece of the core simulator that doesn't fit neatly into the description above, in part because it operates above the other components. While the variables to indicate whether components are being stalled or not are stored within the State and Logic structs, the code for the Stall Control happens directly at the step function, performed after the state update but before the logic. Since forwarding is implemented, stalling is only needed for Control Hazards and for Load-ALU hazards; the former is fully implemented, while the latter, unfortunately, could not be debugged in time.
 
+\begin{lstlisting}
 
+pub fn step(state: &mut Registers, logic: &mut Logic) {
+    //Checks if Stalling or Bubbling is needed
+    //Check if a jump is performed! those always need a stall on the NEXT step
+    let must_jump_stall_next = logic.fetch.jumped;
 
+    //if there's a Load in EX stage and an ALU instruction in the ID stage,
+	// using the same register...
+
+    state.update(logic);
+
+    //always do this inbetween!!!
+	//that way the right instructions get stalled/bubbled,
+	// but their logic is not allowed to propagate.
+    if must_jump_stall_next {
+        //If there is a jump, need to bubble IF and ID of now...
+		// so the ID and EX of next step!
+        logic.pc_stall = false;
+        state.ifid.id_stall = 2; //bubble flag  on
+        state.ifid.bubble();
+
+        state.idex.ex_stall = 2; //bubble flag on
+        state.idex.bubble();
+
+        state.exmem.mem_stall = 0;
+        state.memwb.wb_stall = 0;
+    } else {
+        logic.pc_stall = false;
+        state.ifid.id_stall = 0;
+        state.idex.ex_stall = 0;
+        state.exmem.mem_stall = 0;
+        state.memwb.wb_stall = 0;
+    }
+
+    logic.update(state);
+}
+\end{lstlisting}
+
+I suspect that this decision to place the stall decision there is part of what made the Load-ALU stalling so difficult to figure out, and is worth addressing in future revisions. But with that, the core simulator design is complete!
 
 \section{CPU-Simulator Features}
+
+Of course, such a simulator as it currently stands is pretty bare-bones for the sake of educational purposes. So, in a rough order of complexity-to-implement, the following features were added to the simulator: The ability to feed the simulator a machine-code program from a text file, the ability for the simulator to store and load the entire state of the CPU in previous steps, and a simple graphical user interface that displays and clarifies the internal state of the CPU at its current cycle. But, why these three?
+
+The goal of these features are to make the simulator easier to use, and to aid its goal of helping users attain a more intuitive understanding of a CPU's inner workings. The last feature is by far the most critical for this: The GUI displays the same information as one of the CPU diagrams from earlier, but with the actual data of a live program running through it overlayed on top; and it can be analyzed step by step! The finalized GUI for this simulator is very rudimentary and much smaller in scope than what was originally intended, but it accomplishes its intended purpose well; it will be described in more detail later.
+
+The purposes of the other two features are supplementary in nature, but no less useful: User-Inputed programs make it possible for the end user to provide their own code and run programs tailored around whichever instructions or CPU features they are interested in getting a better grasp of rather than one sample program, without needing to edit the source code and recompile at least. The latter is pure ease-of-use, and ends up implemented solely as a way to be able to "backstep" or "rewind" the simulator at any given step, but is incredibly useful in that alone: If a user steps forward and suddenly finds themselves confused by the CPU's new state, they can rewind back to the previous cycle, or more, to refresh their memory and see how it got there.
+
+\subsection*{Implementation of User Input and Rewinding}
+
+These features were both pretty simple to implement, and are only described here for completeness. The User Input simply involves using Rust's built-in libraries for commandline arguments and file reading, taking in the filename and creating the Instructions vector out of the file's contents line-by-line. For the sake of simplicty, the program expects one machine-code instruction per line, formatted as a 32-bit binary integer. Originally, the project was going to accept RISC-V assembly code as input and have its own built-in assembler to translate them into the binary machine code that the simulator needs, but this has proven to be out of scope.
+
+The backups/rewinding were only a little more involved, requiring just the creation of a "Snapshot" struct that contains one State struct and one Logic struct within it. This new struct then works as a full snapshot of the CPU's previous state: The simulator clones the current State and Logic structs at every cycle, and places the clones in a "backup" vector of Snapshots; When the user asks to go back a step, it simply pops the most recent Snapshot off the backup vector and replaces the State and Logic structs it is currently using with those within the Snapshot. Due to their simplicity, both of these features were very easy to implement!
+
+\subsection*{Graphical User Interface}
+
+In the initial writeup, the plan for the simulator's GUI was incredibly ambitious (the entire writeup was, but that is besides the point): The plan was to learn an application development framework such as Qt as part of the project, develop a proper graphical interface that would run its own window, and then implement all sorts of additional nice features like separate tabs for the different memories, animations to show which wires are actually passing relevant information in any given cycle, and so on. Suffice to say, this idea was entirely out of scope and would have required spending a lot of time studying something entirely unrelated to Computer Systems, and I ended up scaling back to something much more reasonable to get working quickly: An ASCII-art text interface, that can be printed directly to the commandline terminal.
+
+(INSERT SCREENSHOT OF SIMULATOR GUI)
+
+It's fairly dense and all but requires the user's terminal to be maximized, but it properly displays the CPU diagram and all of its relevant information! The top line displays the instruction that each pipeline stage is currently executing, in assembly; the body displays the entire CPU diagram, and the value that every wire currently holds; and the bottom shows the entire values of the register memory! The implementation, while involved and time-consuming, was mostly simple: the text-art for the diagram was drawn up using an online tool named ASCIIflow, and the $display_cpu$ function responsible for it was given a reference to the State and Logic structs, from where it could effortlessly pull the needed values for the diagram display. This simpler method also provides its own advantage: While much less sleek, the commandline approach makes the program more likely to work across operating systems without any tinkering required than an intricate app-develoment framework might.
+
+The most involved part is actually the instruction-display at the top; in order to make it useful and human-readable, having it spit out the instructions as 32-bit binary integers would not cut it. Therefore, the GUI makes use of an additional $display_instruction$ function that converts a given machine-code instruction into its equivalent assembly, a "reverse-assembler" in a way. This feature wasn't too time-intensive, and it was a good use of my growing familiarity with the format of RISC-V's 32-bit instructions.
+
+To cap things off, there is an user-input prompt at the bottom that asks the user to either move to the next step or the previous step, completing the implementation of the rewind feature.
+
+Overall, I have found this user display to be rather satisfactory of the projects needs, despite its stark contrast to the initial goal. The only missing feature that I feel is essential, but ran out of time to implement, is an extra line or two for displaying any values that the program writes into the Data Memory. It is imperative to only present modified data rather than the entire storage unit, as otherwise the sheer amount of information would be utterly useless; luckily, the formatting of the Data Memory variable as a hash-map inherently alleviates this concern. It may also be possible to replicate the desired effect of "indicating which wires are passing important information" using color-coded terminal text, but the method used to print the GUI would have made it far too time-consuming to introduce on a whim.
+
+That said, there are some other potential features that could be added as future extensions to the project, even outside of the GUI.
+
+\subsection*{Future Extensions}
+
+The most obvious and tempting features to include are certain ones dealing with ease-of-use: A built-in RISC-V assembler, which would allow users to write and input programs in the much more human-legible format of assembly code;
 
 
 
