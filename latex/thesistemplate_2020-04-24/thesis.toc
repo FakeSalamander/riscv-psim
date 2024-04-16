@@ -16,9 +16,9 @@
 \contentsline {subsection}{\numberline {2.1.6}Final CPU Design}{16}{}%
 \contentsline {section}{\numberline {2.2}Simulator Design}{17}{}%
 \contentsline {section}{\numberline {2.3}CPU-Simulator Features}{24}{}%
-\contentsline {section}{\numberline {2.4}Bibliographies}{26}{}%
-\contentsline {subsection}{\numberline {2.4.1}Tips for Bibliographies}{26}{}%
-\contentsline {section}{\numberline {2.5}Anything else?}{27}{}%
+\contentsline {section}{\numberline {2.4}Bibliographies}{27}{}%
+\contentsline {subsection}{\numberline {2.4.1}Tips for Bibliographies}{27}{}%
+\contentsline {section}{\numberline {2.5}Anything else?}{28}{}%
 \contentsline {chapter}{Chapter 3: Mathematics and Science}{29}{}%
 \contentsline {section}{\numberline {3.1}Math}{29}{}%
 \contentsline {section}{\numberline {3.2}Chemistry 101: Symbols}{29}{}%

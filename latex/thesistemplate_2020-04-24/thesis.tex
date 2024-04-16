@@ -153,7 +153,9 @@ Of the countless pieces of hardware to study and delve into within this field, t
 
 Therefore, the aim of this project is to develop a pedagogical simulator program, developed in the Rust programming language and capable of running on modern computers, that simulates a simple RISC-V CPU at the hardware level, running assembly code and then transparently displaying how the code and computed information traverse the inside of the processor. While simple, the simulated CPU implements a 5-stage pipeline design similar to the ones that are mandatory for modern CPUs. The project also seeks to include some user-facing features, like a graphical interface and the ability to step through and rewind through the execution of a program, to make the simulator more intuitive to use.
 
-The results are promising, but with room for improvement. Certain useful features have been deemed to be beyond the scope of the current project, but the finished simulator fully supports the 32-bit RISC-V Base Integer specifications, and features a GUI, support for user-inputted programs, and rewinding capabilities for its ease of use as well.
+A few other educational simulators like this already exist... (DESCRIBE THEM HERE). However, the one existing simulator that most heavily influenced this project
+
+The results are promising, but with room for improvement. Certain useful features have been deemed to be beyond the scope of the current project, but the finished simulator supports the 32-bit RISC-V Base Integer specifications, and features a GUI, support for user-inputted programs, and rewinding capabilities for its ease of use as well.
 
 \chapter{Background}
 \section{An abstract view of how a CPU functions}
@@ -684,7 +686,15 @@ That said, there are some other potential features that could be added as future
 
 \subsection*{Future Extensions}
 
-The most obvious and tempting features to include are certain ones dealing with ease-of-use: A built-in RISC-V assembler, which would allow users to write and input programs in the much more human-legible format of assembly code;
+The most obvious and tempting features to include are certain ones dealing with ease-of-use: A built-in RISC-V assembler, which would allow users to write and input programs in the much more human-legible format of assembly code; an english "narration" of sorts of what each stage accomplishes on a given cycle; or perhaps even the ability to edit values of the CPU on the fly in order to study how that changes the outcome.
+
+Another approach is to extend the capabilities or fidelity of the simulated CPU. This project limits itself to a simple design and just the RISC-V 32-bit Base Integer Instruction Set  for the sake of remaining easy-to-understand for newcomers to Computer Systems, but additional support for some of RISC-V's myriad Standard Extensions could be added to give the simulator some much-needed versatility. These range from things like the inclusion of multipication instructions and floating-point numbers to vector calculations and a whole 64-bit instruction set, and would come especially handy for if anyone studying the RISC-V architecture specifically.
+
+As far as incrasing fidelity, the obvious choice is the Data Memory. As described before, the Data Memory in this simulator is a "black box"; it takes in requests to load or store data to certain addresses, and does so without any paerticular consideration of how that is physically possible. This is technically true for our Register and Instruction Memories as well, but those are small enough that they can easily fit on the CPU chip, and thus be set up pretty similarly to what our diagram presents. This is not the case for the Data Memory: The Data Memory is magnitudes larger than either of the former two. Even if one only counts the data that a running program access with its 32-bit addresses, the Data Memory can store a mind-boggling $2^28$ Words (4-byte chunks of data) compared to the Register Memory's measly 32! That's about 4.2 gigabytes and 128 bytes, respectively; and, since the operating systems of modern personal computers want to be running many, many programs at once, the actual size tends to be even larger in practice, nowadays. Therefore, a possible extension of the simulator would be to alter it to replicate the following more realistic setup: One where the actual Data Memory is stored off the CPU chip, massive but painfully slow to access; while a series of caches mediate this access to hopefully maintain on-chip speed for the more frequently-used parts of Data Memory. This setup would allow the simulator to be usable for learnign to work with memory structures as well as CPUs, and could implement crucial features for it such as the aforementioned caches or Virtual Memory.
+(CITATION NEEDED?)
+
+An alternate version of the Register Memory could be provided in similar fashion; this is a much smaller change than the data memory. There are cases where a forwarding or stall is not logically needed in a program, but because a register or Data Memory address is used in a certain way, it ends up being required. (SHOULD I TALK IN DETAIL ABOUT REGISTER RENAMING?)
+
 
 
 
