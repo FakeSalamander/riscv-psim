@@ -1,0 +1,17 @@
+- Abstract (write)
+
+- Add summary of results to intro
+
+- Pipeling (Done! I think?)
+
+
+- My simulator design
+
+
+- CPU Features
+
+
+- Future Driections
+    (missing features)
+    
+    

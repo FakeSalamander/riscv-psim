@@ -1,4 +1,4 @@
-\begin{thebibliography}{17}
+\begin{thebibliography}{23}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname url\endcsname\relax
   \def\url#1{{\tt #1}}\fi
@@ -55,15 +55,35 @@ Jain, A.~K. (1989).
 \newblock {\em Fundamentals of Digital Image Processing\/}.
 \newblock Englewood Cliffs, New Jersey: Prentice-Hall.
 
+\bibitem[{Kanter(2013)}]{kanter2}
+Kanter, D. (2013).
+\newblock Silvermont, intel's low power architecture.
+\urlprefix\url{https://www.realworldtech.com/silvermont/}
+
+\bibitem[{Kanter(2014)}]{kanter1}
+Kanter, D. (2014).
+\newblock Amd's jaguar microarchitecture.
+\urlprefix\url{https://www.realworldtech.com/jaguar/}
+
 \bibitem[{Molina \& Borkovec(1994)}]{Molina1994}
 Molina, S.~T., \& Borkovec, T.~D. (1994).
 \newblock The {P}enn {S}tate worry questionnaire: Psychometric properties and associated characteristics.
 \newblock In G.~C.~L. Davey, \& F.~Tallis (Eds.), {\em Worrying: Perspectives on theory, assessment and treatment\/}, (pp. 265--283). New York: Wiley.
 
+\bibitem[{msykpshinz(2019)}]{msyksphinz}
+msykpshinz (2019).
+\newblock riscv-isa-pages.
+\urlprefix\url{https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html}
+
 \bibitem[{Noble(2002)}]{noble:2002}
 Noble, S.~G. (2002).
 \newblock {\em Turning images into simple line-art\/}.
 \newblock Undergraduate thesis, Reed College.
+
+\bibitem[{Price(1995)}]{price}
+Price, C. (1995).
+\newblock Mips iv instruction set revision 3.2.
+\urlprefix\url{https://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf}
 
 \bibitem[{Reed{\ }College(2007)}]{reedweb:2007}
 Reed{\ }College (2007).
@@ -84,6 +104,16 @@ Salisbury, M.~P., Wong, M.~T., Hughes, J.~F., \& Salesin, D.~H. (1997).
 Savitch, W. (2001).
 \newblock {\em JAVA: An Introduction to Computer Science \& Programming\/}.
 \newblock Upper Saddle River, New Jersey: Prentice Hall.
+
+\bibitem[{Shimpi \& Wilson(2004)}]{shimpi}
+Shimpi, A.~L., \& Wilson, D. (2004).
+\newblock Intel's pentium 4 e: Prescott arrives with luggage.
+\urlprefix\url{https://www.anandtech.com/show/1230/3}
+
+\bibitem[{Waterman et~al.(2017)Waterman, Asanovic, \& Inc.}]{waterman}
+Waterman, A., Asanovic, K., \& Inc., S. (2017).
+\newblock The risc-v instruction set manual volume 1: User-level isa.
+\urlprefix\url{https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf}
 
 \bibitem[{Wong(1999)}]{wong:1999}
 Wong, E. (1999).
