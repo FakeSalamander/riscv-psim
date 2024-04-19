@@ -16,24 +16,25 @@
 \contentsline {subsection}{\numberline {2.1.6}Final CPU Design}{18}{}%
 \contentsline {section}{\numberline {2.2}Simulator Design}{19}{}%
 \contentsline {section}{\numberline {2.3}CPU-Simulator Features}{26}{}%
-\contentsline {section}{\numberline {2.4}Bibliographies}{29}{}%
-\contentsline {subsection}{\numberline {2.4.1}Tips for Bibliographies}{29}{}%
-\contentsline {section}{\numberline {2.5}Anything else?}{30}{}%
-\contentsline {chapter}{Chapter 3: Mathematics and Science}{31}{}%
-\contentsline {section}{\numberline {3.1}Math}{31}{}%
-\contentsline {section}{\numberline {3.2}Chemistry 101: Symbols}{31}{}%
-\contentsline {subsection}{\numberline {3.2.1}Typesetting reactions}{32}{}%
-\contentsline {subsection}{\numberline {3.2.2}Other examples of reactions}{32}{}%
-\contentsline {section}{\numberline {3.3}Physics}{32}{}%
-\contentsline {section}{\numberline {3.4}Biology}{32}{}%
-\contentsline {chapter}{Chapter 4: Tables and Graphics}{33}{}%
-\contentsline {section}{\numberline {4.1}Tables}{33}{}%
-\contentsline {section}{\numberline {4.2}Figures}{35}{}%
-\contentsline {section}{\numberline {4.3}More Figure Stuff}{37}{}%
-\contentsline {section}{\numberline {4.4}Even More Figure Stuff}{37}{}%
-\contentsline {subsection}{\numberline {4.4.1}Common Modifications}{37}{}%
-\contentsline {chapter}{Conclusion}{39}{}%
-\contentsline {section}{\numberline {4.1}More info}{39}{}%
-\contentsline {chapter}{Appendix A: The First Appendix}{41}{}%
-\contentsline {chapter}{Appendix B: The Second Appendix, for Fun}{43}{}%
-\contentsline {chapter}{References}{45}{}%
+\contentsline {chapter}{Chapter 3: Conclusion}{29}{}%
+\contentsline {section}{\numberline {3.1}Bibliographies}{32}{}%
+\contentsline {subsection}{\numberline {3.1.1}Tips for Bibliographies}{32}{}%
+\contentsline {section}{\numberline {3.2}Anything else?}{33}{}%
+\contentsline {chapter}{Chapter 4: Mathematics and Science}{35}{}%
+\contentsline {section}{\numberline {4.1}Math}{35}{}%
+\contentsline {section}{\numberline {4.2}Chemistry 101: Symbols}{35}{}%
+\contentsline {subsection}{\numberline {4.2.1}Typesetting reactions}{36}{}%
+\contentsline {subsection}{\numberline {4.2.2}Other examples of reactions}{36}{}%
+\contentsline {section}{\numberline {4.3}Physics}{36}{}%
+\contentsline {section}{\numberline {4.4}Biology}{36}{}%
+\contentsline {chapter}{Chapter 5: Tables and Graphics}{37}{}%
+\contentsline {section}{\numberline {5.1}Tables}{37}{}%
+\contentsline {section}{\numberline {5.2}Figures}{39}{}%
+\contentsline {section}{\numberline {5.3}More Figure Stuff}{41}{}%
+\contentsline {section}{\numberline {5.4}Even More Figure Stuff}{41}{}%
+\contentsline {subsection}{\numberline {5.4.1}Common Modifications}{41}{}%
+\contentsline {chapter}{Conclusion}{43}{}%
+\contentsline {section}{\numberline {4.1}More info}{43}{}%
+\contentsline {chapter}{Appendix A: The First Appendix}{45}{}%
+\contentsline {chapter}{Appendix B: The Second Appendix, for Fun}{47}{}%
+\contentsline {chapter}{References}{49}{}%

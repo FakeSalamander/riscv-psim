@@ -1,0 +1,32 @@
+- TITLE
+
+- ABSTRACT
+    1-2 paragraphs
+
+    - WHATS THE PROBLEM?
+
+    - WHAT DID I DO?
+
+
+- add OOE as potential extension
+    - Register Renaming after that, it resolves false hazards when using OOE
+
+-
+
+
+- Conclusion!
+    - Mistakes
+
+    - Things you have learned,
+        - Takeaways about experiences
+
+
+    - What has your theis done?
+
+    - How someone who wants to pick up your thesis should proceed
+        - Advice for such a path
+        - Ptential future goals
+
+    - Talk about managing scope a lil
+
+    -
