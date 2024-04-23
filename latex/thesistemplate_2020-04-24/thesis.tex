@@ -47,6 +47,7 @@
 %package used to write code snippets in rust.
 \usepackage{listings, listings-rust}
 \usepackage{comment}
+\usepackage{float}
 
 
 \lstset{
@@ -383,11 +384,35 @@ At the very least, having a program return a consistently incorrect output is un
 
 The first solution that might come to mind is: "Why don't we pause the CPU when a Data Hazard is incoming, so that it has time to catch up?". And, this is shockingly a decent suggestion! The idea is simple: As it is in the example, the update to $\$r1$, ocurring at the start of Instruction 1's WB stage, was needed halfway through Instruction 2's ID stage (Register acessing happens during the latter half of the ID stage, after the Decoder has gone). The red arrow in the diagram represents this desired update that needs to happen for correctness.
 
-(DATAHAZARD-NOSTALL DIAGRAM)
+%(DATAHAZARD-NOSTALL DIAGRAM)
+\begin{figure}[H]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics{nostall}
+	\caption{Program execution without Stalling}
+	\label{no-stall}
+\end{figure}
 
 So, we could just delay the execution of Instruction 2 by three cycles...
 
-(DATAHAZARD-STALL DIAGRAM)
+%(DATAHAZARD-STALL DIAGRAM)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics{stall}
+	\caption{Program execution with Stalling}
+	\label{no-stall}
+\end{figure}
 
 And now the program will execute correctly! This process, called "Stalling", can be applied dynamically, too; if a Data Hazard happens by just one stage of difference, the offending instruction only needs to be stalled one cycle. This method inherently costs us some of the efficiency that pipelining offers either way, though.
 
@@ -483,7 +508,7 @@ The idea now is to divide the CPU design into two categories, and therefore two 
 
 This setup is so useful because it makes the actual update of a CPU cycle incredibly simple: Just run the update function for the State struct, followed by the update function for the Logic Struct. This is not entirely true, as the implementation of stalling will complicate things a little, But for the most part, this makes up the base of the simulated CPU and the process for executing one of its cycles:
 
-\begin{lstlisting}
+\begin{lstlisting}[caption={Barebones layout of $components.rs$}]
 	struct State {
 		pc : u32,
 		instr_mem : Vec<u32>
@@ -525,7 +550,7 @@ Other features can and will be implemented as well, of course; but, the design s
 
 The final design could indeed have just unceremoniously dumped all of its State and Logic variables into their respective structs; but this would've made a rather huge mess, resulted in individual wires (especially different wires that carry the same piece of data at different stages) being hard to keep track of, and would've been rather confusing and inelegant in general; this is one of the issues the first draft design sought to resolve. Therefore, the final design for the structs instead looks like this:
 
-\begin{lstlisting}
+\begin{lstlisting}[caption={Snippet of $components.rs$, holds main 2 structs}]
 	#[derive(Clone)]
 	pub struct Registers {
 		pub ifid: IFIDLatch,
@@ -556,7 +581,7 @@ The final design could indeed have just unceremoniously dumped all of its State 
 
 Rather than having a soup of variables, all of the states tied to a specific latch and all the wires tied to a specific pipeline stage are sequestered off in their own sub-struct; when used like this, these sub-structs are just fancy ways of holding variables and don't get in the way like they did in the previous design. It also allows for said sub-structs to be stored in their own file, leading to a much cleaner folder structure for the source code. In a way, these sub-structs are effectively just organizational folders for the variables within the program.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption={$decode.rs$, the file that holds ID-stage structs}]
 use crate::components::*;
 
 //The IF-ID Latch
@@ -740,7 +765,7 @@ I also learned that, as far as actually storing this information, simpler is bet
 
 \section*{Closing Thoughts}
 
-All in all, I am rather proud of what I've ended up building: A simple, tightly-focused RISC-V simulator that, while lacking in the fancier features of its contemporaries, has enough of a graphical interface to function as an educational tool. There's even something of a hidden silver lining in the project's eventual simplicity: While a simulator like RIPES is meant to be powerful and convenient for the end-user, a more bare-bones commandline program is much easier for an interested undergraduate student to take apart and build on top of.
+All in all, I am rather proud of what I've ended up building: A simple, tightly-focused RISC-V simulator that, while lacking in the fancier features of its contemporaries, has enough of a graphical interface to function as an educational tool. There's even something of a hidden silver lining in the project's eventual simplicity: While a simulator like RIPES is meant to be powerful and convenient for the end-user, a more bare-bones commandline program is much easier for an interested undergraduate student to take apart and build on top of. I hope that I have laid down a foundation for what could one day be a polished enough program to potentially see use in a classroom; though even if it simply ends up that a handful of individuals clone its repository to mess around with my code, its purpose will have been accomplished all the same.
 
 
 
