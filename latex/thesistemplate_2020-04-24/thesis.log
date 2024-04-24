@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Arch Linux) (preloaded format=pdflatex 2024.3.1)  24 APR 2024 13:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Arch Linux) (preloaded format=pdflatex 2024.3.1)  24 APR 2024 14:21
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -317,29 +317,25 @@ Non-PDF special ignored!
 
 ] [3] [4
 
-] [5] [6
-
-] (./thesis.toc [7])
+] (./thesis.toc [5])
 \tf@toc=\write4
 \openout4 = `thesis.toc'.
 
- [8] (./thesis.lot)
+ [6] (./thesis.lot)
 \tf@lot=\write5
 \openout5 = `thesis.lot'.
 
- [9
+ [7
 
-] [10
+] [8
 
 ] (./thesis.lof)
 \tf@lof=\write6
 \openout6 = `thesis.lof'.
 
- [11] [12
+ [9] [10
 
-] [13] [14
-
-] [15] [16
+] [11] [12
 
 ] [1
 
@@ -385,13 +381,13 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [7]
 
 pdfTeX warning: pdflatex (file ./cpu_basic.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<cpu_basic.pdf, id=95, 831.105pt x 397.485pt>
+<cpu_basic.pdf, id=82, 831.105pt x 397.485pt>
 File: cpu_basic.pdf Graphic file (type pdf)
 <use cpu_basic.pdf>
-Package pdftex.def Info: cpu_basic.pdf  used on input line 269.
+Package pdftex.def Info: cpu_basic.pdf  used on input line 272.
 (pdftex.def)             Requested size: 498.66684pt x 238.49283pt.
 
-Overfull \hbox (65.04684pt too wide) in paragraph at lines 269--270
+Overfull \hbox (65.04684pt too wide) in paragraph at lines 272--273
  [][] 
  []
 
@@ -417,10 +413,10 @@ Chapter 2.
 
 
 pdfTeX warning: pdflatex (file ./wastedsteps.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<wastedsteps.pdf, id=116, 722.7pt x 252.945pt>
+<wastedsteps.pdf, id=104, 722.7pt x 252.945pt>
 File: wastedsteps.pdf Graphic file (type pdf)
 <use wastedsteps.pdf>
-Package pdftex.def Info: wastedsteps.pdf  used on input line 303.
+Package pdftex.def Info: wastedsteps.pdf  used on input line 306.
 (pdftex.def)             Requested size: 433.62334pt x 151.76816pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
@@ -431,10 +427,10 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [11]
 
 pdfTeX warning: pdflatex (file ./pipelinedsteps.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<pipelinedsteps.pdf, id=121, 722.7pt x 252.945pt>
+<pipelinedsteps.pdf, id=108, 722.7pt x 252.945pt>
 File: pipelinedsteps.pdf Graphic file (type pdf)
 <use pipelinedsteps.pdf>
-Package pdftex.def Info: pipelinedsteps.pdf  used on input line 322.
+Package pdftex.def Info: pipelinedsteps.pdf  used on input line 325.
 (pdftex.def)             Requested size: 433.62334pt x 151.76816pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -454,10 +450,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [13]
 
 pdfTeX warning: pdflatex (file ./cpu_latches.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<cpu_latches.pdf, id=140, 1047.915pt x 397.485pt>
+<cpu_latches.pdf, id=127, 1047.915pt x 397.485pt>
 File: cpu_latches.pdf Graphic file (type pdf)
 <use cpu_latches.pdf>
-Package pdftex.def Info: cpu_latches.pdf  used on input line 347.
+Package pdftex.def Info: cpu_latches.pdf  used on input line 350.
 (pdftex.def)             Requested size: 419.15857pt x 158.99118pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -469,10 +465,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [14 <./cpu_latches.pdf>]
 
 pdfTeX warning: pdflatex (file ./nopipeline.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<nopipeline.pdf, id=155, 578.16pt x 216.81pt>
+<nopipeline.pdf, id=142, 578.16pt x 216.81pt>
 File: nopipeline.pdf Graphic file (type pdf)
 <use nopipeline.pdf>
-Package pdftex.def Info: nopipeline.pdf  used on input line 392.
+Package pdftex.def Info: nopipeline.pdf  used on input line 395.
 (pdftex.def)             Requested size: 404.70924pt x 151.76596pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -484,10 +480,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [15 <./nopipeline.pdf>]
 
 pdfTeX warning: pdflatex (file ./pipeline.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<pipeline.pdf, id=172, 469.755pt x 216.81pt>
+<pipeline.pdf, id=160, 469.755pt x 216.81pt>
 File: pipeline.pdf Graphic file (type pdf)
 <use pipeline.pdf>
-Package pdftex.def Info: pipeline.pdf  used on input line 422.
+Package pdftex.def Info: pipeline.pdf  used on input line 425.
 (pdftex.def)             Requested size: 328.82626pt x 151.76596pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -499,18 +495,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [16 <./pipeline.pdf>]
 
 pdfTeX warning: pdflatex (file ./nostall.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<nostall.pdf, id=188, 368.57701pt x 180.675pt>
+<nostall.pdf, id=175, 368.57701pt x 180.675pt>
 File: nostall.pdf Graphic file (type pdf)
 <use nostall.pdf>
-Package pdftex.def Info: nostall.pdf  used on input line 468.
+Package pdftex.def Info: nostall.pdf  used on input line 471.
 (pdftex.def)             Requested size: 331.71623pt x 162.60599pt.
 
 
 pdfTeX warning: pdflatex (file ./stall.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<stall.pdf, id=189, 469.755pt x 216.81pt>
+<stall.pdf, id=176, 469.755pt x 216.81pt>
 File: stall.pdf Graphic file (type pdf)
 <use stall.pdf>
-Package pdftex.def Info: stall.pdf  used on input line 484.
+Package pdftex.def Info: stall.pdf  used on input line 487.
 (pdftex.def)             Requested size: 422.7756pt x 195.12718pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -522,13 +518,13 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [17 <./nostall.pdf> <./stall.pdf>]
 
 pdfTeX warning: pdflatex (file ./cpu_stallctl.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<cpu_stallctl.pdf, id=216, 1047.915pt x 469.755pt>
+<cpu_stallctl.pdf, id=203, 1047.915pt x 469.755pt>
 File: cpu_stallctl.pdf Graphic file (type pdf)
 <use cpu_stallctl.pdf>
-Package pdftex.def Info: cpu_stallctl.pdf  used on input line 517.
+Package pdftex.def Info: cpu_stallctl.pdf  used on input line 520.
 (pdftex.def)             Requested size: 471.55739pt x 211.3878pt.
 
-Overfull \hbox (37.9374pt too wide) in paragraph at lines 517--518
+Overfull \hbox (37.9374pt too wide) in paragraph at lines 520--521
  [][] 
  []
 
@@ -537,7 +533,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 File: nostall.pdf Graphic file (type pdf)
 <use nostall.pdf>
-Package pdftex.def Info: nostall.pdf  used on input line 539.
+Package pdftex.def Info: nostall.pdf  used on input line 542.
 (pdftex.def)             Requested size: 331.71623pt x 162.60599pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -561,13 +557,13 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [19 <./cpu_stallctl.pdf>]
 
 pdfTeX warning: pdflatex (file ./forwards.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<forwards.pdf, id=234, 1011.78pt x 505.89pt>
+<forwards.pdf, id=221, 1011.78pt x 505.89pt>
 File: forwards.pdf Graphic file (type pdf)
 <use forwards.pdf>
-Package pdftex.def Info: forwards.pdf  used on input line 557.
+Package pdftex.def Info: forwards.pdf  used on input line 560.
 (pdftex.def)             Requested size: 465.42445pt x 232.71222pt.
 
-Overfull \hbox (31.80446pt too wide) in paragraph at lines 557--558
+Overfull \hbox (31.80446pt too wide) in paragraph at lines 560--561
  [][] 
  []
 
@@ -596,13 +592,13 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [21]
 
 pdfTeX warning: pdflatex (file ./cpu_complete.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<cpu_complete.pdf, id=252, 1264.725pt x 542.025pt>
+<cpu_complete.pdf, id=240, 1264.725pt x 542.025pt>
 File: cpu_complete.pdf Graphic file (type pdf)
 <use cpu_complete.pdf>
-Package pdftex.def Info: cpu_complete.pdf  used on input line 591.
+Package pdftex.def Info: cpu_complete.pdf  used on input line 594.
 (pdftex.def)             Requested size: 505.88104pt x 216.80615pt.
 
-Overfull \hbox (72.26105pt too wide) in paragraph at lines 591--592
+Overfull \hbox (72.26105pt too wide) in paragraph at lines 594--595
  [][] 
  []
 
@@ -628,18 +624,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [24]
 
 pdfTeX warning: pdflatex (file ./cpu_color.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<cpu_color.pdf, id=274, 1264.725pt x 542.025pt>
+<cpu_color.pdf, id=261, 1264.725pt x 542.025pt>
 File: cpu_color.pdf Graphic file (type pdf)
 <use cpu_color.pdf>
-Package pdftex.def Info: cpu_color.pdf  used on input line 639.
+Package pdftex.def Info: cpu_color.pdf  used on input line 642.
 (pdftex.def)             Requested size: 505.88104pt x 216.80615pt.
 
-Overfull \hbox (72.26105pt too wide) in paragraph at lines 639--640
+Overfull \hbox (72.26105pt too wide) in paragraph at lines 642--643
  [][] 
  []
 
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 648.
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 651.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -648,7 +644,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [25 <./cpu_color.pdf>]
-Overfull \hbox (48.03024pt too wide) in paragraph at lines 670--671
+Overfull \hbox (48.03024pt too wide) in paragraph at lines 673--674
 [][][][][][][][][][][][][][][][][][][][][][] 
  []
 
@@ -687,12 +683,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [29]
-Overfull \hbox (48.03024pt too wide) in paragraph at lines 784--785
+Overfull \hbox (48.03024pt too wide) in paragraph at lines 787--788
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (29.50523pt too wide) in paragraph at lines 787--788
+Overfull \hbox (29.50523pt too wide) in paragraph at lines 790--791
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
@@ -716,13 +712,13 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [31]
-<simulator_screenshot.png, id=310, 1419.704pt x 728.25923pt>
+<simulator_screenshot.png, id=297, 1419.704pt x 728.25923pt>
 File: simulator_screenshot.png Graphic file (type png)
 <use simulator_screenshot.png>
-Package pdftex.def Info: simulator_screenshot.png  used on input line 848.
+Package pdftex.def Info: simulator_screenshot.png  used on input line 851.
 (pdftex.def)             Requested size: 496.90385pt x 254.89455pt.
 
-Overfull \hbox (63.28386pt too wide) in paragraph at lines 848--849
+Overfull \hbox (63.28386pt too wide) in paragraph at lines 851--852
  [][] 
  []
 
@@ -810,10 +806,10 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  57i,12n,69p,7966b,2757s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on thesis.pdf (61 pages, 1371765 bytes).
+Output written on thesis.pdf (57 pages, 1371790 bytes).
 PDF statistics:
- 400 PDF objects out of 1000 (max. 8388607)
- 252 compressed objects within 3 object streams
+ 387 PDF objects out of 1000 (max. 8388607)
+ 243 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
  66 words of extra memory for PDF output out of 10000 (max. 10000000)
 
