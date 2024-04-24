@@ -106,14 +106,14 @@ You can always change the way your abbreviations are formatted. Play around with
 \begin{table}[h]
 	\centering % You could remove this to move table to the left
 	\begin{tabular}{ll}
-		\textbf{ALU}    & Arithmetic Logic Unit                 \\
-		\textbf{CISC}   & Complex Instruction Set Computer      \\
-		\textbf{CPU}    & Central Processing Unit               \\
-		\textbf{GUI}    & Graphical User Interface              \\
-		\textbf{ISA}    & Instruction Set Architecture          \\
-		\textbf{RISC}   & Reduced Instruction Set Computer      \\
-		\textbf{RISC-V} & Reduced Instruction Set Computer Five \\
-		\textbf{RV32I}  & RISC-V 32-bit
+		\textbf{ALU}    & Arithmetic Logic Unit                      \\
+		\textbf{CISC}   & Complex Instruction Set Computer           \\
+		\textbf{CPU}    & Central Processing Unit                    \\
+		\textbf{GUI}    & Graphical User Interface                   \\
+		\textbf{ISA}    & Instruction Set Architecture               \\
+		\textbf{RISC}   & Reduced Instruction Set Computer           \\
+		\textbf{RISC-V} & Reduced Instruction Set Computer Five      \\
+		\textbf{RV32I}  & RISC-V 32-bit Base Integer Instruction Set \\
 	\end{tabular}
 \end{table}
 
@@ -466,7 +466,7 @@ The first solution that might come to mind is: "Why don't we pause the CPU when 
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
 	\includegraphics[scale=0.9]{nostall}
-	\caption{Program execution without Stalling}
+	\caption{Program execution wtih no Stalling. Data Hazard occurs.}
 	\label{no-stall}
 \end{figure}
 
@@ -482,7 +482,7 @@ So, we could just delay the execution of Instruction 2 by three cycles...
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
 	\includegraphics[scale=0.9]{stall}
-	\caption{Program execution with Stalling}
+	\caption{Program execution with Stalling. No Data Hazard.}
 	\label{stall}
 \end{figure}
 
@@ -515,7 +515,7 @@ The Stall Control has all latches set to "Transfer" during normal operation. How
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
 	\includegraphics[scale=0.45]{cpu_stallctl}
-	\caption{Program execution without Stalling}
+	\caption{CPU Design with stall control.}
 	\label{stall-ctl}
 \end{figure}
 
@@ -555,7 +555,7 @@ That is exactly what forwarding is! Extra data pathways are added  into the ALU 
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
 	\includegraphics[scale=0.46]{forwards}
-	\caption{Program execution without Stalling}
+	\caption{The three major types of forwarding.}
 	\label{fwd-types}
 \end{figure}
 
@@ -589,7 +589,7 @@ Well, as it turns out, handling jumps  with the flushing method is actually a sm
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
 	\includegraphics[scale=0.4]{cpu_complete}
-	\caption{Program execution without Stalling}
+	\caption{Final CPU Design.}
 	\label{cpu-complete}
 \end{figure}
 
@@ -624,8 +624,23 @@ The second and final iteration of the simulator took a slightly different approa
 
 The idea now is to divide the CPU design into two categories, and therefore two structs: Its State and its Logic. The State consists of all the naturally  stateful elements of the CPU as described before: The Program Counter, the three Memories, and also all of the Latches, which essentially store the supposed current state of the wires they are supposed to clamp down on. The Logic stores everything else that has no state; or, rather, it stores all of the \textit{wires}, since that is all else that matters. A subcomponent like the ALU has no internal state; it reads data of the two operands and the opcode, and calculates its output solely off of that; even to be accurately rerpesented, this representation can be done simply as a piece of code that performs the ALU's function. Even the wires are only stored in persistent variables for the sake of visually displaying the CPU's state later. So, the entirety of the CPU is separated into a State struct and a Logic struct, and each struct has an "Update" function written to it that takes the other struct as a mutable reference and  updates the state of all its own variables at once: For the State Struct, this means handling memory changes like updating the PC, enacting the write of data into the Writeback register, and Storing data into the Data Memory when Store instructions pass by. For the Logic struct, it means reading the state of latches and registers and determining what signals should be traveling through the wire as a result of their changes.
 
-(DIAGRAM OF CPU, COLOR-CODED FOR STATE AND LOGIC MAYBE?)
-(Note, this diagram is not available in the draft. Sorry!)
+Note that some stateful components still have stateless outputs. Here, the component stores a state, but the output wires are entirely dependent on the stateless input; therefore, the output is stateless as well. Wires are only stored in the State struct if they have an output that's solely dependent on the component's state, such as the PC which always displays its internal value or all of the latches' output.
+
+%(DIAGRAM OF CPU, COLOR-CODED FOR STATE AND LOGIC MAYBE?)
+%(Note, this diagram is not available in the draft. Sorry!)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.4]{cpu_color}
+	\caption{color-coded CPU design. Red is for data stored in the State struct, Blue is for data in the Logic struct. Multiplexors are definitionally stateless, and are all in the Logic struct.}
+	\label{cpu-color}
+\end{figure}
+
 
 This setup is so useful because it makes the actual update of a CPU cycle incredibly simple: Just run the update function for the State struct, followed by the update function for the Logic Struct. This is not entirely true, as the implementation of stalling will complicate things a little, But for the most part, this makes up the base of the simulated CPU and the process for executing one of its cycles:
 
@@ -831,7 +846,7 @@ In the initial writeup, the plan for the simulator's GUI was incredibly ambitiou
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
 	\includegraphics[scale=0.35]{simulator_screenshot}
-	\caption{The Simulator's command-line-based GUI}
+	\caption{The Simulator's command-line-based GUI.}
 	\label{simulator}
 \end{figure}
 
@@ -845,7 +860,12 @@ There is also an user-input prompt at the bottom that asks the user to either mo
 To my surprise, I have found this user display to be rather satisfactory of the projects needs, despite its stark contrast to the initial goal. The only missing feature that I feel is essential, but ran out of time to implement, is an extra line or two for displaying any values that the program writes into the Data Memory. It is imperative to only present modified data rather than the entire storage unit, as otherwise the sheer amount of information would be utterly useless; luckily, the formatting of the Data Memory variable as a hash-map inherently alleviates this concern. It may also be possible to replicate the desired effect of "indicating which wires are passing important information" using color-coded terminal text, but the method used to print the GUI would have made it far too time-consuming to introduce on a whim.
 
 
-\chapter{Conclusion}
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+\chaptermark{Conclusion}
+\markboth{Conclusion}{Conclusion}
+\setcounter{chapter}{4}
+\setcounter{section}{0}
 
 On the whole, this project has been a learning experience in more ways than I ever expected. I've had to start over or rethink my approach to a particular challenge multiple times, and I doubt that I would've grown as familiar with CPU architectures as I have, had I not commited so many mistakes. I would almost recommend that Computer System students give their own try at building a CPU simulator rather than just using mine, but I get the feeling that none of them have the extra free month or three to dedicate to such an endeavor.
 There are a great many lessons and takeaways that I earned in the process of building it, but more on those later. First...
@@ -907,8 +927,8 @@ All in all, I am rather proud of what I've ended up building: A simple, tightly-
 
 
 
-
-
+%commented out all the advice stuff.
+\begin{comment}
 
 \section{Bibliographies}
 Of course you will need to cite things, and you will probably accumulate an armful of sources. This is why BibTeX was created. For more information about BibTeX and bibliographies, see our CUS site (\url{web.reed.edu/cis/help/latex/index.html})\footnote{\cite{reedweb:2007}}. There are three pages on this topic: {\it bibtex} (which talks about using BibTeX, at \url{/latex/bibtex.html}), {\it bibtexstyles} (about how to find and use the bibliography style that best suits your needs, at \url{/latex/bibtexstyles.html}) and {\it bibman} (which covers how to make and maintain a bibliography by hand, without BibTeX, at at \url{/latex/bibman.html}). The last page will not be useful unless you have only a few sources. There used to be APA stuff here, but we don't need it since I've fixed this with my apa-good natbib style file.
@@ -1231,6 +1251,9 @@ And here's some other random info: the first paragraph after a chapter title or 
 %This is where endnotes are supposed to go, if you have them.
 %I have no idea how endnotes work with LaTeX.
 
+
+\end{comment}
+
 \backmatter % backmatter makes the index and bibliography appear properly in the t.o.c...
 
 % if you're using bibtex, the next line forces every entry in the bibtex file to be included
@@ -1248,6 +1271,9 @@ And here's some other random info: the first paragraph after a chapter title or 
 \bibliography{thesis}
 % Comment the above two lines and uncomment the next line to use biblatex-chicago.
 %\printbibliography[heading=bibintoc]
+
+
+
 
 % Finally, an index would go here... but it is also optional.
 \end{document}

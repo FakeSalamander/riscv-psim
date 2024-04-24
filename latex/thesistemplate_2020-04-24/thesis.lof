@@ -6,21 +6,12 @@
 \contentsline {figure}{\numberline {2.3}{\ignorespaces CPU with Pipelining Latches.}}{14}{}%
 \contentsline {figure}{\numberline {2.4}{\ignorespaces Program execution without pipelining.}}{15}{}%
 \contentsline {figure}{\numberline {2.5}{\ignorespaces Program execution with pipelining.}}{16}{}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Program execution without Stalling}}{17}{}%
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Program execution with Stalling}}{17}{}%
-\contentsline {figure}{\numberline {2.8}{\ignorespaces Program execution without Stalling}}{19}{}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Program execution wtih no Stalling. Data Hazard occurs.}}{17}{}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Program execution with Stalling. No Data Hazard.}}{17}{}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces CPU Design with stall control.}}{19}{}%
 \contentsline {figure}{\numberline {2.9}{\ignorespaces Program execution without Stalling}}{19}{}%
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Program execution without Stalling}}{20}{}%
-\contentsline {figure}{\numberline {2.11}{\ignorespaces Program execution without Stalling}}{22}{}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces The three major types of forwarding.}}{20}{}%
+\contentsline {figure}{\numberline {2.11}{\ignorespaces Final CPU Design.}}{22}{}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces The Simulator's command-line-based GUI}}{32}{}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Combustion of glucose}}{44}{}%
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces A Figure}}{48}{}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces A Smaller Figure, Flipped Upside Down}}{49}{}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces A Cropped Figure}}{49}{}%
-\contentsline {figure}{\numberline {6.4}{\ignorespaces Subdivision of arc segments}}{49}{}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces color-coded CPU design. Red is for data stored in the State struct, Blue is for data in the Logic struct. Multiplexors are definitionally stateless, and are all in the Logic struct.}}{25}{}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces The Simulator's command-line-based GUI.}}{32}{}%
