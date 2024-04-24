@@ -113,6 +113,7 @@ You can always change the way your abbreviations are formatted. Play around with
 		\textbf{ISA}    & Instruction Set Architecture          \\
 		\textbf{RISC}   & Reduced Instruction Set Computer      \\
 		\textbf{RISC-V} & Reduced Instruction Set Computer Five \\
+		\textbf{RV32I}  & RISC-V 32-bit
 	\end{tabular}
 \end{table}
 
@@ -257,7 +258,18 @@ The RV32I is simpler, and easier to understand at a glance, making it a better c
 
 This information is enough to build a full hardware model of the CPU that the simulator will use; at least if Pipelining is ignored for now. The following is a visual representation of this model:
 
-(INSERT DIAGRAM HERE)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.6]{cpu_basic}
+	\caption{Basic CPU Design}
+	\label{cpu-basic}
+\end{figure}
 
 Most of the components shown here have already been explained earlier, albeit with some modifications and additions. It should be noted that the components are arranged from left to right in the order of the stages; with the wires of the WB stage looping back to where the outputs should be stored. The notable changes are as follows:
 
@@ -269,7 +281,7 @@ Most of the components shown here have already been explained earlier, albeit wi
 
 This is enough to understand the CPU simulator, for the most part; rather than simply take in a machine-code program and execute it as efficiently as possible, which would be trivial to do in a modern high-level programming language, the simulator represents each of these components individually as structs, so that the flow of data through the CPU circuits can be displayed accurately.
 
-\chapter{CPU and Simulator Design}
+\chapter{CPU Design}
 
 Before looking at the build of the actual CPU simulator program, it is worth going over one, in particular, of the features that this simulator seeks to implement.
 
@@ -280,13 +292,37 @@ This feature, Pipelining, must be described first: It is not a feature of the si
 The previously-described CPU design has one simple issue: It is painfully slow. This design is capable of executing one instruction per cycle: one instruction per full use of each of the CPU's parts. This may seem good, but at any given moment, most of the CPU is actually going unused: The decoder is waiting on the instruction memory to fetch the instruction it needs to decode, which is waited upon by the register memory that needs the register indices to fetch their data, which is waited upon by the ALU that wants its inputs, so on.
 When, say, the ALU is firing and computing, the data memory, decoder, instruction memory, and so on are all entirely dormant. They could, theoretically, be doing something useful at the same time; but because our design handles one instruction at a time, the components before the ALU have already done their part and the components after the ALU are waiting on it to finish and present its output. Theoretically, one could be multiplying efficiency of this CPU many times.
 
-(DIAGRAM HERE OF THE STEPS, SHOW WASTED SPACE )
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.6]{wastedsteps}
+	\caption{Program execution over time.}
+	\label{wasted-steps}
+\end{figure}
+
+\break
 
 The solution is simple in theory, though difficult in execution: have the CPU be performing multiple instructions at once. Five of them, to be exact. This is where the five stages come into play: each stage does its part, performing its needed function for the current instruction; but when that instruction is passed off to the next stage, rather than waiting around for the full round trip, it's already receiving the information for the next instruction right away. If the WB stage is executing instruction number 9, the MEM stage is executing instruction 8, and the EX is executing instruction 7, so on.
 
-(FOOTNOTE??)
+%(FOOTNOTE??)
 
-(DIAGRAM HERE OF THE PIPELINED STEPS)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.6]{pipelinedsteps.pdf}
+	\caption{Program execution over time, with pipelining.}
+	\label{pipelined-steps}
+\end{figure}
 
 This is a good time to remind that the choice to subdivide this process into five stages, specifically, is entirely arbitrary. It's easy to see how two of these stages could be combined to have less-than-5 pipeline stages, or how the Instruction Decoding and Register Fetching could be separared into their own stages, but you can go much further than that: While 4 stages was the norm just three decades ago \footnote{\cite{denning}}, the now-also-outdated \textit{Pentium 4 Prescott} CPU had a whopping 31 stages \footnote{\cite{shimpi}}! And, by contrast, many newer CPUs like AMD's \textit{Jaguar} and Intel's \textit{Silvermont} have found a comfortable middle ground somewhere in the 10-15 pipeline stage range \footnote{\cite{kanter1}} \footnote{\cite{kanter2}}.  Theoretically, you'd want to split your CPU into as many pipelined stages as you possibly can; the more instructions you're running at once, the more efficiently the CPU is being utilized. There are tradeoffs and reasons for why this is not the case, which are better to describe later in this section.
 
@@ -300,7 +336,18 @@ The first modification, which makes pipelining possible on a basic level, is to 
 
 So, what is this modification? The main thing to be prevented here is that no stage of the CPU should recieve the inputs for the next instruction before it is done performing its computations for its current structure; to keep all five stages in sync. The ideal way to do this is to "hold" the outputs of each stage once they are computed, until the slowest stage completes its computations, and then release them all at once to begin the next step. This "holding" of outputs is done through the addition of a set of "Latches" to the CPU:
 
-(INSERT CPU + LATCHES DIAGRAM)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.4]{cpu_latches}
+	\caption{CPU with Pipelining Latches.}
+	\label{cpu-latches}
+\end{figure}
 
 There's one latch inbetween each CPU stage, with all of the outputs passing through said latch. They are named after the two stages they separate, with the leftmost being the "IF-ID Latch" for example. No latch is needed after WB, since that stage simply consists of delivering the instruction result to where it needs to go.
 The latches are their own kind of register; in fact, "Pipeline Register" is another name for them. The latch holds one value for every wire that would pass through it, and constantly outputs said value through to the output end. Then, at the start of every cycle If the ALU's output wire read "13" before the EX-MEM latch was closed, and "4" after, the latch will continue to output "13" to the wire leading from the latch to the Data Memory until the latch is opened again. This achieves the 'holding' effect that was desired, and makes pipelining possible at all! In order to pipeline possible... (REFRESH ON HARDWARE LEVEL OF LATCH OPERATION)
@@ -313,7 +360,7 @@ However, even with pipeline and latches in place, even with the efficiency trade
 
 - Control Hazards: Hazards that involve jump instructions.
 
-(... WERE THERE MORE??)
+%(... WERE THERE MORE??)
 
 Let's look at these hazards in more details, and at how the pipeline CPU design can be altereted to handle them.
 
@@ -332,7 +379,20 @@ addi $r2, $r1, 4
 
 In a non-pipelined CPU, this program runs fine, as shown below. The steps relevant to this example are described by cycle; the IF and MEM stages do not matter to the example and will thus be skipped over.
 
-(INSERT DATAHAZARD-NOPIPELINE FIGURE)
+
+%(INSERT DATAHAZARD-NOPIPELINE FIGURE)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.7]{nopipeline}
+	\caption{Program execution without pipelining.}
+	\label{no-pipeline}
+\end{figure}
 
 Cycle 2: Fetch the value of input register $\$r0$, $0$, from Register Memory.
 
@@ -350,7 +410,19 @@ Cycle 10: The output, $7$, is written back to the $\$r2$ register.
 
 The end result is a state where $\$r1$ holds the value of $3$ and $\$r2$ holds the value of $4$. This is the correct output, and what any such person would expect this code snippet to perform with the described starting conditions. However, look at what happens if we run the same code snippet through our pipelined design:
 
-(INSERT DATAHAZARD-PIPELINE FIGURE)
+%(INSERT DATAHAZARD-PIPELINE FIGURE)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.7]{pipeline}
+	\caption{Program execution with pipelining.}
+	\label{pipeline}
+\end{figure}
 
 Cycle 2:
 
@@ -385,7 +457,7 @@ At the very least, having a program return a consistently incorrect output is un
 The first solution that might come to mind is: "Why don't we pause the CPU when a Data Hazard is incoming, so that it has time to catch up?". And, this is shockingly a decent suggestion! The idea is simple: As it is in the example, the update to $\$r1$, ocurring at the start of Instruction 1's WB stage, was needed halfway through Instruction 2's ID stage (Register acessing happens during the latter half of the ID stage, after the Decoder has gone). The red arrow in the diagram represents this desired update that needs to happen for correctness.
 
 %(DATAHAZARD-NOSTALL DIAGRAM)
-\begin{figure}[H]
+\begin{figure}[h!]
 	% the options are h = here, t = top, b = bottom, p = page of figures.
 	% you can add an exclamation mark to make it try harder, and multiple
 	% options if you have an order of preference, e.g.
@@ -393,7 +465,7 @@ The first solution that might come to mind is: "Why don't we pause the CPU when 
 
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
-	\includegraphics{nostall}
+	\includegraphics[scale=0.9]{nostall}
 	\caption{Program execution without Stalling}
 	\label{no-stall}
 \end{figure}
@@ -409,9 +481,9 @@ So, we could just delay the execution of Instruction 2 by three cycles...
 
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
-	\includegraphics{stall}
+	\includegraphics[scale=0.9]{stall}
 	\caption{Program execution with Stalling}
-	\label{no-stall}
+	\label{stall}
 \end{figure}
 
 And now the program will execute correctly! This process, called "Stalling", can be applied dynamically, too; if a Data Hazard happens by just one stage of difference, the offending instruction only needs to be stalled one cycle. This method inherently costs us some of the efficiency that pipelining offers either way, though.
@@ -434,7 +506,18 @@ But, why are all these modes needed at all? Well, we cannot simply stall out the
 
 The Stall Control has all latches set to "Transfer" during normal operation. However, once an instruction with a Data Hazard reaches the ID stage, it alters the latch modes as follows.
 
-(INSERT STALL CONTROL FIGURE HERE)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.45]{cpu_stallctl}
+	\caption{Program execution without Stalling}
+	\label{stall-ctl}
+\end{figure}
 
 At this point, the EX, MEM, and WB stages hold the instructions that you do not wish to stall; those are Transfered so they can finish. The IF and ID stages are Stalled (using the PC and IF-ID Latch respectively), holding their current instructions. Lastly, the EX stage gets "Bubbled"; set to an output matching a "NOP" instruction that simply does absolutely nothing. This is quite important: if the EX stage was simply stalled as well, you'd actually start getting duplicates of the instruction immediately predecing the hazard-holding instruction inserted into the pipeline. Thanks to the bubble, harmless 'nop' instructions that alter nothing get sent out instead to fill that gap.
 
@@ -444,15 +527,39 @@ Once the instruction that holds the needed alteration reaches the WB stage, the 
 
 The answer is that yes, we can! Let's go back to our data hazard example, when it is un-stalled:
 
-(DATAHAZARD-NOSTALL DIAGRAM)
+%(DATAHAZARD-NOSTALL DIAGRAM)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.9]{nostall}
+	\caption{Program execution without Stalling}
+	\label{no-stall}
+\end{figure}
 
 Obviously, the issue is clear here: The data needed in the ID isn't ready until Instruction 1's WB stage, and is needed in Instruction 2's ID stage. Except, this isn't really true. Technically, that data has already been computed by the end of Instruction 1's EX stage, found in the output of the ALU. And, it is Instruction 2's EX stage that needs the data for the addition calculation, not the ID; as long as the ALU gets the correct integer input of $4$ instead of $0$, it doesn't care where it came from. So, technically, the desired data to resolve this hazard \textit{is} available by the time it's needed; it just doesn't have the pathway to get there in time. So... what if we added that pathway ourselves?
 
 That is exactly what forwarding is! Extra data pathways are added  into the ALU input; controlled by a multiplexor that reads register indices to decide if forwarding is needed. The pathways come from the MEM-stage output if the offending instructions are adjacent, and from the WB-stage output if they are one instruction apart; any more than that, and there is no Data Hazard at all. These are called "EX-EX Forwarding" and "MEM-EX Forwarding" respectively. There is a third type of Data Hazard, which occurs when a value is loaded from the Data Memory to a register and then stored to somewhere else in the Data Memory immediately after; the store will still have the stale value from that register, from before it was read to. An extra pathway and multiplexor, from the WB stage to the Data Memory, handles that; this is called "MEM-MEM Forwarding" . With that, all of the Data Hazards are resolved, this time without performance loss!
 
-(INSERT FORWARDING TYPES DIAGRAM)
+%(FORWARD TYPES
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
 
-Doesn't this make stalling entirely obsolete? Well, not exactly; there's still one more unhandled data hazard case. What if happens if a load instruction is immediately followed by an arithmetic instruction, using the register that was loaded to? (Or by a store instruction, using the register to calculate an adress rather than as the to-store data). As seen below, the data is retrieved at the end of the Load's MEM stage, yet is needed at the beginning of the EX stage so it can be used in the arithmetic operation. In this case, the data truly doesn't come soon enough!
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.46]{forwards}
+	\caption{Program execution without Stalling}
+	\label{fwd-types}
+\end{figure}
+
+Doesn't this make stalling entirely obsolete? Well, not exactly; there's still one more unhandled data hazard case. What if happens if a load instruction is immediately followed by an arithmetic instruction, using the register that was loaded to? (Or by a store instruction, using the register to calculate an adress rather than as the to-store data). The data is retrieved at the end of the Load's MEM stage, yet is needed at the beginning of the EX stage so it can be used in the arithmetic operation. In this case, the data truly doesn't come soon enough!
 
 The ideal solution is a hybrid of the two techniques: If you stall the second instruction by just one cycle, the data can now arrive just in time. It can even use the same "MEM-EX Forwarding" from earlier without any new pathways needed!
 
@@ -470,23 +577,36 @@ It has to do with \textit{Branching} control instructions, or Branches. A Branch
 
 Well, as it turns out, handling jumps  with the flushing method is actually a small optimization that potentially saves time for \textit{branching} control instructions. Branching control instructions are almost the same as jump instructions: there's just an extra subcomponent in the EX stage that compares its values to check if the Branch is to be taken, which decides if the Program Count is changed or left alone. However since we cannot know whether the branch will be taken or not \textit{until} the EX stage, this causes a difference between the flushing and stalling methods: In the stalling method, the instruction after the Branch has to get stalled regardless of whether the Branch gets taken or not; it has to start stalling right away. In the flushing method, the CPU flushes and jumps as usual if the Branch gets taken; however, if it does not get taken, the Stall Control simply... doesn't do anything. Those two "erroneous instructions" are actually now the correct path forward for the program to take, and it just lets them happen. So, flushing the Branches instead of stalling them makes no diffence if the branch is taken, but saves cycles if it isn't! This method is also called the "Fetch and Cancel When Taken" method of handling control hazards, since the "cancel" or flush only happens if the Branch is taken.
 
-\subsection{Final CPU Design}
+\section{Final CPU Design}
 
-(INSERT FIANLIZED CPU DESIGN HERE)
+%(FINAL CPU)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.4]{cpu_complete}
+	\caption{Program execution without Stalling}
+	\label{cpu-complete}
+\end{figure}
 
 The final design of the CPU we will simulate is therefore as shown above. Instruction, Decoder, Registers, Arithmetic, Data Memory, and Writeback; built with the intent that the simulator will display its own internal state to a similar level of granularity as the diagram above.
 
 The flow of instructions through the wires is separated into 5 arbitrary stages in order to \textbf{Pipeline} them for major performance boosts, with the separation enforced by a set of Latches.
 
 Then, in order to deal with the correctness hazards that this pipelining incurrs, additional \textbf{Forwarding} pathways and a \textbf{Stall control} in the latches are implemented to sidesteps those hazards, while also minimizing the performance loss incurred.
+The new forwarding pathways are highlighted in orange in the diagram above. Note that two additional multiplexors, one for R1 and another for R2, are needed in order to determine whether a jump is needed there at all.
 
-\section{Simulator Design}
+\chapter{Simulator Design}
 
 The actual simulator is a program written in the Rust programming language, and aims to faithfully replicate the operation of the CPU at the same level of abstraction used in the diagrams above! as a result, it can be compiled and run on most modern personal computers. Its final iteration fully supports the Risc-V 32-bit Base Integer Instruction Set, with the exception of system-call instructions that are meaningless without the context of an OS outside the program, and the failsafe for a particular Data Hazard that turned out to be rather difficult to impelement.
 
 The goal of the simulator itself is simple: to take in a machine-code RISC-V program as input, set up a virtual construct in Rust that replicates the low-level, semi-abstracted model of a CPU that has been discussed in the background chapter, and then run said program through it in a way where the simulated CPU's internal state is always transparent. Other goals, such as a User Interface, are additional features and not part of the core design. This design was eventually accomplished, though the project had to go through a major restart partway.
 
-\subsection*{First Draft}
+\subsection{First Draft}
 
 The first draft was quite neat in theory, though rather idealistic. The core idea is to rely on the way that the diagrams above dive the CPU into separate "subcomponents", such as the Program Counter or the ALU, which only pass along information through predefined wires; this is something the final design will keep.
 
@@ -498,13 +618,14 @@ However, this design also has two glaring flaws: The first is more manageable, a
 
 That said, the second issue is that the design was unbearably repetitive, to the point of being confusing to look at. The distinct input-output variables on each struct meant that every piece of information in the CPU essentially took up two variables instead of one, and the process of computing a piece of data and sending it to the next subcomponent in the stage became a chore with many unecessary middle-man steps inbetween.
 
-\subsection*{Final design}
+\subsection{Final design}
 
 The second and final iteration of the simulator took a slightly different approach, one that relies more closely on the nature of this CPU as being ultimately made of logic gates and wires, and employs style of design often used to simulate simpler logic gate machines.
 
 The idea now is to divide the CPU design into two categories, and therefore two structs: Its State and its Logic. The State consists of all the naturally  stateful elements of the CPU as described before: The Program Counter, the three Memories, and also all of the Latches, which essentially store the supposed current state of the wires they are supposed to clamp down on. The Logic stores everything else that has no state; or, rather, it stores all of the \textit{wires}, since that is all else that matters. A subcomponent like the ALU has no internal state; it reads data of the two operands and the opcode, and calculates its output solely off of that; even to be accurately rerpesented, this representation can be done simply as a piece of code that performs the ALU's function. Even the wires are only stored in persistent variables for the sake of visually displaying the CPU's state later. So, the entirety of the CPU is separated into a State struct and a Logic struct, and each struct has an "Update" function written to it that takes the other struct as a mutable reference and  updates the state of all its own variables at once: For the State Struct, this means handling memory changes like updating the PC, enacting the write of data into the Writeback register, and Storing data into the Data Memory when Store instructions pass by. For the Logic struct, it means reading the state of latches and registers and determining what signals should be traveling through the wire as a result of their changes.
 
 (DIAGRAM OF CPU, COLOR-CODED FOR STATE AND LOGIC MAYBE?)
+(Note, this diagram is not available in the draft. Sorry!)
 
 This setup is so useful because it makes the actual update of a CPU cycle incredibly simple: Just run the update function for the State struct, followed by the update function for the Logic Struct. This is not entirely true, as the implementation of stalling will complicate things a little, But for the most part, this makes up the base of the simulated CPU and the process for executing one of its cycles:
 
@@ -546,7 +667,7 @@ This code is entirely functional as a rough base for the simulator's design; all
 
 Other features can and will be implemented as well, of course; but, the design shown above is a sweeping generalization. It's worth taking a closer look at what the final, detailed program looks like, now that its basic structure is understood.
 
-\subsection*{Structs and Sub-Structs}
+\subsection{Structs and Sub-Structs}
 
 The final design could indeed have just unceremoniously dumped all of its State and Logic variables into their respective structs; but this would've made a rather huge mess, resulted in individual wires (especially different wires that carry the same piece of data at different stages) being hard to keep track of, and would've been rather confusing and inelegant in general; this is one of the issues the first draft design sought to resolve. Therefore, the final design for the structs instead looks like this:
 
@@ -618,8 +739,8 @@ pub struct IDLogic {
     pub immediates: u32,
 }
 \end{lstlisting}
-(FOOTNOTE EXPLAINING THIS IS DECODE.RS)
-(MAYBE DIAGRAM OF DECODE STAGE TO COMPARE?)
+%(FOOTNOTE EXPLAINING THIS IS DECODE.RS)
+%(MAYBE DIAGRAM OF DECODE STAGE TO COMPARE?)
 
 This is an example of one such file; in genral, everything is stored as simply as possible, with the data types one would expect: Most wires carry a 32-bit unsigned integer; since this is a 32-bit system, that is the format that the CPU preferst to handle its data in. while wires for the smalled opcode, funct-3, and funct-7 all use unsigned 8-bit integers. Technically, the latter should use u7, u3, and u7 respectively, but establishing custom-length integer data types just for them was deemed to not be a very high priority.
 
@@ -629,7 +750,7 @@ It is worth noting that there are some wires which aren't often shown in CPU des
 
 Ultimately, this makes the storing and accessing of information about the CPU pretty intuitive, which will come in very handy for the User Interface.
 
-\subsection*{Update Functions}
+\subsection{Update Functions}
 
 Unfortunately, the two update functions aren't quite as simple. In a sense, they are: Each one goes has the struct going through all of its variables and updating them according to the internal logic of the CPU design. However, this updating needs to be done in just the right order in order to make things work properly. This is one case where building a virtual simulator is actually harder than making a real CPU: In a real CPU, all of this happens instantaenously and at the exact same time, literally within that given CPU clock cycle, and so it does not need to worry about this. But the simulated CPU runs one-step-at-a-time, and doing certain updates before others can cause massive errors. For example, the latches in the State struct's update function need to be updated in order from right to left, starting with the MEM-WB latch and ending with the IF-ID latch. Otherwise, if the IF-ID latch updates before the ID-EX latch, the information it was supposed to send directly over, like the base PC and added PC, that information vanishes for good. The problem is especially tricky with the Logic update function where, thanks to forwarding and writebacks, certain computations of a pipeline stage rely on information from a stage further to the right. Thankfully, part of the job of the latches here is to serve as a stopgap to separate the stages, so the issue is merely annoying rather than impossible.
 
@@ -637,7 +758,7 @@ A lot of the desired ordering was figured out, in part, by writing a large amoun
 
 Its ordering aside, the actual code contained within is mostly understandable, just there to perform the functions that those sub-components would in a real CPU. The decoder code takes an instruction and separates it into its relevant pieces using bit-masks and bit-shifts; the register memory writes and reads data off the 32 general-purpose registers, so on. The most crucial one is the ALU, since that's  utlimately where the actual computation of most instructions takes place, and even that one is farily simple: It takes in the two operands, looks at the opcode to figure out what sort of arithmetic operation it's supposed to perform and spits out the output to $logic.execute.alu_out$. To whomever is interested in more details, the update functions and my comments on them can be found in the $components.rs$ file, right under the structs.
 
-\subsection*{Stalling}
+\subsection{Stalling}
 
 There is one piece of the core simulator that doesn't fit neatly into the description above, in part because it operates above the other components. While the variables to indicate whether components are being stalled or not are stored within the State and Logic structs, the code for the Stall Control happens directly at the step function, performed after the state update but before the logic. Since forwarding is implemented, stalling is only needed for Control Hazards and for Load-ALU hazards; the former is fully implemented, while the latter, unfortunately, could not be debugged in time.
 
@@ -690,21 +811,35 @@ The goal of these features are to make the simulator easier to use, and to aid i
 
 The purposes of the other two features are supplementary in nature, but no less useful: User-Inputed programs make it possible for the end user to provide their own code and run programs tailored around whichever instructions or CPU features they are interested in getting a better grasp of rather than one sample program, without needing to edit the source code and recompile at least. The latter is pure ease-of-use, and ends up implemented solely as a way to be able to "backstep" or "rewind" the simulator at any given step, but is incredibly useful in that alone: If a user steps forward and suddenly finds themselves confused by the CPU's new state, they can rewind back to the previous cycle, or more, to refresh their memory and see how it got there.
 
-\subsection*{Implementation of User Input and Rewinding}
+\subsection{Implementation of User Input and Rewinding}
 
 These features were both pretty simple to implement, and are only described here for completeness. The User Input simply involves using Rust's built-in libraries for commandline arguments and file reading, taking in the filename and creating the Instructions vector out of the file's contents line-by-line. For the sake of simplicty, the program expects one machine-code instruction per line, formatted as a 32-bit binary integer. Originally, the project was going to accept RISC-V assembly code as input and have its own built-in assembler to translate them into the binary machine code that the simulator needs, but this has proven to be out of scope.
 
 The backups/rewinding were only a little more involved, requiring just the creation of a "Snapshot" struct that contains one State struct and one Logic struct within it. This new struct then works as a full snapshot of the CPU's previous state: The simulator clones the current State and Logic structs at every cycle, and places the clones in a "backup" vector of Snapshots; When the user asks to go back a step, it simply pops the most recent Snapshot off the backup vector and replaces the State and Logic structs it is currently using with those within the Snapshot. Due to their simplicity, both of these features were very easy to implement!
 
-\subsection*{Graphical User Interface}
+\subsection{Graphical User Interface}
 
 In the initial writeup, the plan for the simulator's GUI was incredibly ambitious (the entire writeup was, but that is besides the point): The plan was to learn an application development framework such as Qt as part of the project, develop a proper graphical interface that would run its own window, and then implement all sorts of additional nice features like separate tabs for the different memories, animations to show which wires are actually passing relevant information in any given cycle, and so on. Suffice to say, this idea was entirely out of scope and would have required spending a lot of time studying something entirely unrelated to Computer Systems, and I ended up scaling back to something much more reasonable to get working quickly: An ASCII-art text interface, that can be printed directly to the commandline terminal.
 
-(INSERT SCREENSHOT OF SIMULATOR GUI)
+%(DATAHAZARD-NOSTALL DIAGRAM)
+\begin{figure}[h!]
+	% the options are h = here, t = top, b = bottom, p = page of figures.
+	% you can add an exclamation mark to make it try harder, and multiple
+	% options if you have an order of preference, e.g.
+	% \begin{figure}[h!tbp]
+
+	\centering
+	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
+	\includegraphics[scale=0.35]{simulator_screenshot}
+	\caption{The Simulator's command-line-based GUI}
+	\label{simulator}
+\end{figure}
+
+\break
 
 It's fairly dense and all but requires the user's terminal to be maximized, but it properly displays the CPU diagram and all of its relevant information! The top line displays the instruction that each pipeline stage is currently executing, in assembly; the body displays the entire CPU diagram, and the value that every wire currently holds; and the bottom shows the entire values of the register memory! The implementation, while involved and time-consuming, was mostly simple: the text-art for the diagram was drawn up using an online tool named ASCIIflow, and the $display_cpu$ function responsible for it was given a reference to the State and Logic structs, from where it could effortlessly pull the needed values for the diagram display. This simpler method also provides its own advantage: While much less sleek, the commandline approach makes the program more likely to work across operating systems without any tinkering required than an intricate app-develoment framework might.
 
-The most involved part is actually the instruction-display at the top; in order to make it useful and human-readable, having it spit out the instructions as 32-bit binary integers would not cut it. Therefore, the GUI makes use of an additional $display_instruction$ function that converts a given machine-code instruction into its equivalent assembly, a "reverse-assembler" in a way. This feature wasn't too time-intensive, and it was a good use of my growing familiarity with the format of RISC-V's 32-bit instructions.
+The most involved part is actually the instruction-display at the top; in order to make it useful and human-readable, having it spit out the instructions as 32-bit binary integers would not cut it. Therefore, the GUI makes use of an additional \textit{display\_instruction} function that converts a given machine-code instruction into its equivalent assembly, a "reverse-assembler" in a way. This feature wasn't too time-intensive, and it was a good use of my growing familiarity with the format of RISC-V's 32-bit instructions.
 There is also an user-input prompt at the bottom that asks the user to either move to the next step or the previous step, completing the implementation of the rewind feature.
 
 To my surprise, I have found this user display to be rather satisfactory of the projects needs, despite its stark contrast to the initial goal. The only missing feature that I feel is essential, but ran out of time to implement, is an extra line or two for displaying any values that the program writes into the Data Memory. It is imperative to only present modified data rather than the entire storage unit, as otherwise the sheer amount of information would be utterly useless; luckily, the formatting of the Data Memory variable as a hash-map inherently alleviates this concern. It may also be possible to replicate the desired effect of "indicating which wires are passing important information" using color-coded terminal text, but the method used to print the GUI would have made it far too time-consuming to introduce on a whim.
@@ -718,19 +853,19 @@ There are a great many lessons and takeaways that I earned in the process of bui
 %this part will go somewhere in the Conclusion, not sure where yet.
 If anyone is, in fact, interested in making use of and building on-top of this simulator, here are some other potential features that could be added as future extensions to the project, even outside of the GUI.
 
-\section*{Future Extensions}
+\section{Future Extensions}
 
 The most obvious and tempting features to include are certain ones dealing with ease-of-use: A built-in RISC-V assembler, which would allow users to write and input programs in the much more human-legible format of assembly code; an english "narration" of sorts of what each stage accomplishes on a given cycle; or perhaps even the ability to edit values of the CPU on the fly in order to study how that changes the outcome.
 
 Another approach is to extend the capabilities or fidelity of the simulated CPU. This project limits itself to a simple design and just the RISC-V 32-bit Base Integer Instruction Set  for the sake of remaining easy-to-understand for newcomers to Computer Systems, but additional support for some of RISC-V's myriad Standard Extensions could be added to give the simulator some much-needed versatility. These range from things like the inclusion of multipication instructions and floating-point numbers to vector calculations and a whole 64-bit instruction set, and would come especially handy for if anyone studying the RISC-V architecture specifically.
 
-\subsection*{Data Memory}
+\subsection{Data Memory}
 
 As far as incrasing fidelity, the obvious choice is the Data Memory. As described before, the Data Memory in this simulator is a "black box"; it takes in requests to load or store data to certain addresses, and does so without any paerticular consideration of how that is physically possible. This is technically true for our Register and Instruction Memories as well, but those are small enough that they can easily fit on the CPU chip, and thus be set up pretty similarly to what our diagram presents. This is not the case for the Data Memory: The Data Memory is magnitudes larger than either of the former two. Even if one only counts the data that a running program access with its 32-bit addresses, the Data Memory can store a mind-boggling $2^28$ Words (4-byte chunks of data) compared to the Register Memory's measly 32! That's about 4.2 gigabytes and 128 bytes, respectively; and, since the operating systems of modern personal computers want to be running many, many programs at once, the actual size tends to be even larger in practice, nowadays. Therefore, a possible extension of the simulator would be to alter it to replicate the following more realistic setup: One where the actual Data Memory is stored off the CPU chip, massive but painfully slow to access; while a series of caches mediate this access to hopefully maintain on-chip speed for the more frequently-used parts of Data Memory. This setup would allow the simulator to be usable for learning to work with memory structures as well as CPUs, and could implement crucial features for it such as the aforementioned caches or Virtual Memory.
 
 If this feature is implemented, this will also break another assumption that the current simulator makes: That every pipeline stage takes roughly the same amount of time to execute. It may be worth adding in another subsystem that can measure the time transpired by the CPU's operation in actual milliseconds rather than abstract cycles, to show how significant a time loss total cache misses incur.
 
-\subsection*{Out-of-Order Execution and Register Renaming}
+\subsection{Out-of-Order Execution and Register Renaming}
 
 If one wishes to extend the CPU with more advanced features, two relatively-simple ones that go hand-in-hand are OOE (Out-of-Order Execution) and Register Renaming.
 
@@ -751,7 +886,7 @@ In a register-renaming Register Renaming, the $\$r1 - \$r31$ general-purpose reg
 If you want to implement Register Renaming to this simulator, it may be tempting to try to do so using pointers/references; after all, the register names in this feature are shockingly akin to the references of a programming language. However, this becomes increasingly difficult as one realizes that the Register Memory must keep track of past mappoings. I suggest simply making the Mapping Table as an actual table using whatever data structure is most fit for such in the used language; it will make it easier to incorporate the Mapping Table into the GUI as well, which is a must if this feature is implemented.
 
 
-\section*{Takeaways}
+\section{Takeaways}
 
 Some of the lessons I've acquired are fairly general to managing a project like this, while others are more specific to my particular topic. The biggest such lesson, to me, is that you shouldn't be afraid of ripping initial attempts down and starting over from scratch. It's only natural that the first design you come up with for a program or feature isn't going to be the best, and you can use the experience you've gained in working on the initial attempt to further improve the next design. I've had to do this many, many times throughout the building of this simulator: The window-based GUI was replaced with a command-line interface, the overall code of the program had to be totally redone, and even the finalized design had moments where a function was reordered around to avoid desyncing issues. There are even a few design restarts that I would implement right now, if I had the time: The main one that comes to mind would be reimplementing the Stalling code from scratch, as I'm fairly certain that my choice to implement it outside of the step function is part of what made Load-ALU Stalling so difficult to pull off correctly.
 
@@ -763,7 +898,7 @@ On the flipside, the aspect of what parts of the CPU are state-holding and which
 
 I also learned that, as far as actually storing this information, simpler is better. Early on, I noted the similarity between subcomponents and the wires connecting them and objects in a programming language with pointers to one another, and thought it would be quite elegant and clever to design my simulator that way; however, we've already gone over how that only caused nightmares in the long run. For future extensions, I recommend writing variables that store the data you need as simply as possible, as I was served so well by simple unsigned 32-bit integers and vectors, and putting them in places where they easy to access. Making sub-structs for the sake of organization is good, which I ended up doing based on the pipeline stages, but those should all be owned by a small handful of main structs that are easy to feed into functions. For my design, that is simply the State and Logic structs. There may be more than two main structures in an extended version of this project; for example, a faithfully-simulated Data Memory will certainly be complex enough to warrant distinction from the other stateful components. However, you should consider whether this new struct would be better served by being on its own, or by being a sub-struct to the existing main State struct.
 
-\section*{Closing Thoughts}
+\section{Closing Thoughts}
 
 All in all, I am rather proud of what I've ended up building: A simple, tightly-focused RISC-V simulator that, while lacking in the fancier features of its contemporaries, has enough of a graphical interface to function as an educational tool. There's even something of a hidden silver lining in the project's eventual simplicity: While a simulator like RIPES is meant to be powerful and convenient for the end-user, a more bare-bones commandline program is much easier for an interested undergraduate student to take apart and build on top of. I hope that I have laid down a foundation for what could one day be a polished enough program to potentially see use in a classroom; though even if it simply ends up that a handful of individuals clone its repository to mess around with my code, its purpose will have been accomplished all the same.
 

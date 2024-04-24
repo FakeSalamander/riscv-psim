@@ -1,25 +1,32 @@
 CPU Diagram with NO Pipelining
+    DONE
 
 CPU's  wasted steps
+    DONE
 
 CPU w/ pipeline divisors
-
+    DONE?
 
 CPU Diagram w/ Latches, nothng else
+    DONE
 
 the Hazard ones are done, just need to figure out how to insert them
 
 
 CPU Diagram w/ Latches + Stall Control
+    DONE
+
 
 Diagram of different Forwarding Types!
-
+    DONE
 
 CPU Diagram w/ Latches + Stall Control + Forwarding Paths. (highlight the last!)
-
+    DONE
 
 
 CPU Final Diagram, Color-coded for State and Logic.
+
+
 
 
 Simulator GUI screenshot!
