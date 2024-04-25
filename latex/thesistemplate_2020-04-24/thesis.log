@@ -1,31 +1,32 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Arch Linux) (preloaded format=pdflatex 2024.3.1)  25 APR 2024 09:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.13)  25 APR 2024 11:35
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/home/ralsei/Documents/SCHOOL/thesis/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex
-(/home/ralsei/Documents/SCHOOL/thesis/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex
-LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2023-02-22> (./reedthesis.cls
+**/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex
+(/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-03-14>
+(./reedthesis.cls
 Document Class: reedthesis 2004/01/27 The Reed College Thesis Class
-(/usr/share/texmf-dist/tex/latex/base/book.cls
-Document Class: book 2022/07/02 v1.4n Standard LaTeX document class
-(/usr/share/texmf-dist/tex/latex/base/bk12.clo
-File: bk12.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
+(/opt/texlive/2024/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/opt/texlive/2024/texmf-dist/tex/latex/base/bk12.clo
+File: bk12.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count185
-\c@chapter=\count186
-\c@section=\count187
-\c@subsection=\count188
-\c@subsubsection=\count189
-\c@paragraph=\count190
-\c@subparagraph=\count191
-\c@figure=\count192
-\c@table=\count193
+\c@part=\count188
+\c@chapter=\count189
+\c@section=\count190
+\c@subsection=\count191
+\c@subsubsection=\count192
+\c@paragraph=\count193
+\c@subparagraph=\count194
+\c@figure=\count195
+\c@table=\count196
 \abovecaptionskip=\skip48
 \belowcaptionskip=\skip49
 \bibindent=\dimen140
-) (/usr/share/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@headwidth=\skip50
 \f@nch@O@elh=\skip51
@@ -36,75 +37,75 @@ Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@O@erf=\skip56
 \f@nch@O@olf=\skip57
 \f@nch@O@orf=\skip58
-)) (/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
+)) (/opt/texlive/2024/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
- (/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
-\KV@toks@=\toks16
-) (/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
+\KV@toks@=\toks17
+) (/opt/texlive/2024/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
- (/usr/share/texmf-dist/tex/latex/graphics/trig.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
-) (/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+) (/opt/texlive/2024/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
- (/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+ (/opt/texlive/2024/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
 \Gin@req@height=\dimen141
 \Gin@req@width=\dimen142
-) (/usr/share/texmf-dist/tex/latex/base/latexsym.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/base/latexsym.sty
 Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 \symlasy=\mathgroup4
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 (Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
-) (/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
- (/usr/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
-\@emptytoks=\toks17
+\@emptytoks=\toks18
 \symAMSa=\mathgroup5
 \symAMSb=\mathgroup6
 LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
-)) (/usr/share/texmf-dist/tex/latex/amscls/amsthm.sty
+)) (/opt/texlive/2024/texmf-dist/tex/latex/amscls/amsthm.sty
 Package: amsthm 2020/05/29 v2.20.6
-\thm@style=\toks18
-\thm@bodyfont=\toks19
-\thm@headfont=\toks20
-\thm@notefont=\toks21
-\thm@headpunct=\toks22
+\thm@style=\toks19
+\thm@bodyfont=\toks20
+\thm@headfont=\toks21
+\thm@notefont=\toks22
+\thm@headpunct=\toks23
 \thm@preskip=\skip59
 \thm@postskip=\skip60
 \thm@headsep=\skip61
-\dth@everypar=\toks23
-) (/usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
-Package: amsmath 2022/04/08 v2.17n AMS math features
+\dth@everypar=\toks24
+) (/opt/texlive/2024/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
 \@mathmargin=\skip62
 
 For additional information on amsmath, use the `?' option.
-(/usr/share/texmf-dist/tex/latex/amsmath/amstext.sty
+(/opt/texlive/2024/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2021/08/26 v2.01 AMS text
- (/usr/share/texmf-dist/tex/latex/amsmath/amsgen.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
-\@emptytoks=\toks24
+\@emptytoks=\toks25
 \ex@=\dimen143
-)) (/usr/share/texmf-dist/tex/latex/amsmath/amsbsy.sty
+)) (/opt/texlive/2024/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen144
-) (/usr/share/texmf-dist/tex/latex/amsmath/amsopn.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count194
+\inf@bad=\count197
 LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count195
-\leftroot@=\count196
+\uproot@=\count198
+\leftroot@=\count199
 LaTeX Info: Redefining \overline on input line 399.
 LaTeX Info: Redefining \colon on input line 410.
-\classnum@=\count197
-\DOTSCASE@=\count198
+\classnum@=\count266
+\DOTSCASE@=\count267
 LaTeX Info: Redefining \ldots on input line 496.
 LaTeX Info: Redefining \dots on input line 499.
 LaTeX Info: Redefining \cdots on input line 620.
@@ -117,52 +118,52 @@ LaTeX Info: Redefining \Bigg on input line 725.
 \big@size=\dimen145
 LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count199
+\macc@depth=\count268
 LaTeX Info: Redefining \bmod on input line 905.
 LaTeX Info: Redefining \pmod on input line 910.
 LaTeX Info: Redefining \smash on input line 940.
 LaTeX Info: Redefining \relbar on input line 970.
 LaTeX Info: Redefining \Relbar on input line 971.
-\c@MaxMatrixCols=\count266
+\c@MaxMatrixCols=\count269
 \dotsspace@=\muskip16
-\c@parentequation=\count267
-\dspbrk@lvl=\count268
-\tag@help=\toks25
-\row@=\count269
-\column@=\count270
-\maxfields@=\count271
-\andhelp@=\toks26
+\c@parentequation=\count270
+\dspbrk@lvl=\count271
+\tag@help=\toks26
+\row@=\count272
+\column@=\count273
+\maxfields@=\count274
+\andhelp@=\toks27
 \eqnshift@=\dimen146
 \alignsep@=\dimen147
 \tagshift@=\dimen148
 \tagwidth@=\dimen149
 \totwidth@=\dimen150
 \lineht@=\dimen151
-\@envbody=\toks27
+\@envbody=\toks28
 \multlinegap=\skip63
 \multlinetaggap=\skip64
-\mathdisplay@stack=\toks28
+\mathdisplay@stack=\toks29
 LaTeX Info: Redefining \[ on input line 2953.
 LaTeX Info: Redefining \] on input line 2954.
-) (/usr/share/texmf-dist/tex/latex/tools/longtable.sty
-Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
+) (/opt/texlive/2024/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2023-11-01 v4.19 Multi-page Table package (DPC)
 \LTleft=\skip65
 \LTright=\skip66
 \LTpre=\skip67
 \LTpost=\skip68
-\LTchunksize=\count272
+\LTchunksize=\count275
 \LTcapwidth=\dimen152
 \LT@head=\box53
 \LT@firsthead=\box54
 \LT@foot=\box55
 \LT@lastfoot=\box56
 \LT@gbox=\box57
-\LT@cols=\count273
-\LT@rows=\count274
-\c@LT@tables=\count275
-\c@LT@chunks=\count276
-\LT@p@ftn=\toks29
-) (/usr/share/texmf-dist/tex/latex/booktabs/booktabs.sty
+\LT@cols=\count276
+\LT@rows=\count277
+\c@LT@tables=\count278
+\c@LT@chunks=\count279
+\LT@p@ftn=\toks30
+) (/opt/texlive/2024/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \heavyrulewidth=\dimen153
 \lightrulewidth=\dimen154
@@ -174,78 +175,80 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \cmidrulesep=\dimen160
 \cmidrulekern=\dimen161
 \defaultaddspace=\dimen162
-\@cmidla=\count277
-\@cmidlb=\count278
+\@cmidla=\count280
+\@cmidlb=\count281
 \@aboverulesep=\dimen163
 \@belowrulesep=\dimen164
-\@thisruleclass=\count279
-\@lastruleclass=\count280
+\@thisruleclass=\count282
+\@lastruleclass=\count283
 \@thisrulewidth=\dimen165
-) (/usr/share/texmf-dist/tex/latex/setspace/setspace.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/setspace/setspace.sty
 Package: setspace 2022/12/04 v6.7b set line spacing
 ) (./chemarr.sty
 Package: chemarr 2001/06/22 v1.1 Chemical reaction arrows (HO)
-) (/usr/share/texmf-dist/tex/latex/url/url.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
-) (/usr/share/texmf-dist/tex/latex/graphics/rotating.sty
+) (/opt/texlive/2024/texmf-dist/tex/latex/graphics/rotating.sty
 Package: rotating 2016/08/11 v2.16d rotated objects in LaTeX
- (/usr/share/texmf-dist/tex/latex/base/ifthen.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 )
-\c@r@tfl@t=\count281
+\c@r@tfl@t=\count284
 \rotFPtop=\skip69
 \rotFPbot=\skip70
 \rot@float@box=\box58
-\rot@mess@toks=\toks30
-) (/usr/share/texmf-dist/tex/latex/natbib/natbib.sty
+\rot@mess@toks=\toks31
+) (/opt/texlive/2024/texmf-dist/tex/latex/natbib/natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip71
 \bibsep=\skip72
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count282
-) (/usr/share/texmf-dist/tex/latex/listings/listings.sty
-\lst@mode=\count283
+\c@NAT@ctr=\count285
+) (/opt/texlive/2024/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count286
 \lst@gtempboxa=\box59
-\lst@token=\toks31
-\lst@length=\count284
+\lst@token=\toks32
+\lst@length=\count287
 \lst@currlwidth=\dimen166
-\lst@column=\count285
-\lst@pos=\count286
+\lst@column=\count288
+\lst@pos=\count289
 \lst@lostspace=\dimen167
 \lst@width=\dimen168
-\lst@newlines=\count287
-\lst@lineno=\count288
+\lst@newlines=\count290
+\lst@lineno=\count291
 \lst@maxwidth=\dimen169
- (/usr/share/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2023/02/27 1.9 (Carsten Heinz)
-\c@lstnumber=\count289
-\lst@skipnumbers=\count290
+ (/opt/texlive/2024/texmf-dist/tex/latex/listings/lstpatch.sty
+File: lstpatch.sty 2024/03/11 1.10a (Carsten Heinz)
+) (/opt/texlive/2024/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2024/03/11 1.10a (Carsten Heinz)
+\c@lstnumber=\count292
+\lst@skipnumbers=\count293
 \lst@framebox=\box60
-) (/usr/share/texmf-dist/tex/latex/listings/listings.cfg
-File: listings.cfg 2023/02/27 1.9 listings configuration
+) (/opt/texlive/2024/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2024/03/11 1.10a listings configuration
 ))
-Package: listings 2023/02/27 1.9 (Carsten Heinz)
+Package: listings 2024/03/11 1.10a (Carsten Heinz)
  (./listings-rust.sty
 Package: listings-rust 2018/01/23 Custom Package
- (/usr/share/texmf-dist/tex/latex/graphics/color.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/graphics/color.sty
 Package: color 2022/01/06 v1.3d Standard LaTeX Color (DPC)
- (/usr/share/texmf-dist/tex/latex/graphics-cfg/color.cfg
+ (/opt/texlive/2024/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package color Info: Driver file: pdftex.def on input line 149.
- (/usr/share/texmf-dist/tex/latex/graphics/mathcolor.ltx))) (/usr/share/texmf-dist/tex/latex/comment/comment.sty
+ (/opt/texlive/2024/texmf-dist/tex/latex/graphics/mathcolor.ltx))) (/opt/texlive/2024/texmf-dist/tex/latex/comment/comment.sty
 \CommentStream=\write3
- Excluding comment 'comment') (/usr/share/texmf-dist/tex/latex/float/float.sty
+ Excluding comment 'comment') (/opt/texlive/2024/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count291
-\float@exts=\toks32
+\c@float@type=\count294
+\float@exts=\toks33
 \float@box=\box61
-\@float@everytoks=\toks33
+\@float@everytoks=\toks34
 \@floatcapt=\box62
-) (/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-File: l3backend-pdftex.def 2023-01-16 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count292
+) (/opt/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2024-03-14 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count295
 \l__pdf_internal_box=\box63
 ) (./thesis.aux
 
@@ -268,36 +271,36 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 85.
 LaTeX Font Info:    ... okay on input line 85.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 85.
 LaTeX Font Info:    ... okay on input line 85.
- (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+ (/opt/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count293
+\scratchcounter=\count296
 \scratchdimen=\dimen170
 \scratchbox=\box64
-\nofMPsegments=\count294
-\nofMParguments=\count295
-\everyMPshowfont=\toks34
-\MPscratchCnt=\count296
+\nofMPsegments=\count297
+\nofMParguments=\count298
+\everyMPshowfont=\toks35
+\MPscratchCnt=\count299
 \MPscratchDim=\dimen171
-\MPnumerator=\count297
-\makeMPintoPDFobject=\count298
-\everyMPtoPDFconversion=\toks35
-) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+\MPnumerator=\count300
+\makeMPintoPDFobject=\count301
+\everyMPtoPDFconversion=\toks36
+) (/opt/texlive/2024/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
- (/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+ (/opt/texlive/2024/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-\c@lstlisting=\count299
+\c@lstlisting=\count302
 LaTeX Font Info:    Trying to load font information for U+lasy on input line 87.
- (/usr/share/texmf-dist/tex/latex/base/ulasy.fd
+ (/opt/texlive/2024/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
 LaTeX Font Info:    Trying to load font information for U+msa on input line 87.
- (/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
+ (/opt/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 87.
- (/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
+ (/opt/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 Non-PDF special ignored!
@@ -306,7 +309,7 @@ Non-PDF special ignored!
 <special> rawpostscript % Reed College LaTeX Thesis Class 2001/12/04 SN
 
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2
+{/opt/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
 
 ] [3] [4
 
@@ -337,16 +340,27 @@ Non-PDF special ignored!
 
 ] [11] [12
 
-] [1
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-] [2
+ [1
 
 ]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[2]
 Chapter 1.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [3]
+ [3
+
+]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -384,10 +398,10 @@ pdfTeX warning: pdflatex (file ./cpu_basic.pdf): PDF inclusion: found PDF versio
 <cpu_basic.pdf, id=82, 831.105pt x 397.485pt>
 File: cpu_basic.pdf Graphic file (type pdf)
 <use cpu_basic.pdf>
-Package pdftex.def Info: cpu_basic.pdf  used on input line 275.
+Package pdftex.def Info: cpu_basic.pdf  used on input line 278.
 (pdftex.def)             Requested size: 498.66684pt x 238.49283pt.
 
-Overfull \hbox (65.04684pt too wide) in paragraph at lines 275--276
+Overfull \hbox (65.04684pt too wide) in paragraph at lines 278--279
  [][] 
  []
 
@@ -416,7 +430,7 @@ pdfTeX warning: pdflatex (file ./wastedsteps.pdf): PDF inclusion: found PDF vers
 <wastedsteps.pdf, id=104, 722.7pt x 252.945pt>
 File: wastedsteps.pdf Graphic file (type pdf)
 <use wastedsteps.pdf>
-Package pdftex.def Info: wastedsteps.pdf  used on input line 309.
+Package pdftex.def Info: wastedsteps.pdf  used on input line 312.
 (pdftex.def)             Requested size: 433.62334pt x 151.76816pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
@@ -430,7 +444,7 @@ pdfTeX warning: pdflatex (file ./pipelinedsteps.pdf): PDF inclusion: found PDF v
 <pipelinedsteps.pdf, id=108, 722.7pt x 252.945pt>
 File: pipelinedsteps.pdf Graphic file (type pdf)
 <use pipelinedsteps.pdf>
-Package pdftex.def Info: pipelinedsteps.pdf  used on input line 328.
+Package pdftex.def Info: pipelinedsteps.pdf  used on input line 331.
 (pdftex.def)             Requested size: 433.62334pt x 151.76816pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -453,7 +467,7 @@ pdfTeX warning: pdflatex (file ./cpu_latches.pdf): PDF inclusion: found PDF vers
 <cpu_latches.pdf, id=127, 1047.915pt x 397.485pt>
 File: cpu_latches.pdf Graphic file (type pdf)
 <use cpu_latches.pdf>
-Package pdftex.def Info: cpu_latches.pdf  used on input line 353.
+Package pdftex.def Info: cpu_latches.pdf  used on input line 356.
 (pdftex.def)             Requested size: 419.15857pt x 158.99118pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -468,7 +482,7 @@ pdfTeX warning: pdflatex (file ./nopipeline.pdf): PDF inclusion: found PDF versi
 <nopipeline.pdf, id=142, 578.16pt x 216.81pt>
 File: nopipeline.pdf Graphic file (type pdf)
 <use nopipeline.pdf>
-Package pdftex.def Info: nopipeline.pdf  used on input line 398.
+Package pdftex.def Info: nopipeline.pdf  used on input line 401.
 (pdftex.def)             Requested size: 404.70924pt x 151.76596pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -483,7 +497,7 @@ pdfTeX warning: pdflatex (file ./pipeline.pdf): PDF inclusion: found PDF version
 <pipeline.pdf, id=160, 469.755pt x 216.81pt>
 File: pipeline.pdf Graphic file (type pdf)
 <use pipeline.pdf>
-Package pdftex.def Info: pipeline.pdf  used on input line 428.
+Package pdftex.def Info: pipeline.pdf  used on input line 431.
 (pdftex.def)             Requested size: 328.82626pt x 151.76596pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -498,7 +512,7 @@ pdfTeX warning: pdflatex (file ./nostall.pdf): PDF inclusion: found PDF version 
 <nostall.pdf, id=175, 368.57701pt x 180.675pt>
 File: nostall.pdf Graphic file (type pdf)
 <use nostall.pdf>
-Package pdftex.def Info: nostall.pdf  used on input line 474.
+Package pdftex.def Info: nostall.pdf  used on input line 477.
 (pdftex.def)             Requested size: 331.71623pt x 162.60599pt.
 
 
@@ -506,7 +520,7 @@ pdfTeX warning: pdflatex (file ./stall.pdf): PDF inclusion: found PDF version <1
 <stall.pdf, id=176, 469.755pt x 216.81pt>
 File: stall.pdf Graphic file (type pdf)
 <use stall.pdf>
-Package pdftex.def Info: stall.pdf  used on input line 490.
+Package pdftex.def Info: stall.pdf  used on input line 493.
 (pdftex.def)             Requested size: 422.7756pt x 195.12718pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -521,10 +535,10 @@ pdfTeX warning: pdflatex (file ./cpu_stallctl.pdf): PDF inclusion: found PDF ver
 <cpu_stallctl.pdf, id=203, 1047.915pt x 469.755pt>
 File: cpu_stallctl.pdf Graphic file (type pdf)
 <use cpu_stallctl.pdf>
-Package pdftex.def Info: cpu_stallctl.pdf  used on input line 523.
+Package pdftex.def Info: cpu_stallctl.pdf  used on input line 526.
 (pdftex.def)             Requested size: 471.55739pt x 211.3878pt.
 
-Overfull \hbox (37.9374pt too wide) in paragraph at lines 523--524
+Overfull \hbox (37.9374pt too wide) in paragraph at lines 526--527
  [][] 
  []
 
@@ -533,7 +547,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 File: nostall.pdf Graphic file (type pdf)
 <use nostall.pdf>
-Package pdftex.def Info: nostall.pdf  used on input line 545.
+Package pdftex.def Info: nostall.pdf  used on input line 548.
 (pdftex.def)             Requested size: 331.71623pt x 162.60599pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -560,10 +574,10 @@ pdfTeX warning: pdflatex (file ./forwards.pdf): PDF inclusion: found PDF version
 <forwards.pdf, id=221, 1011.78pt x 505.89pt>
 File: forwards.pdf Graphic file (type pdf)
 <use forwards.pdf>
-Package pdftex.def Info: forwards.pdf  used on input line 563.
+Package pdftex.def Info: forwards.pdf  used on input line 566.
 (pdftex.def)             Requested size: 465.42445pt x 232.71222pt.
 
-Overfull \hbox (31.80446pt too wide) in paragraph at lines 563--564
+Overfull \hbox (31.80446pt too wide) in paragraph at lines 566--567
  [][] 
  []
 
@@ -595,10 +609,10 @@ pdfTeX warning: pdflatex (file ./cpu_complete.pdf): PDF inclusion: found PDF ver
 <cpu_complete.pdf, id=240, 1264.725pt x 542.025pt>
 File: cpu_complete.pdf Graphic file (type pdf)
 <use cpu_complete.pdf>
-Package pdftex.def Info: cpu_complete.pdf  used on input line 597.
+Package pdftex.def Info: cpu_complete.pdf  used on input line 600.
 (pdftex.def)             Requested size: 505.88104pt x 216.80615pt.
 
-Overfull \hbox (72.26105pt too wide) in paragraph at lines 597--598
+Overfull \hbox (72.26105pt too wide) in paragraph at lines 600--601
  [][] 
  []
 
@@ -627,15 +641,15 @@ pdfTeX warning: pdflatex (file ./cpu_color.pdf): PDF inclusion: found PDF versio
 <cpu_color.pdf, id=261, 1264.725pt x 542.025pt>
 File: cpu_color.pdf Graphic file (type pdf)
 <use cpu_color.pdf>
-Package pdftex.def Info: cpu_color.pdf  used on input line 645.
+Package pdftex.def Info: cpu_color.pdf  used on input line 648.
 (pdftex.def)             Requested size: 505.88104pt x 216.80615pt.
 
-Overfull \hbox (72.26105pt too wide) in paragraph at lines 645--646
+Overfull \hbox (72.26105pt too wide) in paragraph at lines 648--649
  [][] 
  []
 
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 654.
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 657.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -644,7 +658,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [25 <./cpu_color.pdf>]
-Overfull \hbox (48.03024pt too wide) in paragraph at lines 676--677
+Overfull \hbox (48.03024pt too wide) in paragraph at lines 679--680
 [][][][][][][][][][][][][][][][][][][][][][] 
  []
 
@@ -683,12 +697,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [29]
-Overfull \hbox (48.03024pt too wide) in paragraph at lines 790--791
+Overfull \hbox (48.03024pt too wide) in paragraph at lines 793--794
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (29.50523pt too wide) in paragraph at lines 793--794
+Overfull \hbox (29.50523pt too wide) in paragraph at lines 796--797
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
@@ -715,10 +729,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <simulator_screenshot.png, id=297, 1419.704pt x 728.25923pt>
 File: simulator_screenshot.png Graphic file (type png)
 <use simulator_screenshot.png>
-Package pdftex.def Info: simulator_screenshot.png  used on input line 854.
+Package pdftex.def Info: simulator_screenshot.png  used on input line 857.
 (pdftex.def)             Requested size: 496.90385pt x 254.89455pt.
 
-Overfull \hbox (63.28386pt too wide) in paragraph at lines 854--855
+Overfull \hbox (63.28386pt too wide) in paragraph at lines 857--858
  [][] 
  []
 
@@ -793,20 +807,25 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 
 ] (./thesis.aux)
+ ***********
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-03-14>
+ ***********
+
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6941 strings out of 477985
- 99446 string characters out of 5840059
- 1893388 words of memory out of 5000000
- 27042 multiletter control sequences out of 15000+600000
- 522427 words of font info for 75 fonts, out of 8000000 for 9000
- 14 hyphenation exceptions out of 8191
- 57i,12n,69p,7966b,2757s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on thesis.pdf (57 pages, 1371698 bytes).
+ 6905 strings out of 474104
+ 97866 string characters out of 5719832
+ 1969493 words of memory out of 5000000
+ 29179 multiletter control sequences out of 15000+600000
+ 568209 words of font info for 79 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 57i,12n,69p,7970b,2760s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on thesis.pdf (57 pages, 1372291 bytes).
 PDF statistics:
  387 PDF objects out of 1000 (max. 8388607)
  243 compressed objects within 3 object streams
