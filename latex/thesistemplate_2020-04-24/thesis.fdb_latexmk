@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex thesis"] 1714069155.28229 "thesis.aux" "thesis.bbl" "thesis" 1714070145.75065 0
+["bibtex thesis"] 1714073188.84512 "thesis.aux" "thesis.bbl" "thesis" 1714073553.76551 0
   "./APA/apa-good.bst" 1709498026.60253 29521 681759d6fea01a76087da65eae747ed5 ""
   "./thesis.bib" 1713995024.7436 1722 a59aedc4fbda023acc3d68b3be1d0a25 ""
-  "thesis.aux" 1714070145.19991 7443 0b702a12e266893f52ffe80ea76df0ab "pdflatex"
+  "thesis.aux" 1714073553.33808 7443 718918ac6f8fa024f0053bf43231a1af "pdflatex"
   (generated)
   "thesis.bbl"
   "thesis.blg"
   (rewritten before read)
-["pdflatex"] 1714070141.16656 "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" "thesis.pdf" "thesis" 1714070145.75098 0
-  "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" 1714070140.9333 126547 2b61632d1841d8b67d4dcc9ccd18b5f6 ""
+["pdflatex"] 1714073549.3032 "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" "thesis.pdf" "thesis" 1714073553.76576 0
+  "/home/ralsei/Documents/SCHOOL/spring2024/riscv-psim/latex/thesistemplate_2020-04-24/thesis.tex" 1714073549.05475 127354 22c7bbbef4c43a6130b4df7c4c062d36 ""
   "/opt/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1713041416 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1713041416 1004 54797486969f23fa377b128694d548df ""
   "/opt/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1713041416 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -111,12 +111,12 @@
   "reedthesis.cls" 1709498026.60586 8293 480a01b2533a1585368760477c470aa0 ""
   "simulator_screenshot.png" 1713978190.75911 1283103 cd67800c72a8618b2f0d95a439554fb3 ""
   "stall.pdf" 1713978190.75911 24769 ad35f31d4a8452f66aaf256d4f35d06a ""
-  "thesis.aux" 1714070145.19991 7443 0b702a12e266893f52ffe80ea76df0ab "pdflatex"
-  "thesis.bbl" 1714069155.50343 1629 cf3046fcc44ce4c54ad1e3afc50317a1 "bibtex thesis"
-  "thesis.lof" 1714070145.20324 1599 c4da1f4d1f691e3eb78328f0b88c54a4 "pdflatex"
-  "thesis.lot" 1714070145.20324 60 35b3ba4c48b0bf046560cd0a3baa68f3 "pdflatex"
-  "thesis.tex" 1714070140.9333 126547 2b61632d1841d8b67d4dcc9ccd18b5f6 ""
-  "thesis.toc" 1714070145.20324 2180 33d9bdfc0824fce75babdefebaa54862 "pdflatex"
+  "thesis.aux" 1714073553.33808 7443 718918ac6f8fa024f0053bf43231a1af "pdflatex"
+  "thesis.bbl" 1714073189.07146 1629 cf3046fcc44ce4c54ad1e3afc50317a1 "bibtex thesis"
+  "thesis.lof" 1714073553.33808 1600 abe829af3dedf6bcdf139c9288b7ebdc "pdflatex"
+  "thesis.lot" 1714073553.33808 60 35b3ba4c48b0bf046560cd0a3baa68f3 "pdflatex"
+  "thesis.tex" 1714073549.05475 127354 22c7bbbef4c43a6130b4df7c4c062d36 ""
+  "thesis.toc" 1714073553.33808 2179 b3950d1870a0cebb6405259e6eb378e3 "pdflatex"
   "wastedsteps.pdf" 1713978190.78244 20311 90f8097803086ef222215b7ae9ce4129 ""
   (generated)
   "thesis.aux"
