@@ -104,7 +104,7 @@ I would also like to thank my parents, Gisela and Gabriel, for their uncondition
 
 
 \chapter*{List of Abbreviations}
-You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
+%You can always change the way your abbreviations are formatted. Play around with it yourself, use tables, or come to CUS if you'd like to change the way it looks. You can also completely remove this chapter if you have no need for a list of abbreviations. Here is an example of what this could look like:
 
 \begin{table}[h]
 	\centering % You could remove this to move table to the left
@@ -115,7 +115,7 @@ You can always change the way your abbreviations are formatted. Play around with
 		\textbf{GUI}    & Graphical User Interface                   \\
 		\textbf{ISA}    & Instruction Set Architecture               \\
 		\textbf{RISC}   & Reduced Instruction Set Computer           \\
-		\textbf{RISC-V} & Reduced Instruction Set Computer Five      \\
+		\textbf{RISC-V} & The RISC-V Instruction Set Architecture    \\
 		\textbf{RV32I}  & RISC-V 32-bit Base Integer Instruction Set \\
 	\end{tabular}
 \end{table}
@@ -130,9 +130,12 @@ You can always change the way your abbreviations are formatted. Play around with
 % The abstract is not required if you're writing a creative thesis (but aren't they all?)
 % If your abstract is longer than a page, there may be a formatting issue.
 \chapter*{Abstract}
-Computer Systems is a critical field of computer science, but it can also have a rather harsh introduction for undergraduate students. Many of them go into introductory Computer System courses with little to no experience in lower-level programming languages, nevermind any assembly, and while one can learn well enough how a computer microprocessor functions over the first few weeks, it may be quite a while until they grow familiar with the way informations flows through a chip to make the execution of computer programs possible.
+Computer Systems is a critical field of computer science, but it can also have a rather harsh introduction for undergraduate students. Many of them go into introductory Computer Systems courses with little to no experience in lower-level programming languages, nevermind any assembly; and while one can learn well enough how a computer microprocessor functions over the first few weeks, it may take quite some time for them to grow familiar with the topic. This is especially true for trying to learn how information flows through a chip to make the execution of computer programs possible.
 
-In order to help such students gain a more intuitive understanding of CPUs as they are taught in introductory Computer Systems courses, I have developed a CPU simulator made explicitly for educational purposes. The simulator focuses on simplicity, ease-of-use, and transparency: Its primary goal is not to execute assembly-code programs, but rather to cleanly display its own internal state while doing so and be easy to interact with. It gives potential users the opportunity to not only write and run their own low-level assembly code programs, but to then also watch them in action; or, is a user is interested in a particular feature of CPUs, they can see how that feature is used in a variety of different scenarios. The goal of the simulate is not to teach how a CPU works on its own, per se, but rather to function as an interactive tool that can supplement existing instruction.
+In order to help such students gain a more intuitive understanding of CPUs as they are taught in introductory Computer Systems courses, I have developed a CPU simulator made explicitly for educational purposes.
+The simulator focuses on simplicity, ease-of-use, and transparency. Its primary goal is not to obtain the results of running assembly programs, but rather to cleanly display its own internal state while doing so and be easy to interact with.
+It gives potential users the opportunity to not only write and run their own low-level assembly code programs, but to then also watch them in action; or, if a user is interested in a particular feature of CPUs, they can see how that feature is used in a variety of different scenarios. The simulator is not meant to teach how a CPU works on its own, but rather to function as an interactive tool that can supplement existing instruction.
+Simple CPU simulators, such as SPIM MIPS, are already in use throughout college classrooms for this sort of purpose, but they are largely concerned
 
 %\chapter*{Dedication}
 %You can have a dedication here if you wish.
