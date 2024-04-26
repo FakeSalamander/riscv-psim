@@ -6,17 +6,17 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1.1}An abstract view of how a CPU functions}{3}{}\protected@file@percent }
 \citation{waterman}
 \@writefile{toc}{\contentsline {section}{\numberline {1.2}What is an ISA?}{4}{}\protected@file@percent }
-\citation{denning}
 \@writefile{toc}{\contentsline {section}{\numberline {1.3}Why RISC-V?}{5}{}\protected@file@percent }
+\citation{denning}
 \citation{waterman}
 \citation{msyksphinz}
 \@writefile{toc}{\contentsline {section}{\numberline {1.4}RISC-V Instructions}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {1.5}RISC-V Hardware Specifications}{7}{}\protected@file@percent }
 \citation{waterman}
 \citation{waterman}
-\@writefile{toc}{\contentsline {section}{\numberline {1.6}A more detailed look of how a CPU functions}{8}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1.1}{\ignorespaces Basic CPU Design.}}{8}{}\protected@file@percent }
-\newlabel{cpu-basic}{{1.1}{8}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1.6}A more detailed look at how a CPU functions}{9}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1.1}{\ignorespaces Basic CPU Design.}}{9}{}\protected@file@percent }
+\newlabel{cpu-basic}{{1.1}{9}}
 \citation{denning}
 \@writefile{toc}{\contentsline {chapter}{Chapter 2: CPU Design}{11}{}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
@@ -27,40 +27,40 @@
 \citation{kanter1}
 \citation{kanter2}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces Program execution over time.}}{12}{}\protected@file@percent }
-\newlabel{wasted-steps}{{2.1}{12}{}{}{}}
+\newlabel{wasted-steps}{{2.1}{12}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces Program execution over time, with pipelining.}}{12}{}\protected@file@percent }
-\newlabel{pipelined-steps}{{2.2}{12}{}{}{}}
+\newlabel{pipelined-steps}{{2.2}{12}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}The Backbone of Pipelining: Latches}{13}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces CPU with Pipelining Latches.}}{14}{}\protected@file@percent }
-\newlabel{cpu-latches}{{2.3}{14}{}{}{}}
+\newlabel{cpu-latches}{{2.3}{14}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Data Hazards}{15}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces Program execution without pipelining.}}{15}{}\protected@file@percent }
-\newlabel{no-pipeline}{{2.4}{15}{}{}{}}
+\newlabel{no-pipeline}{{2.4}{15}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Program execution with pipelining.}}{16}{}\protected@file@percent }
-\newlabel{pipeline}{{2.5}{16}{}{}{}}
+\newlabel{pipeline}{{2.5}{16}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Stalling}{17}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces Program execution wtih no Stalling. Data Hazard occurs.}}{17}{}\protected@file@percent }
-\newlabel{no-stall}{{2.6}{17}{}{}{}}
+\newlabel{no-stall}{{2.6}{17}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Program execution with Stalling. No Data Hazard.}}{17}{}\protected@file@percent }
-\newlabel{stall}{{2.7}{17}{}{}{}}
+\newlabel{stall}{{2.7}{17}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.8}{\ignorespaces CPU Design with stall control.}}{19}{}\protected@file@percent }
-\newlabel{stall-ctl}{{2.8}{19}{}{}{}}
+\newlabel{stall-ctl}{{2.8}{19}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Forwarding}{19}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2.9}{\ignorespaces Program execution without Stalling}}{19}{}\protected@file@percent }
-\newlabel{no-stall}{{2.9}{19}{}{}{}}
+\newlabel{no-stall}{{2.9}{19}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.10}{\ignorespaces The three major types of forwarding.}}{20}{}\protected@file@percent }
-\newlabel{fwd-types}{{2.10}{20}{}{}{}}
+\newlabel{fwd-types}{{2.10}{20}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.5}Control Hazards}{21}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2.2}Final CPU Design}{22}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {2.11}{\ignorespaces Final CPU Design.}}{22}{}\protected@file@percent }
-\newlabel{cpu-complete}{{2.11}{22}{}{}{}}
+\newlabel{cpu-complete}{{2.11}{22}}
 \@writefile{toc}{\contentsline {chapter}{Chapter 3: Simulator Design}{23}{}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.0.1}First Draft}{23}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.0.2}Final design}{24}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces color-coded CPU design. Red is for data stored in the State struct, Blue is for data in the Logic struct. Multiplexors are definitionally stateless, and are all in the Logic struct.}}{25}{}\protected@file@percent }
-\newlabel{cpu-color}{{3.1}{25}{}{}{}}
+\newlabel{cpu-color}{{3.1}{25}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {3.1}Barebones layout of $components.rs$}{25}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.0.3}Structs and Sub-Structs}{26}{}\protected@file@percent }
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {3.2}Snippet of $components.rs$, holds main 2 structs}{26}{}\protected@file@percent }
@@ -71,7 +71,7 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Implementation of User Input and Rewinding}{31}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Graphical User Interface}{32}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces The Simulator's command-line-based GUI.}}{32}{}\protected@file@percent }
-\newlabel{simulator}{{3.2}{32}{}{}{}}
+\newlabel{simulator}{{3.2}{32}}
 \@writefile{toc}{\contentsline {chapter}{Conclusion}{35}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4.1}Future Extensions}{35}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Data Memory}{35}{}\protected@file@percent }
