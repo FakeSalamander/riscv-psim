@@ -43,18 +43,30 @@
 %\usepackage{biblatex-chicago}
 %\bibliography{thesis}
 
+%My own packages and setups are included below
 
 %package used to write code snippets in rust.
 \usepackage{listings, listings-rust}
 \usepackage{comment}
 \usepackage{float}
-
 \lstset{
   language=Rust,
   style=colouredRust,
 }
+%renaming the "Listings" to match the List of Figures
 \renewcommand\lstlistingname{List of Listings}
 \renewcommand\lstlistlistingname{List of Listings}
+%hyperlink setup
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+	urlcolor=blue,
+	filecolor=blue,
+	citecolor=black,
+    pdftitle={Hands-On Experience: A Pedagogical RISC-V Simulator},
+    pdfpagemode=FullScreen,
+    }
 
 % \usepackage{times} % other fonts are available like times, bookman, charter, palatino
 
@@ -567,7 +579,7 @@ The Stall Control has all latches set to "Transfer" during normal operation. How
 
 	\centering
 	% DO NOT ADD A FILENAME EXTENSION TO THE GRAPHIC FILE
-	\includegraphics[scale=0.45]{cpu_stallctl}
+	\includegraphics[scale=0.36]{cpu_stallctl}
 	\caption{CPU Design with stall control.}
 	\label{stall-ctl}
 \end{figure}
@@ -982,7 +994,10 @@ I also learned that, as far as actually storing this information, simpler is bet
 
 \section{Closing Thoughts}
 
-All in all, I am rather proud of what I've ended up building: A simple, tightly-focused RISC-V simulator that, while lacking in the fancier features of its contemporaries, has enough of a graphical interface to function as an educational tool. There's even something of a hidden silver lining in the project's eventual simplicity: While a simulator like RIPES is meant to be powerful and convenient for the end-user, a more bare-bones commandline program is much easier for an interested undergraduate student to take apart and build on top of. I hope that I have laid down a foundation for what could one day be a polished enough program to potentially see use in a classroom; though even if it simply ends up that a handful of individuals clone its repository to mess around with my code, its purpose will have been accomplished all the same.
+All in all, I am rather proud of what I've ended up building: A simple, tightly-focused RISC-V simulator that, while lacking in the fancier features of its contemporaries, has enough of a graphical interface to function as an educational tool.
+The simulator is now freely available at \href{https://github.com/FakeSalamander/riscv-psim}{https://github.com/FakeSalamander/riscv-psim}, and can be compiled and ran on any modern computer with a functioning Rust setup.
+
+There's even something of a hidden silver lining in the project's eventual simplicity: While a simulator like RIPES is meant to be powerful and convenient for the end-user, a more bare-bones commandline program is much easier for an interested undergraduate student to take apart and build on top of. I hope that I have laid down a foundation for what could one day be a polished enough program to potentially see use in a classroom; though even if it simply ends up that a handful of individuals clone its repository to mess around with my code, its purpose will have been accomplished all the same.
 
 
 

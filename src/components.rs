@@ -322,12 +322,14 @@ impl Logic {
             self.execute.formux_r2 = state.idex.r2_data;
         } else {
             // Forwarding might be needed. Check RD index of instructions further along.
+            println!("r2:{}  rd:{}", state.idex.r2_index, state.memwb.rd_index);
             if state.idex.r2_index == state.exmem.rd_index {
                 //need to EX-EX forward!
                 self.execute.r2_forwarded = 1;
                 self.execute.formux_r2 = state.exmem.alu_output;
             } else if state.idex.r2_index == state.memwb.rd_index {
                 //need to MEM-EX forward!
+                println!("yes!");
                 self.execute.r2_forwarded = 2;
                 self.execute.formux_r2 = state.memwb.alu_output;
             } else {
@@ -368,13 +370,13 @@ impl Logic {
 
         // Checks based off the 3bit funct3-code and R1 & R2, if the instruction is a Branch, whether a branch happens or not.
         self.execute.branch_taken = match state.idex.funct3 {
-            0b000 => state.idex.r1_data == state.idex.r2_data, //BEQ
-            0b001 => state.idex.r1_data != state.idex.r2_data, //BNE
-            0b100 => (state.idex.r1_data as i32) < (state.idex.r2_data as i32), //BLT
-            0b101 => (state.idex.r1_data as i32) > (state.idex.r2_data as i32), //BGE
-            0b110 => state.idex.r1_data < state.idex.r2_data,  //BLTU
-            0b111 => state.idex.r1_data > state.idex.r2_data,  //BGEU
-            _ => false,                                        //not a branching instruction.
+            0b000 => self.execute.formux_r1 == self.execute.formux_r2, //BEQ
+            0b001 => self.execute.formux_r1 != self.execute.formux_r2, //BNE
+            0b100 => (self.execute.formux_r1 as i32) < (self.execute.formux_r2 as i32), //BLT
+            0b101 => (self.execute.formux_r1 as i32) > (self.execute.formux_r2 as i32), //BGE
+            0b110 => self.execute.formux_r1 < self.execute.formux_r2,  //BLTU
+            0b111 => self.execute.formux_r1 > self.execute.formux_r2,  //BGEU
+            _ => false, //not a branching instruction.
         };
 
         if state.idex.opcode != 0b1100011 {
