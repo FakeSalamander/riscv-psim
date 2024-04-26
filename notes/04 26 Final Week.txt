@@ -1,0 +1,5 @@
+ - Add Superscalar
+
+ - Check with strangely-named refrerence on Charlie
+ 
+ - Copyleft License
