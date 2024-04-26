@@ -13,5 +13,5 @@
 \contentsline {figure}{\numberline {2.10}{\ignorespaces The three major types of forwarding.}}{20}{}%
 \contentsline {figure}{\numberline {2.11}{\ignorespaces Final CPU Design.}}{22}{}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces color-coded CPU design. Red is for data stored in the State struct, Blue is for data in the Logic struct. Multiplexors are definitionally stateless, and are all in the Logic struct.}}{25}{}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Color-coded CPU design. Red is for data stored in the State struct, Blue is for data in the Logic struct. Multiplexors are definitionally stateless, and are all in the Logic struct.}}{25}{}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces The Simulator's command-line-based GUI.}}{32}{}%
