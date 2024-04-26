@@ -9,6 +9,8 @@ IMPLEMENTED:
 
     
 TO IMPLEMENT:
+    - Open Source License
+
     - Data Memory Display
 
     - LOAD-ALU bug-fix
