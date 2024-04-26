@@ -322,14 +322,14 @@ impl Logic {
             self.execute.formux_r2 = state.idex.r2_data;
         } else {
             // Forwarding might be needed. Check RD index of instructions further along.
-            println!("r2:{}  rd:{}", state.idex.r2_index, state.memwb.rd_index);
+            //println!("r2:{}  rd:{}", state.idex.r2_index, state.memwb.rd_index);
             if state.idex.r2_index == state.exmem.rd_index {
                 //need to EX-EX forward!
                 self.execute.r2_forwarded = 1;
                 self.execute.formux_r2 = state.exmem.alu_output;
             } else if state.idex.r2_index == state.memwb.rd_index {
                 //need to MEM-EX forward!
-                println!("yes!");
+                //println!("yes!");
                 self.execute.r2_forwarded = 2;
                 self.execute.formux_r2 = state.memwb.alu_output;
             } else {
