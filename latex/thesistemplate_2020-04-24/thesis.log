@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.13)  2 MAY 2024 20:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.13)  2 MAY 2024 20:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -778,9 +778,9 @@ pdfTeX warning: pdflatex (file ./cpu_color.pdf): PDF inclusion: found PDF versio
 File: cpu_color.pdf Graphic file (type pdf)
 <use cpu_color.pdf>
 Package pdftex.def Info: cpu_color.pdf  used on input line 707.
-(pdftex.def)             Requested size: 505.88104pt x 216.80615pt.
+(pdftex.def)             Requested size: 442.66039pt x 189.71158pt.
 
-Overfull \hbox (72.26105pt too wide) in paragraph at lines 707--708
+Overfull \hbox (9.04039pt too wide) in paragraph at lines 707--708
  [][] 
  []
 
@@ -844,6 +844,10 @@ Overfull \hbox (29.50523pt too wide) in paragraph at lines 855--856
  []
 
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
@@ -863,12 +867,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 File: simulator_screenshot.png Graphic file (type png)
 <use simulator_screenshot.png>
 Package pdftex.def Info: simulator_screenshot.png  used on input line 916.
-(pdftex.def)             Requested size: 496.90385pt x 254.89455pt.
-
-Overfull \hbox (63.28386pt too wide) in paragraph at lines 916--917
- [][] 
- []
-
+(pdftex.def)             Requested size: 425.91449pt x 218.47945pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -951,13 +950,13 @@ Package rerunfilecheck Info: File `thesis.out' has not changed.
 Here is how much of TeX's memory you used:
  14086 strings out of 474104
  207658 string characters out of 5719832
- 1972493 words of memory out of 5000000
+ 1971493 words of memory out of 5000000
  35991 multiletter control sequences out of 15000+600000
  568209 words of font info for 79 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,12n,79p,7970b,3002s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></opt/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on thesis.pdf (57 pages, 1378982 bytes).
+Output written on thesis.pdf (57 pages, 1379041 bytes).
 PDF statistics:
  909 PDF objects out of 1000 (max. 8388607)
  762 compressed objects within 8 object streams
