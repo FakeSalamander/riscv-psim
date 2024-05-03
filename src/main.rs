@@ -117,12 +117,12 @@ fn run_program(state: &mut Registers, logic: &mut Logic, interactive: bool) {
             }
         } else if user_input == "b\n" {
             //load backup, go one step back!!
-            if step_count == 0 {
+            if step_count == 1 {
                 println!("Can't go back any further!");
             } else {
                 step_count -= 1;
-                *state = backups[step_count].state.clone();
-                *logic = backups[step_count].logic.clone();
+                *state = backups[step_count - 1].state.clone();
+                *logic = backups[step_count - 1].logic.clone();
             }
         }
     }

@@ -1,0 +1,30 @@
+- Introduction
+    - shwo the Problem and my Motivations
+
+    -
+
+- CPU Background
+    - Go over the important pieces
+
+    - dont talk as much about the ISAs
+
+
+- Simulator Design
+    - Show the components.rs listing
+        - talk thru it
+
+    - my features
+
+- Show off simulator
+    - just run 12821.txt, focus on the features
+
+
+- Takeaways
+    - Talk about failed design IF have time
+
+    - Lessons learedn
+
+    - Future extension
+
+
+- Can mention ISAs at end if i have time
